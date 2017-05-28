@@ -1,0 +1,5 @@
+build*
+xcode*
+.DS_Store
+.idea
+cmake-build-*
