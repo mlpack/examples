@@ -183,6 +183,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 # Recurse into each model.
 set(DIRS
   # Model directory.
+  augmented_lstm_baseline
 )
 
 foreach(dir ${DIRS})
