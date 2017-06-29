@@ -217,7 +217,7 @@ void RunAddTask(size_t bitLen,
   // TODO Maybe take it to AddTask?
   for (size_t i = 0; i < samples; ++i) {
     trainPredictor.at(i).reshape(trainPredictor.at(i).n_elem, 1);
-    trainResponse.at(i).reshape(trainResponse.at(i).n_elem, 1);
+    trainResponse.at(i).reshape(trainPredictor.at(i).n_elem, 1);
   }
 
   Log::Info << "Generated " << samples << " training samples.\n";
@@ -235,7 +235,7 @@ void RunAddTask(size_t bitLen,
   // TODO Maybe take it to AddTask?
   for (size_t i = 0; i < samples; ++i) {
     testPredictor.at(i).reshape(testPredictor.at(i).n_elem, 1);
-    testResponse.at(i).reshape(testResponse.at(i).n_elem, 1);
+    testResponse.at(i).reshape(testPredictor.at(i).n_elem, 1);
   }
   
   Log::Info << "Generated " << samples << " evaluation samples.\n";
@@ -254,9 +254,9 @@ void RunAddTask(size_t bitLen,
     for (size_t example = 0; example < trainPredictor.n_elem; ++example) {
       arma::mat predictor = trainPredictor.at(example);
       arma::mat response = trainResponse.at(example);
-      std::cerr  << "Sample #" << example+1 << "\n";
+      /*std::cerr  << "Sample #" << example+1 << "\n";
       std::cerr  << "Input sequence:\n" << predictor.t();
-      std::cerr  << "Ground truth sequence:\n" << response.t();
+      std::cerr  << "Ground truth sequence:\n" << response.t();*/
       model.Rho() = predictor.n_elem / inputSize;
       model.Train(predictor, response, opt);
     }
@@ -295,6 +295,9 @@ void RunAddTask(size_t bitLen,
     Log::Debug << testResponse.at(example).t();
   }
   Log::Info << "Final score: "
+            << SequencePrecision<arma::mat>(testResponse, modelOutput)
+            << "\n";
+  std::cerr << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
 }
