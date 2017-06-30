@@ -138,6 +138,8 @@ void RunCopyTask(size_t maxLen,
     }
     Log::Debug << "Finished running training epoch #"
                << epoch+1 << "\n";
+    std::cerr  << "Finished running training epoch #"
+               << epoch+1 << "\n";
   }
   Log::Info << "Finished training loop.\n";
 
@@ -174,6 +176,9 @@ void RunCopyTask(size_t maxLen,
     Log::Debug << testResponse.at(example).t();
   }
   Log::Info << "Final score: "
+            << SequencePrecision<arma::mat>(testResponse, modelOutput)
+            << "\n";
+  std::cout << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
 }
@@ -297,7 +302,7 @@ void RunAddTask(size_t bitLen,
   Log::Info << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
-  std::cerr << "Final score: "
+  std::cout << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
 }
@@ -422,15 +427,13 @@ void RunSortTask(size_t maxLen,
   Log::Info << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
-  std::cerr << "Final score: "
+  std::cout << "Final score: "
             << SequencePrecision<arma::mat>(testResponse, modelOutput)
             << "\n";
 }
 
 int main(int argc, char** argv)
 {
-
-
   // Parse command line options.
   CLI::ParseCommandLine(argc, argv);
 
