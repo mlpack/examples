@@ -71,6 +71,28 @@ PARAM_INT_IN("bit_length", "Maximum length of sequence elements in binary repres
 PARAM_INT_IN("epochs", "Learning epochs.", "i", 25);
 PARAM_INT_IN("samples", "Sample size used for fitting and evaluating the model.", "s", 64);
 
+// Generate the LSTM model for benchmarking.
+// NOTE: it's the same model for all tasks.
+RNN<MeanSquaredError<> > GenerateModel(size_t inputSize,
+                                       size_t outputSize,
+                                       size_t maxRho) {
+  RNN<MeanSquaredError<> > model(2);
+
+  model.Add<IdentityLayer<> >();
+  model.Add<Linear<> >(inputSize, 40);
+  model.Add<LeakyReLU<> >();
+  model.Add<LSTM<> >(40, 30, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<LSTM<> >(30, 30, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<LSTM<> >(30, 20, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<Linear<> >(20, outputSize);
+  model.Add<SigmoidLayer<> >();
+
+  return model;
+}
+
 //! Run CopyTask on the specified sequence length and repeat count.
 void RunCopyTask(size_t maxLen,
                  size_t nRepeats,
@@ -82,18 +104,10 @@ void RunCopyTask(size_t maxLen,
 
   const size_t outputSize = 1;
   const size_t inputSize = 2;
-  const size_t rho = 2;
   size_t maxRho = inputSize * (nRepeats + 1) * maxLen + 1;
 
   // Creating a baseline model.
-  RNN<MeanSquaredError<> > model(rho);
-
-  model.Add<IdentityLayer<> >();
-  model.Add<Linear<> >(inputSize, 30);
-  model.Add<LSTM<> >(30, 15, maxRho);
-  model.Add<LeakyReLU<> >();
-  model.Add<Linear<> >(15, outputSize);
-  model.Add<SigmoidLayer<> >();
+  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
 
   Adam<decltype(model)> opt(model);
 
@@ -193,20 +207,10 @@ void RunAddTask(size_t bitLen,
 
   const size_t outputSize = 3;
   const size_t inputSize = 3;
-  const size_t rho = 2;
   size_t maxRho = inputSize * (bitLen + 1) + 1;
 
   // Creating a baseline model.
-  RNN<MeanSquaredError<> > model(rho);
-
-  model.Add<IdentityLayer<> >();
-  model.Add<Linear<> >(inputSize, 50);
-  model.Add<LSTM<> >(50, 30, maxRho);
-  model.Add<LeakyReLU<> >();
-  model.Add<LSTM<> >(30, 15, maxRho);
-  model.Add<LeakyReLU<> >();
-  model.Add<Linear<> >(15, outputSize);
-  model.Add<SigmoidLayer<> >();
+  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
 
   Adam<decltype(model)> opt(model);
 
@@ -318,20 +322,10 @@ void RunSortTask(size_t maxLen,
 
   size_t outputSize = bitLen;
   size_t inputSize = bitLen;
-  const size_t rho = 2;
   size_t maxRho = inputSize * (bitLen + 1) + 1;
 
   // Creating a baseline model.
-  RNN<MeanSquaredError<> > model(rho);
-
-  model.Add<IdentityLayer<> >();
-  model.Add<Linear<> >(inputSize, 50);
-  model.Add<LSTM<> >(50, 30, maxRho);
-  model.Add<LeakyReLU<> >();
-  model.Add<LSTM<> >(30, 15, maxRho);
-  model.Add<LeakyReLU<> >();
-  model.Add<Linear<> >(15, outputSize);
-  model.Add<SigmoidLayer<> >();
+  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
 
   Adam<decltype(model)> opt(model);
 
