@@ -9,8 +9,6 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <iostream>
-
 #include <mlpack/prereqs.hpp>
 #include <mlpack/core/util/cli.hpp>
 #include <mlpack/core/math/random.hpp>
@@ -298,8 +296,7 @@ void RunAddTask(size_t bitLen,
 void RunSortTask(size_t maxLen,
                  size_t bitLen,
                  size_t epochs,
-                 size_t samples)
-{
+                 size_t samples) {
   Log::Info << "Running sort task benchmark for maxLen = "
             << maxLen << "\n, bitLen = " << bitLen << "\n";
 
@@ -415,98 +412,82 @@ int main(int argc, char** argv)
 
   string task = CLI::GetParam<string>("task");
   if (task == "copy") {
-    bool okParams = true;
     int repeats = CLI::GetParam<int>("repeats");
     if (repeats <= 0) {
       Log::Fatal << "Invalid value for 'repeats': "
                  << "expecting a positive number, received "
                  << repeats << "\n";
-      okParams = false;
     }
     int maxLen = CLI::GetParam<int>("length");
     if (maxLen <= 0) {
       Log::Fatal << "Invalid value for 'length': "
                  << "expecting a positive number, received "
                  << maxLen << "\n";
-      okParams = false;
     }
     int epochs = CLI::GetParam<int>("epochs");
     if (repeats <= 0) {
       Log::Fatal << "Invalid value for 'epochs': "
                  << "expecting a positive number, received "
                  << repeats << "\n";
-      okParams = false;
     }
     int samples = CLI::GetParam<int>("samples");
     if (samples <= 0) {
       Log::Fatal << "Invalid value for 'samples': "
                  << "expecting a positive number, received "
                  << samples << "\n";
-      okParams = false;
     }
-    if (okParams)
-      RunCopyTask(maxLen, repeats, epochs, samples);
+    RunCopyTask(maxLen, repeats, epochs, samples);
   }
   else if (task == "add") {
-    bool okParams = true;
     int bitLen = CLI::GetParam<int>("bit_length");
     if (bitLen <= 0) {
       Log::Fatal << "Invalid value for 'bit_length': "
                  << "expecting a positive number, received "
                  << bitLen << "\n";
-      okParams = false;
     }
     int epochs = CLI::GetParam<int>("epochs");
     if (epochs <= 0) {
       Log::Fatal << "Invalid value for 'epochs': "
                  << "expecting a positive number, received "
                  << epochs << "\n";
-      okParams = false;
     }
     int samples = CLI::GetParam<int>("samples");
     if (samples <= 0) {
       Log::Fatal << "Invalid value for 'samples': "
                  << "expecting a positive number, received "
                  << samples << "\n";
-      okParams = false;
     }
-    if (okParams)
-      RunAddTask(bitLen, epochs, samples);
+    RunAddTask(bitLen, epochs, samples);
   }
   else if (task == "sort") {
-    bool okParams = true;
     int bitLen = CLI::GetParam<int>("bit_length");
     if (bitLen <= 0) {
       Log::Fatal << "Invalid value for 'bit_length': "
                  << "expecting a positive number, received "
                  << bitLen << "\n";
-      okParams = false;
     }
     int maxLen = CLI::GetParam<int>("length");
     if (maxLen <= 0) {
       Log::Fatal << "Invalid value for 'length': "
                  << "expecting a positive number, received "
                  << bitLen << "\n";
-      okParams = false;
     }
     int epochs = CLI::GetParam<int>("epochs");
     if (epochs <= 0) {
       Log::Fatal << "Invalid value for 'epochs': "
                  << "expecting a positive number, received "
                  << epochs << "\n";
-      okParams = false;
     }
     int samples = CLI::GetParam<int>("samples");
     if (samples <= 0) {
       Log::Fatal << "Invalid value for 'samples': "
                  << "expecting a positive number, received "
                  << samples << "\n";
-      okParams = false;
     }
-    if (okParams)
-      RunSortTask(maxLen, bitLen, epochs, samples);
+    RunSortTask(maxLen, bitLen, epochs, samples);
   }
   else {
     Log::Fatal << "Can't recognize task type, aborting execution.\n";
+    Log::Fatal << "Supported tasks: add, copy, sort.\n";
   }
 }
