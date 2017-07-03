@@ -140,7 +140,7 @@ void RunCopyTask(size_t maxLen,
 
   // Training loop
   Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < 20; ++epoch) {
+  for (size_t epoch = 0; epoch < epochs; ++epoch) {
     Log::Debug << "Starting training epoch #"
                << epoch+1 << "\n";
     // TODO Shuffle?
@@ -219,15 +219,8 @@ void RunAddTask(size_t bitLen,
 
   arma::field<arma::mat> trainPredictor, trainResponse;
   task.Generate(trainPredictor, trainResponse, samples);
-  //std::cerr << trainPredictor << "\n***\n" << trainResponse << "\n";
   assert(trainPredictor.n_elem == trainResponse.n_elem &&
          trainResponse.n_elem == samples);
-
-  // TODO Maybe take it to AddTask?
-  for (size_t i = 0; i < samples; ++i) {
-    trainPredictor.at(i).reshape(trainPredictor.at(i).n_elem, 1);
-    trainResponse.at(i).reshape(trainPredictor.at(i).n_elem, 1);
-  }
 
   Log::Info << "Generated " << samples << " training samples.\n";
   for (size_t i = 0; i < samples; ++i) {
@@ -241,12 +234,6 @@ void RunAddTask(size_t bitLen,
   assert(testPredictor.n_elem == testResponse.n_elem &&
          testResponse.n_elem == samples);
   
-  // TODO Maybe take it to AddTask?
-  for (size_t i = 0; i < samples; ++i) {
-    testPredictor.at(i).reshape(testPredictor.at(i).n_elem, 1);
-    testResponse.at(i).reshape(testPredictor.at(i).n_elem, 1);
-  }
-  
   Log::Info << "Generated " << samples << " evaluation samples.\n";
   for (size_t i = 0; i < samples; ++i) {
     Log::Debug << "Sample #" << i+1 << "\n";
@@ -256,16 +243,13 @@ void RunAddTask(size_t bitLen,
 
   // Training loop
   Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < 20; ++epoch) {
+  for (size_t epoch = 0; epoch < epochs; ++epoch) {
     Log::Debug << "Starting training epoch #"
                << epoch+1 << "\n";
     // TODO Shuffle?
     for (size_t example = 0; example < trainPredictor.n_elem; ++example) {
       arma::mat predictor = trainPredictor.at(example);
       arma::mat response = trainResponse.at(example);
-      /*std::cerr  << "Sample #" << example+1 << "\n";
-      std::cerr  << "Input sequence:\n" << predictor.t();
-      std::cerr  << "Ground truth sequence:\n" << response.t();*/
       model.Rho() = predictor.n_elem / inputSize;
       model.Train(predictor, response, opt);
     }
@@ -279,7 +263,6 @@ void RunAddTask(size_t bitLen,
   // Evaluation loop
   Log::Info << "Running evaluation loop.\n";
   arma::field<arma::mat> modelOutput(samples);
-
   for (size_t example = 0; example < samples; ++example) {
     arma::mat predictor = testPredictor.at(example);
     arma::mat response = testResponse.at(example);
@@ -334,7 +317,6 @@ void RunSortTask(size_t maxLen,
 
   arma::field<arma::mat> trainPredictor, trainResponse;
   task.Generate(trainPredictor, trainResponse, samples);
-  //std::cerr << trainPredictor << "\n***\n" << trainResponse << "\n";
   assert(trainPredictor.n_elem == trainResponse.n_elem &&
          trainResponse.n_elem == samples);
 
@@ -371,7 +353,7 @@ void RunSortTask(size_t maxLen,
 
   // Training loop
   Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < 20; ++epoch) {
+  for (size_t epoch = 0; epoch < epochs; ++epoch) {
     Log::Debug << "Starting training epoch #"
                << epoch+1 << "\n";
     // TODO Shuffle?
