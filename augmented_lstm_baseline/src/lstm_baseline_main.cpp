@@ -191,17 +191,14 @@ int main(int argc, char** argv)
   }
   if (task == "copy") {
     CopyTask task(maxLen, repeats, true);
-    //RunCopyTask(maxLen, repeats, epochs, samples);
     RunTask<CopyTask>(task, 2, 1, epochs, samples);
   }
   else if (task == "add") {
     AddTask task(bitLen);
-    //RunAddTask(bitLen, epochs, samples);
     RunTask<AddTask>(task, 3, 3, epochs, samples);
   }
   else if (task == "sort") {
     SortTask task(maxLen, bitLen);
-    //RunSortTask(maxLen, bitLen, epochs, samples);
     RunTask<SortTask>(task, bitLen, bitLen, epochs, samples);
   }
   else {
