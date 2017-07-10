@@ -91,185 +91,22 @@ RNN<MeanSquaredError<> > GenerateModel(size_t inputSize,
   return model;
 }
 
-//! Run CopyTask on the specified sequence length and repeat count.
-void RunCopyTask(size_t maxLen,
-                 size_t nRepeats,
-                 size_t epochs,
-                 size_t samples)
+//! Runs an instance of the task of given size on a baseline LSTM model.
+template<typename TaskType>
+void RunTask(TaskType& task,
+             size_t inputSize,
+             size_t outputSize,
+             size_t epochs,
+             size_t samples)
 {
-  Log::Info << "Running copy task benchmark for nRepeats = "
-             << nRepeats << ", maxLen = " << maxLen << "\n";
-
-  const size_t outputSize = 1;
-  const size_t inputSize = 2;
-  size_t maxRho = inputSize * (nRepeats + 1) * maxLen + 1;
+  // TODO Make this dirty hack less dirty.
+  size_t maxRho = inputSize * 1024 + 1;
 
   // Creating a baseline model.
   RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
+  Adam opt;
 
-  Adam<decltype(model)> opt(model);
-
-  // Initializing task instance.
-  CopyTask task(maxLen, nRepeats, true);
-
-  arma::mat trainPredictor, trainResponse;
-  task.Generate(trainPredictor, trainResponse, samples);
-
-  arma::field<arma::mat> testPredictor, testResponse;
-  task.Generate(testPredictor, testResponse, samples, true);
-  assert(testPredictor.n_elem == testResponse.n_elem &&
-         testResponse.n_elem == samples);
-
-  // Training loop
-  Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < epochs; ++epoch) {
-    Log::Debug << "Starting training epoch #"
-               << epoch+1 << "\n";
-    model.Rho() = trainPredictor.n_rows / inputSize;
-    model.Train(trainPredictor, trainResponse, opt);
-    Log::Debug << "Finished running training epoch #"
-               << epoch+1 << "\n";
-    std::cerr  << "Finished running training epoch #"
-               << epoch+1 << "\n";
-  }
-  Log::Info << "Finished training loop.\n";
-
-  // Evaluation loop
-  Log::Info << "Running evaluation loop.\n";
-  arma::field<arma::mat> modelOutput(samples);
-
-  for (size_t example = 0; example < samples; ++example) {
-    arma::mat predictor = testPredictor.at(example);
-    arma::mat response = testResponse.at(example);
-
-    Log::Debug << "Evaluating model on:\n";
-    Log::Debug << "Input sequence:\n" << predictor.t();
-    Log::Debug << "Ground truth sequence:\n" << response.t();
-
-    model.Rho() = predictor.n_elem / inputSize;
-    arma::mat softOutput;
-    model.Predict(
-      predictor,
-      softOutput);
-
-    Log::Debug << "Model predictions:\n";
-    Log::Debug << softOutput.t();
-
-    modelOutput.at(example) = softOutput.rows(
-      predictor.n_elem / (inputSize * (nRepeats + 1)),
-      softOutput.n_rows-1);
-    testResponse.at(example) = testResponse.at(example).rows(
-      predictor.n_elem / (inputSize * (nRepeats + 1)),
-      softOutput.n_rows-1);
-    Binarize<double>(modelOutput.at(example), modelOutput.at(example), 0.5);
-
-    Log::Debug << "Model predictions after binarization:\n";
-    Log::Debug << testResponse.at(example).t();
-  }
-  Log::Info << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
-  std::cout << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
-}
-
-
-//! Run AddTask on the specified bit length.
-void RunAddTask(size_t bitLen,
-                size_t epochs,
-                size_t samples)
-{
-  Log::Info << "Running add task benchmark for bitLen = " << bitLen << "\n";
-
-  const size_t outputSize = 3;
-  const size_t inputSize = 3;
-  size_t maxRho = inputSize * (bitLen + 1) + 1;
-
-  // Creating a baseline model.
-  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
-
-  Adam<decltype(model)> opt(model);
-
-  // Initializing task instance.
-  AddTask task(bitLen);
-
-  arma::mat trainPredictor, trainResponse;
-  task.Generate(trainPredictor, trainResponse, samples);
-
-  arma::field<arma::mat> testPredictor, testResponse;
-  task.Generate(testPredictor, testResponse, samples, true);
-  assert(testPredictor.n_elem == testResponse.n_elem &&
-         testResponse.n_elem == samples);
-
-  // Training loop
-  Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < epochs; ++epoch) {
-    Log::Debug << "Starting training epoch #"
-               << epoch+1 << "\n";
-    model.Rho() = trainPredictor.n_rows / inputSize;
-    model.Train(trainPredictor, trainResponse, opt);
-    Log::Debug << "Finished running training epoch #"
-               << epoch+1 << "\n";
-    std::cerr  << "Finished running training epoch #"
-               << epoch+1 << "\n";
-  }
-  Log::Info << "Finished training loop.\n";
-
-  // Evaluation loop
-  Log::Info << "Running evaluation loop.\n";
-  arma::field<arma::mat> modelOutput(samples);
-  for (size_t example = 0; example < samples; ++example) {
-    arma::mat predictor = testPredictor.at(example);
-    arma::mat response = testResponse.at(example);
-
-    Log::Debug << "Evaluating model on:\n";
-    Log::Debug << "Input sequence:\n" << predictor.t();
-    Log::Debug << "Ground truth sequence:\n" << response.t();
-
-    model.Rho() = predictor.n_elem / inputSize;
-    arma::mat softOutput;
-    model.Predict(
-      predictor,
-      softOutput);
-
-    Log::Debug << "Model predictions:\n";
-    Log::Debug << softOutput.t();
-
-    modelOutput.at(example) = softOutput;
-    Binarize<double>(modelOutput.at(example), modelOutput.at(example), 0.5);
-
-    Log::Debug << "Model predictions after binarization:\n";
-    Log::Debug << testResponse.at(example).t();
-  }
-  Log::Info << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
-  std::cout << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
-}
-
-//! Run SortTask on the specified sequence length and bit length.
-void RunSortTask(size_t maxLen,
-                 size_t bitLen,
-                 size_t epochs,
-                 size_t samples) {
-  Log::Info << "Running sort task benchmark for maxLen = "
-            << maxLen << "\n, bitLen = " << bitLen << "\n";
-
-  size_t outputSize = bitLen;
-  size_t inputSize = bitLen;
-  size_t maxRho = inputSize * (bitLen + 1) + 1;
-
-  // Creating a baseline model.
-  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
-
-  Adam<decltype(model)> opt(model);
-
-  // Initializing task instance.
-  SortTask task(maxLen, bitLen);
-
+  // Generating a task instance
   arma::mat trainPredictor, trainResponse;
   task.Generate(trainPredictor, trainResponse, samples);
 
@@ -333,80 +170,39 @@ int main(int argc, char** argv)
   CLI::ParseCommandLine(argc, argv);
 
   string task = CLI::GetParam<string>("task");
+  int repeats = CLI::GetParam<int>("repeats");
+  int bitLen = CLI::GetParam<int>("bit_length");
+  int maxLen = CLI::GetParam<int>("length");
+  int epochs = CLI::GetParam<int>("epochs");
+  int samples = CLI::GetParam<int>("samples");
+  vector<pair<string, int>> params = {
+    make_pair("repeats", repeats),
+    make_pair("bit_length", bitLen),
+    make_pair("length", maxLen),
+    make_pair("epochs", epochs),
+    make_pair("samples", samples)
+  };
+  for (pair<string, int> param : params) {
+    if (param.second <= 0) {   
+      Log::Fatal << "Invalid value for '" << param.first << "': "
+                 << "expecting a positive number, received "
+                 << param.second << "\n";
+    }
+  }
   if (task == "copy") {
-    int repeats = CLI::GetParam<int>("repeats");
-    if (repeats <= 0) {
-      Log::Fatal << "Invalid value for 'repeats': "
-                 << "expecting a positive number, received "
-                 << repeats << "\n";
-    }
-    int maxLen = CLI::GetParam<int>("length");
-    if (maxLen <= 0) {
-      Log::Fatal << "Invalid value for 'length': "
-                 << "expecting a positive number, received "
-                 << maxLen << "\n";
-    }
-    int epochs = CLI::GetParam<int>("epochs");
-    if (repeats <= 0) {
-      Log::Fatal << "Invalid value for 'epochs': "
-                 << "expecting a positive number, received "
-                 << repeats << "\n";
-    }
-    int samples = CLI::GetParam<int>("samples");
-    if (samples <= 0) {
-      Log::Fatal << "Invalid value for 'samples': "
-                 << "expecting a positive number, received "
-                 << samples << "\n";
-    }
-    RunCopyTask(maxLen, repeats, epochs, samples);
+    CopyTask task(maxLen, repeats, true);
+    //RunCopyTask(maxLen, repeats, epochs, samples);
+    RunTask<CopyTask>(task, 2, 1, epochs, samples);
   }
   else if (task == "add") {
-    int bitLen = CLI::GetParam<int>("bit_length");
-    if (bitLen <= 0) {
-      Log::Fatal << "Invalid value for 'bit_length': "
-                 << "expecting a positive number, received "
-                 << bitLen << "\n";
-    }
-    int epochs = CLI::GetParam<int>("epochs");
-    if (epochs <= 0) {
-      Log::Fatal << "Invalid value for 'epochs': "
-                 << "expecting a positive number, received "
-                 << epochs << "\n";
-    }
-    int samples = CLI::GetParam<int>("samples");
-    if (samples <= 0) {
-      Log::Fatal << "Invalid value for 'samples': "
-                 << "expecting a positive number, received "
-                 << samples << "\n";
-    }
-    RunAddTask(bitLen, epochs, samples);
+    AddTask task(bitLen);
+    //RunAddTask(bitLen, epochs, samples);
+    RunTask<AddTask>(task, 3, 3, epochs, samples);
   }
   else if (task == "sort") {
-    int bitLen = CLI::GetParam<int>("bit_length");
-    if (bitLen <= 0) {
-      Log::Fatal << "Invalid value for 'bit_length': "
-                 << "expecting a positive number, received "
-                 << bitLen << "\n";
-    }
-    int maxLen = CLI::GetParam<int>("length");
-    if (maxLen <= 0) {
-      Log::Fatal << "Invalid value for 'length': "
-                 << "expecting a positive number, received "
-                 << bitLen << "\n";
-    }
-    int epochs = CLI::GetParam<int>("epochs");
-    if (epochs <= 0) {
-      Log::Fatal << "Invalid value for 'epochs': "
-                 << "expecting a positive number, received "
-                 << epochs << "\n";
-    }
-    int samples = CLI::GetParam<int>("samples");
-    if (samples <= 0) {
-      Log::Fatal << "Invalid value for 'samples': "
-                 << "expecting a positive number, received "
-                 << samples << "\n";
-    }
-    RunSortTask(maxLen, bitLen, epochs, samples);
+    SortTask task(maxLen, bitLen);
+    //RunSortTask(maxLen, bitLen, epochs, samples);
+    RunTask<SortTask>(task, bitLen, bitLen, epochs, samples);
   }
   else {
     Log::Fatal << "Can't recognize task type, aborting execution.\n";
