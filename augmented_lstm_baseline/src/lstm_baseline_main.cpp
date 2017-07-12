@@ -172,11 +172,11 @@ int main(int argc, char** argv)
   int epochs = CLI::GetParam<int>("epochs");
   int samples = CLI::GetParam<int>("samples");
   vector<pair<string, int>> params = {
-    make_pair("repeats", repeats),
-    make_pair("bit_length", bitLen),
-    make_pair("length", maxLen),
-    make_pair("epochs", epochs),
-    make_pair("samples", samples)
+      make_pair("repeats", repeats),
+      make_pair("bit_length", bitLen),
+      make_pair("length", maxLen),
+      make_pair("epochs", epochs),
+      make_pair("samples", samples)
   };
   for (pair<string, int> param : params) {
     if (param.second <= 0) {   
