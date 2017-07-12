@@ -36,6 +36,9 @@ using namespace mlpack::optimization;
 using mlpack::data::Binarize;
 
 using std::string;
+using std::vector;
+using std::pair;
+using std::make_pair;
 
 PROGRAM_INFO("LSTM baseline for ann::augmented tasks",
     "This program runs and evaluates a simple LSTM recurrent neural network "
@@ -66,14 +69,15 @@ PARAM_STRING_IN_REQ("task", "Task to execute LSTM network on.", "t");
 PARAM_INT_IN("length", "Maximum sequence length (doesn't impact binary addition task).", "l", 2);
 PARAM_INT_IN("repeats", "Number of repeats required to solve the task (specific for Copy task).", "r", 1);
 PARAM_INT_IN("bit_length", "Maximum length of sequence elements in binary representation.", "b", 2);
-PARAM_INT_IN("epochs", "Learning epochs.", "i", 25);
+PARAM_INT_IN("epochs", "Learning epochs.", "e", 25);
 PARAM_INT_IN("samples", "Sample size used for fitting and evaluating the model.", "s", 64);
 
 // Generate the LSTM model for benchmarking.
 // NOTE: it's the same model for all tasks.
 RNN<MeanSquaredError<> > GenerateModel(size_t inputSize,
                                        size_t outputSize,
-                                       size_t maxRho) {
+                                       size_t maxRho)
+{
   RNN<MeanSquaredError<> > model(2);
 
   model.Add<IdentityLayer<> >();
@@ -105,6 +109,8 @@ void RunTask(TaskType& task,
   // Creating a baseline model.
   RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
   Adam opt;
+  opt.MaxIterations() = epochs * samples;
+  opt.Tolerance() = 0;
 
   // Generating a task instance
   arma::mat trainPredictor, trainResponse;
@@ -116,18 +122,8 @@ void RunTask(TaskType& task,
          testResponse.n_elem == samples);
 
   // Training loop
-  Log::Info << "Running training loop for " << epochs << " epochs.\n";
-  for (size_t epoch = 0; epoch < epochs; ++epoch) {
-    Log::Debug << "Starting training epoch #"
-               << epoch+1 << "\n";
-    model.Rho() = trainPredictor.n_rows / inputSize;
-    model.Train(trainPredictor, trainResponse, opt);
-    Log::Debug << "Finished running training epoch #"
-               << epoch+1 << "\n";
-    std::cerr  << "Finished running training epoch #"
-               << epoch+1 << "\n";
-  }
-  Log::Info << "Finished training loop.\n";
+  model.Rho() = trainPredictor.n_rows / inputSize;
+  model.Train(trainPredictor, trainResponse, opt);
 
   // Evaluation loop
   Log::Info << "Running evaluation loop.\n";
@@ -186,7 +182,7 @@ int main(int argc, char** argv)
     if (param.second <= 0) {   
       Log::Fatal << "Invalid value for '" << param.first << "': "
                  << "expecting a positive number, received "
-                 << param.second << "\n";
+                 << param.second << ".\n";
     }
   }
   if (task == "copy") {
@@ -202,7 +198,7 @@ int main(int argc, char** argv)
     RunTask<SortTask>(task, bitLen, bitLen, epochs, samples);
   }
   else {
-    Log::Fatal << "Can't recognize task type, aborting execution.\n";
-    Log::Fatal << "Supported tasks: add, copy, sort.\n";
+    Log::Fatal << "Can't recognize task type, aborting execution.\n"
+               << "Supported tasks: add, copy, sort.\n";
   }
 }
