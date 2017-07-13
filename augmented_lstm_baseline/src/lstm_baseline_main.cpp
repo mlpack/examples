@@ -25,6 +25,8 @@
 #include <mlpack/methods/ann/layer/leaky_relu.hpp>
 #include <mlpack/methods/ann/rnn.hpp>
 
+#include <mlpack/methods/ann/init_rules/gaussian_init.hpp>
+
 using namespace mlpack;
 
 using namespace mlpack::ann::augmented::tasks;
@@ -72,13 +74,15 @@ PARAM_INT_IN("bit_length", "Maximum length of sequence elements in binary repres
 PARAM_INT_IN("epochs", "Learning epochs.", "e", 25);
 PARAM_INT_IN("samples", "Sample size used for fitting and evaluating the model.", "s", 64);
 
+using ModelType = RNN<CrossEntropyError<>, GaussianInitialization>;
+
 // Generate the LSTM model for benchmarking.
 // NOTE: it's the same model for all tasks.
-RNN<MeanSquaredError<> > GenerateModel(size_t inputSize,
+ModelType GenerateModel(size_t inputSize,
                                        size_t outputSize,
                                        size_t maxRho)
 {
-  RNN<MeanSquaredError<> > model(2);
+  ModelType model(2);
 
   model.Add<IdentityLayer<> >();
   model.Add<Linear<> >(inputSize, 40);
@@ -107,7 +111,7 @@ void RunTask(TaskType& task,
   size_t maxRho = inputSize * 1024 + 1;
 
   // Creating a baseline model.
-  RNN<MeanSquaredError<> > model = GenerateModel(inputSize, outputSize, maxRho);
+  ModelType model = GenerateModel(inputSize, outputSize, maxRho);
   Adam opt;
   opt.MaxIterations() = epochs * samples;
   opt.Tolerance() = 0;
