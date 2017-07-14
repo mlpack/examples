@@ -74,13 +74,13 @@ PARAM_INT_IN("bit_length", "Maximum length of sequence elements in binary repres
 PARAM_INT_IN("epochs", "Learning epochs.", "e", 25);
 PARAM_INT_IN("samples", "Sample size used for fitting and evaluating the model.", "s", 64);
 
-using ModelType = RNN<CrossEntropyError<>, GaussianInitialization>;
+using ModelType = RNN<MeanSquaredError<>>;
 
 // Generate the LSTM model for benchmarking.
 // NOTE: it's the same model for all tasks.
 ModelType GenerateModel(size_t inputSize,
-                                       size_t outputSize,
-                                       size_t maxRho)
+                        size_t outputSize,
+                        size_t maxRho)
 {
   ModelType model(2);
 
