@@ -73,8 +73,9 @@ PARAM_INT_IN("repeats", "Number of repeats required to solve the task (specific 
 PARAM_INT_IN("bit_length", "Maximum length of sequence elements in binary representation.", "b", 2);
 PARAM_INT_IN("epochs", "Learning epochs.", "e", 25);
 PARAM_INT_IN("samples", "Sample size used for fitting and evaluating the model.", "s", 64);
+PARAM_INT_IN("trials", "Number of evaluation runs.", "", 1);
 
-using ModelType = RNN<MeanSquaredError<>>;
+using ModelType = RNN<CrossEntropyError<>>;
 
 // Generate the LSTM model for benchmarking.
 // NOTE: it's the same model for all tasks.
@@ -101,71 +102,102 @@ ModelType GenerateModel(size_t inputSize,
 
 //! Runs an instance of the task of given size on a baseline LSTM model.
 template<typename TaskType>
-void RunTask(TaskType& task,
-             size_t inputSize,
-             size_t outputSize,
-             size_t epochs,
-             size_t samples)
+double RunTask(TaskType& task,
+               size_t inputSize,
+               size_t outputSize,
+               size_t epochs,
+               size_t samples,
+               size_t trials)
 {
-  // TODO Make this dirty hack less dirty.
-  size_t maxRho = inputSize * 1024 + 1;
+  double result = 0;
+  for (size_t trial = 0; trial < trials; ++trial) {
+    Log::Info << "Run #" << trial + 1 << "\n";
+    // TODO Make this dirty hack less dirty.
+    size_t maxRho = inputSize * 1024 + 1;
 
-  // Creating a baseline model.
-  ModelType model = GenerateModel(inputSize, outputSize, maxRho);
-  Adam opt;
-  opt.MaxIterations() = epochs * samples;
-  opt.Tolerance() = 0;
+    // Creating a baseline model.
+    ModelType model = GenerateModel(inputSize, outputSize, maxRho);
+    Adam opt;
+    opt.MaxIterations() = samples;
+    opt.Tolerance() = 0;
 
-  // Generating a task instance
-  arma::mat trainPredictor, trainResponse;
-  task.Generate(trainPredictor, trainResponse, samples);
+    // Generating a task instance
+    arma::mat trainPredictor, trainResponse;
+    task.Generate(trainPredictor, trainResponse, samples);
 
-  arma::field<arma::mat> testPredictor, testResponse;
-  task.Generate(testPredictor, testResponse, samples, true);
-  assert(testPredictor.n_elem == testResponse.n_elem &&
-         testResponse.n_elem == samples);
+    arma::field<arma::mat> valPredictor, valResponse;
+    task.Generate(valPredictor, valResponse, samples, true);
+    assert(valPredictor.n_elem == valResponse.n_elem &&
+           valResponse.n_elem == samples);
 
-  // Training loop
-  model.Rho() = trainPredictor.n_rows / inputSize;
-  model.Train(trainPredictor, trainResponse, opt);
+    arma::field<arma::mat> testPredictor, testResponse;
+    task.Generate(testPredictor, testResponse, samples, true);
+    assert(testPredictor.n_elem == testResponse.n_elem &&
+           testResponse.n_elem == samples);
 
-  // Evaluation loop
-  Log::Info << "Running evaluation loop.\n";
-  arma::field<arma::mat> modelOutput(samples);
+    double bestValScore = 0.0, bestTestScore = 0.0;
+    // Training loop
+    for (size_t e = 0; e < epochs; ++e) {
+      Log::Info << "Iteration " << e+1 << "\n";
+      model.Rho() = trainPredictor.n_rows / inputSize;
+      model.Train(trainPredictor, trainResponse, opt);
 
-  for (size_t example = 0; example < samples; ++example) {
-    arma::mat predictor = testPredictor.at(example);
-    arma::mat response = testResponse.at(example);
+      // Validation loop
+      arma::field<arma::mat> valModelOutput(samples);
+      for (size_t example = 0; example < samples; ++example) {
+        arma::mat predictor = valPredictor.at(example);
+        arma::mat response = valResponse.at(example);
 
-    Log::Debug << "Evaluating model on:\n";
-    Log::Debug << "Input sequence:\n" << predictor.t();
-    Log::Debug << "Ground truth sequence:\n" << response.t();
+        model.Rho() = predictor.n_elem / inputSize;
+        arma::mat softOutput;
+        model.Predict(predictor, softOutput);
 
-    model.Rho() = predictor.n_elem / inputSize;
-    arma::mat softOutput;
-    model.Predict(
-      predictor,
-      softOutput);
+        valModelOutput.at(example) = softOutput;
+        Binarize<double>(valModelOutput.at(example),
+                         valModelOutput.at(example),
+                         0.5);
+      }
+      double valScore = SequencePrecision<arma::mat>(valResponse, valModelOutput);
 
-    Log::Debug << "Model predictions:\n";
-    Log::Debug << softOutput.t();
+      if (valScore > bestValScore) {
+        Log::Info << "Improved validaton score\n";
+        Log::Info << bestValScore << " -> " << valScore << "\n";
+        bestValScore = valScore;
+        // Testing loop
+        arma::field<arma::mat> testModelOutput(samples);
+        for (size_t example = 0; example < samples; ++example) {
+          arma::mat predictor = testPredictor.at(example);
+          arma::mat response = testResponse.at(example);
 
-    modelOutput.at(example) = softOutput;
-    Binarize<double>(modelOutput.at(example), modelOutput.at(example), 0.5);
+          model.Rho() = predictor.n_elem / inputSize;
+          arma::mat softOutput;
+          model.Predict(predictor, softOutput);
 
-    Log::Debug << "Model predictions after binarization:\n";
-    Log::Debug << testResponse.at(example).t();
+          testModelOutput.at(example) = softOutput;
+          Binarize<double>(testModelOutput.at(example), 
+                           testModelOutput.at(example),
+                           0.5);
+        }
+        bestTestScore = SequencePrecision<arma::mat>(testResponse,
+                                                     testModelOutput);
+        Log::Info << "Running test score is " << bestTestScore << "\n";
+      }
+    }
+
+    Log::Info << "Final score: " << bestTestScore << "\n";
+
+    result += bestTestScore;
   }
-  Log::Info << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
-  std::cout << "Final score: "
-            << SequencePrecision<arma::mat>(testResponse, modelOutput)
-            << "\n";
+
+  result /= trials;
+  Log::Info << "Average score: " << result << "\n";
+  std::cout << "Average score: " << result << "\n";
+  return result;
 }
 
 int main(int argc, char** argv)
 {
+  mlpack::math::RandomSeed(std::time(NULL));
   // Parse command line options.
   CLI::ParseCommandLine(argc, argv);
 
@@ -175,6 +207,7 @@ int main(int argc, char** argv)
   int maxLen = CLI::GetParam<int>("length");
   int epochs = CLI::GetParam<int>("epochs");
   int samples = CLI::GetParam<int>("samples");
+  int trials = CLI::GetParam<int>("samples");
   vector<pair<string, int>> params = {
       make_pair("repeats", repeats),
       make_pair("bit_length", bitLen),
@@ -191,15 +224,15 @@ int main(int argc, char** argv)
   }
   if (task == "copy") {
     CopyTask task(maxLen, repeats, true);
-    RunTask<CopyTask>(task, 2, 1, epochs, samples);
+    RunTask<CopyTask>(task, 2, 1, epochs, samples, trials);
   }
   else if (task == "add") {
     AddTask task(bitLen);
-    RunTask<AddTask>(task, 3, 3, epochs, samples);
+    RunTask<AddTask>(task, 3, 3, epochs, samples, trials);
   }
   else if (task == "sort") {
     SortTask task(maxLen, bitLen);
-    RunTask<SortTask>(task, bitLen, bitLen, epochs, samples);
+    RunTask<SortTask>(task, bitLen, bitLen, epochs, samples, trials);
   }
   else {
     Log::Fatal << "Can't recognize task type, aborting execution.\n"
