@@ -228,7 +228,7 @@ int main(int argc, char** argv)
   }
   else if (task == "add") {
     AddTask task(bitLen);
-    RunTask<AddTask>(task, 3, 3, epochs, samples, trials);
+    RunTask<AddTask>(task, 1, 1, epochs, samples, trials);
   }
   else if (task == "sort") {
     SortTask task(maxLen, bitLen);
