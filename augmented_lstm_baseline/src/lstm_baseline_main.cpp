@@ -20,6 +20,7 @@
 #include <mlpack/methods/ann/augmented/tasks/add.hpp>
 #include <mlpack/methods/ann/augmented/tasks/score.hpp>
 
+#include <mlpack/core/optimizers/minibatch_sgd/minibatch_sgd.hpp>
 #include <mlpack/core/optimizers/adam/adam.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/layer/leaky_relu.hpp>
@@ -117,11 +118,12 @@ double RunTask(TaskType& task,
 
     // Creating a baseline model.
     ModelType model = GenerateModel(inputSize, outputSize, maxRho);
-    Adam opt;
+    MiniBatchSGD opt;
+    opt.BatchSize() = 10;
     opt.MaxIterations() = samples;
     opt.Tolerance() = 0;
 
-    // Generating a task instance
+    // Generating a task instance.
     arma::mat trainPredictor, trainResponse;
     task.Generate(trainPredictor, trainResponse, samples);
 
@@ -136,13 +138,13 @@ double RunTask(TaskType& task,
            testResponse.n_elem == samples);
 
     double bestValScore = 0.0, bestTestScore = 0.0;
-    // Training loop
+    // Run training loop.
     for (size_t e = 0; e < epochs; ++e) {
       Log::Info << "Iteration " << e+1 << "\n";
       model.Rho() = trainPredictor.n_rows / inputSize;
       model.Train(trainPredictor, trainResponse, opt);
 
-      // Validation loop
+      // Run validation loop.
       arma::field<arma::mat> valModelOutput(samples);
       for (size_t example = 0; example < samples; ++example) {
         arma::mat predictor = valPredictor.at(example);
