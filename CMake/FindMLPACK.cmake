@@ -40,7 +40,7 @@ if(MLPACK_INCLUDE_DIR)
 	file(STRINGS "${MLPACK_INCLUDE_DIR}/mlpack/core/util/version.hpp" _mlpack_HEADER_CONTENTS REGEX "#define MLPACK_VERSION_[A-Z]+ ")
 	string(REGEX REPLACE ".*#define MLPACK_VERSION_MAJOR ([0-9]+).*" "\\1" MLPACK_VERSION_MAJOR "${_mlpack_HEADER_CONTENTS}")
 	string(REGEX REPLACE ".*#define MLPACK_VERSION_MINOR ([0-9]+).*" "\\1" MLPACK_VERSION_MINOR "${_mlpack_HEADER_CONTENTS}")
-	string(REGEX REPLACE ".*#define MLPACK_VERSION_PATCH ([0-9]+).*" "\\1" MLPACK_VERSION_PATCH "${_mlpack_HEADER_CONTENTS}")
+	string(REGEX REPLACE ".*#define MLPACK_VERSION_PATCH \"?([0-9x]+).*" "\\1" MLPACK_VERSION_PATCH "${_mlpack_HEADER_CONTENTS}")
 	
 	unset(_mlpack_HEADER_CONTENTS)
 	
