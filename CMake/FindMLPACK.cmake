@@ -23,6 +23,7 @@
 #   MLPACK_VERSION_PATCH - patch version number
 #   MLPACK_VERSION_STRING - version number as a string (ex: "1.0.4")
 
+include(FindPackageHandleStandardArgs)
 
 # UNIX paths are standard, no need to specify them.
 find_library(MLPACK_LIBRARY
