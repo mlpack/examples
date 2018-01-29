@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.6)
+project(kaggle-digit-recognizer)
 
-set(SOURCES DigitRecognizer.cpp)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3 -std=c++11")
+set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../CMake")
-find_package(MLPACK REQUIRED)
-find_package(Armadillo REQUIRED)
+set(SOURCES ${MODEL_SOURCE_DIR}/DigitRecognizer.cpp)
 
-include_directories(${MLPACK_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3")
+
 
 add_executable(DigitRecognizer ${SOURCES})
 target_link_libraries(DigitRecognizer ${MLPACK_LIBRARIES} ${ARMADILLO_LIBRARIES})
