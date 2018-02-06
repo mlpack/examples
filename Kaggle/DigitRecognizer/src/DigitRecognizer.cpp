@@ -41,7 +41,7 @@ int main()
   // The number of neurons in the second layer.
   constexpr int H2 = 100;
   
-  // The solution is done in several approaches (CYCLES), each approach 
+  // The solution is done in several approaches (CYCLES), so each approach 
   // uses previous results as starting point and have a different optimizer 
   // options (here the step size is different).
   
@@ -62,9 +62,9 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   mat tempDataset;
-  //TODO: Here you should put proper path to train.csv file, which could
-  //be download from https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../Kaggle/DigitRecognizer/data/train.csv", tempDataset, true);
+  // The original file could be download from 
+  // https://www.kaggle.com/c/digit-recognizer/data
+  data::Load("train.csv", tempDataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -145,7 +145,7 @@ int main()
     // Getting predictions on training data points.
     model.Predict(trainX, predOut);
     // Calculating accuracy on training data points.
-    Row<int> predLabels = getLabels(predOut);
+    Row<size_t> predLabels = getLabels(predOut);
     double trainAccuracy = accuracy(predLabels, trainY);
     // Getting predictions on validating data points.
     model.Predict(validX, predOut);
@@ -161,24 +161,25 @@ int main()
   
   // Loading test dataset (the one whose predicted labels 
   // should be sent to Kaggle website).
-  // As before, it's necessary to get rid of header
+  // As before, it's necessary to get rid of header.
   
-  //TODO: Here you should put proper path to test.csv file, which could
-  //be download from https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../Kaggle/DigitRecognizer/data/test.csv", tempDataset, true);
+  // The original file could be download from 
+  // https://www.kaggle.com/c/digit-recognizer/data
+  data::Load("test.csv", tempDataset, true);
   mat testX = tempDataset.submat(0, 1, 
     tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   mat testPredOut;
-  // Getting predictions on test data points 
+  // Getting predictions on test data points .
   model.Predict(testX, testPredOut);
-  // Generating labels for the test dataset
-  Row<int> testPred = getLabels(testPredOut);
+  // Generating labels for the test dataset.
+  Row<size_t> testPred = getLabels(testPredOut);
   cout << "Saving predicted labels to \"results.csv\" ..." << endl;
   
-  // TODO: result.csv could be uploaded to 
-  // https://www.kaggle.com/c/digit-recognizer/submissions for competition
+  // Saving results into Kaggle compatibe CSV file.
   save("results.csv", "ImageId,Label", testPred);
- 
+  cout << "Results were saved to \"results.csv\" and could be uploaded to " 
+    << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition" 
+    << endl;
   cout << "Finished" << endl;
 }

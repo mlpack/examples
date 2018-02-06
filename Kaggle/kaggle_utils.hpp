@@ -12,10 +12,7 @@
 #ifndef MODELS_KAGGLE_UTILS_HPP
 #define MODELS_KAGGLE_UTILS_HPP
 
-#include <iostream>
-#include <fstream>
-
-#include <armadillo>
+#include <mlpack/prereqs.hpp>
 
 /**
  * Returns labels bases on predicted probability (or log of probability)  
@@ -26,13 +23,13 @@
  * @return a row vector of data point's classes. The classes starts from 1 to
  * the number of rows in input matrix.
  */
-arma::Row<int> getLabels(const arma::mat& predOut) 
+arma::Row<size_t> getLabels(const arma::mat& predOut) 
 {
-  arma::Row<int> pred = arma::zeros<arma::Row<int>>(predOut.n_cols);
+  arma::Row<size_t> pred(predOut.n_cols);
   
   // Class of a j-th data point is chosen to be the one with maximum value
   // in j-th column plus 1 (since column's elements are numbered from 0).
-  for (unsigned int j = 0; j < predOut.n_cols; ++j)
+  for (size_t j = 0; j < predOut.n_cols; ++j)
   {
     pred(j) = arma::as_scalar(arma::find(
         arma::max(predOut.col(j)) == predOut.col(j), 1)) + 1;
@@ -48,11 +45,11 @@ arma::Row<int> getLabels(const arma::mat& predOut)
  * CSV file that contain many other double values).
  * @return percentage of correct answers.
  */
-double accuracy(arma::Row<int> predLabels, const arma::mat& realY)
+double accuracy(arma::Row<size_t> predLabels, const arma::mat& realY)
 {
   // Calculating how many predicted classes are coincide with real labels.
-  int success = 0;
-  for (unsigned int j = 0; j < realY.n_cols; j++) {
+  size_t success = 0;
+  for (size_t j = 0; j < realY.n_cols; j++) {
     if (predLabels(j) == std::round(realY(j))) {
       ++success;
     }  
@@ -64,7 +61,7 @@ double accuracy(arma::Row<int> predLabels, const arma::mat& realY)
 
 /**
  * Saves prediction into specifically formated CSV file, suitable for 
- * the most Kaggle competitions.
+ * most Kaggle competitions.
  * @param filename the name of a file.
  * @param header the header in a CSV file.
  * @param predLabels predicted labels of data points. Classes of data points
@@ -72,11 +69,11 @@ double accuracy(arma::Row<int> predLabels, const arma::mat& realY)
  * the file are going to start from 0 (as Kaggle usually expects)
  */
 void save(const std::string filename, std::string header, 
-  const arma::Row<int>& predLabels)
+  const arma::Row<size_t>& predLabels)
 {
 	std::ofstream out(filename);
 	out << header << std::endl;
-	for (unsigned int j = 0; j < predLabels.n_cols; ++j)
+	for (size_t j = 0; j < predLabels.n_cols; ++j)
 	{
 	  // j + 1 because Kaggle indexes start from 1
 	  // pred - 1 because 1st class is 0, 2nd class is 1 and etc.
