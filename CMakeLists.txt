@@ -137,7 +137,7 @@ if (WIN32)
        ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARY} ${LAPACK_LIBRARY})
 endif ()
 
-find_package(Mlpack REQUIRED)
+find_package(MLPACK REQUIRED)
 
 # Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
@@ -183,6 +183,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 # Recurse into each model.
 set(DIRS
   # Model directory.
+  Kaggle/DigitRecognizer
 )
 
 foreach(dir ${DIRS})
