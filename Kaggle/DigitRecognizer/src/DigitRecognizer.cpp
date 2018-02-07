@@ -113,17 +113,17 @@ int main()
   
   cout << "Training ..." << endl;  
   
-  // Setting parameters Stochastic Gradient Descent (SGD) optimizer/
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
     // Step size of the optimizer.
     STEP_SIZE,
-    // Batch size. Number of data points that are used in each iteration
+    // Batch size. Number of data points that are used in each iteration.
     BATCH_SIZE, 
     // Max number of iterations
     ITERATIONS_PER_CYCLE,
     // Tolerance, used as a stopping condition. This small number 
     // means we never stop by this condition and continue to optimize 
-    // up to reaching maximum of iterations
+    // up to reaching maximum of iterations.
     1e-8, 
     // Shuffle. If optimizer should take random data points from the dataset at
     // each iteration.
