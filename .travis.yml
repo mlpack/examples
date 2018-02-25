@@ -2,10 +2,6 @@ sudo: required
 dist: xenial
 language: cpp
 
-env:
-  - CMAKE_OPTIONS="-DDEBUG=OFF -DPROFILE=OFF -DPYTHON=/usr/bin/python"
-  - CMAKE_OPTIONS="-DDEBUG=OFF -DPROFILE=OFF -DPYTHON=/usr/bin/python3"
-  - CMAKE_OPTIONS="-DDEBUG=ON -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF"
 
 before_install:
   # xenial is not stable yet, so we have to manually disable the systemd
@@ -21,17 +17,12 @@ before_install:
   - cd /usr/include && sudo patch -p1 < fix-std-vector-load.diff && sudo rm fix-std-vector-load.diff && cd -
   # Install both python2 and python3 modules, and the build will decide which to
   # use.
-  - sudo pip install cython numpy pandas
-  - sudo pip install --upgrade --ignore-installed setuptools
-  - sudo pip3 install cython numpy pandas
-  - sudo pip3 install --upgrade --ignore-installed setuptools
   - curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz | tar xvz && cd armadillo*
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
 
-
-script:
-  - CTEST_OUTPUT_ON_FAILURE=1 travis_wait 30 ctest -j2
+install:
+  - mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
 
 notifications:
   email:
