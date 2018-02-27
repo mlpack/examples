@@ -19,10 +19,10 @@ before_install:
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - git clone https://github.com/mlpack/mlpack.git --depth 5
-  - cd mlpack && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
+  - cd mlpack && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2 && cd ..
 
 install:
-  - mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
+  - cd .. && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
 
 notifications:
   email:
