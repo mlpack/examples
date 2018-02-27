@@ -18,7 +18,6 @@ before_install:
   - curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz | tar xvz && cd armadillo*
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
-  - sudo apt-get install git
   - git clone https://github.com/mlpack/mlpack.git --depth 5
   - cd mlpack && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
 
