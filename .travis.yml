@@ -20,8 +20,7 @@ before_install:
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 5
   - cd mlpack && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2 && sudo make install
-  - $TRAVIS_BUILD_DIR
-
+  
 install:
   - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake $CMAKE_OPTIONS .. && make -j2
 
