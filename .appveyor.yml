@@ -12,8 +12,6 @@ configuration: Release
 os: Visual Studio 2015
 
 install:
-  - ps : cd C:\projects
-  - sh : git clone https://github.com/mlpack/mlpack.git
   - ps: nuget install boost -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
   - ps: nuget install boost_unit_test_framework-vc140 -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
   - ps: nuget install boost_program_options-vc140 -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
@@ -23,6 +21,8 @@ install:
   - ps: nuget install OpenBLAS -o "${env:APPVEYOR_BUILD_FOLDER}"
 
 build_script:
+  - ps : cd C:\projects
+  - ps : git clone https://github.com/mlpack/mlpack.git
   - mkdir boost_libs
   - ps: cp C:\projects\mlpack\boost_program_options-vc140.1.60.0.0\lib\native\address-model-64\lib\*.* C:\projects\mlpack\boost_libs\
   - ps: cp C:\projects\mlpack\boost_math_c99-vc140.1.60.0.0\lib\native\address-model-64\lib\*.* C:\projects\mlpack\boost_libs\
