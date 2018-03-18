@@ -22,7 +22,7 @@ install:
 
 build_script:
   - ps : cd C:\projects
-  - ps : git clone https://github.com/mlpack/mlpack.git
+  - ps : git clone -q --depth=2 --branch=master https://github.com/mlpack/mlpack.git C:\projects\mlpack
   - mkdir boost_libs
   - ps: cp C:\projects\mlpack\boost_program_options-vc140.1.60.0.0\lib\native\address-model-64\lib\*.* C:\projects\mlpack\boost_libs\
   - ps: cp C:\projects\mlpack\boost_math_c99-vc140.1.60.0.0\lib\native\address-model-64\lib\*.* C:\projects\mlpack\boost_libs\
