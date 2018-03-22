@@ -1,5 +1,5 @@
 /**
- * An example of using Feed Forward Neural Network (FFN) for 
+ * An example of using Convolution Neural Network (CNN) for 
  * solving Digit Recognizer problem from Kaggle website.
  * 
  * The full description of a problem as well as datasets for training 
@@ -10,7 +10,14 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  * 
+ * The file works as basic example implementation of CNNs.
+ * The file is shamelessly copied from DigitRecognizer.cpp .
+ * The model has been taken from CNN test.
  * @author Eugene Freyman
+ * @author Marcus Edel
+ * @author Abhinav Moudgil
+ * @author Sudhanshu Ranjan
+ *
  */
 
 #include <mlpack/core.hpp>
@@ -35,11 +42,7 @@ int main()
 {
   // Dataset is randomly split into training 
   // and validation parts with following ratio.
-  constexpr double RATIO = 0.9;
-  // The number of neurons in the first layer.
-  constexpr int H1 = 100;
-  // The number of neurons in the second layer.
-  constexpr int H2 = 100;
+  constexpr double RATIO = 0.2;
   
   // The solution is done in several approaches (CYCLES), so each approach 
   // uses previous results as starting point and have a different optimizer 
@@ -49,10 +52,10 @@ int main()
   constexpr int ITERATIONS_PER_CYCLE = 10000;
   
   // Number of cycles.
-  constexpr int CYCLES = 20;
+  constexpr int CYCLES = 100;
   
   // Step size of an optimizer.
-  constexpr double STEP_SIZE = 5e-4;
+  constexpr double STEP_SIZE = 5e-3;
   
   // Number of data points in each iteration of SGD
   constexpr int BATCH_SIZE = 50;
@@ -66,6 +69,7 @@ int main()
   // https://www.kaggle.com/c/digit-recognizer/data
   data::Load("train.csv", tempDataset, true);
 
+  std::cout<<"Data loaded : \n";
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
   mat dataset = tempDataset.submat(0, 1, 
@@ -76,8 +80,14 @@ int main()
   data::Split(dataset, train, valid, RATIO);
   
   // Getting training and validating dataset with features only.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  mat trainX;
+  trainX.set_size(train.n_rows - 1, train.n_cols);
+  mat validX;
+  validX.set_size(valid.n_rows - 1, valid.n_cols);
+  for(size_t i = 0; i < train.n_cols; i++)
+    trainX.col(i) = train.submat(1, i, train.n_rows -1, i), trainX.col(i) /= norm(trainX.col(i), 2);
+  for(size_t i = 0; i < valid.n_cols; i++)
+    validX.col(i) = valid.submat(1, i, valid.n_rows -1, i), validX.col(i) /= norm(validX.col(i), 2);
 
   // According to NegativeLogLikelihood output layer of NN, labels should
   // specify class of a data point and be in the interval from 1 to 
@@ -87,32 +97,83 @@ int main()
   const mat trainY = train.row(0) + 1;
   const mat validY = valid.row(0) + 1;
 
-  // Specifying the NN model. NegativeLogLikelihood is the output layer that
-  // is used for classification problem. RandomInitialization means that 
-  // initial weights in neurons are generated randomly in the interval 
-  // from -1 to 1.
+  std::cout<<"Splitting done\n";
+
+  // CNNs are implemented as feed forward network in mlpack
+  // First template parameter is output layer.
+  // Second template parameter is initialization for model.
   FFN<NegativeLogLikelihood<>, RandomInitialization> model;
-  // This is intermediate layer that is needed for connection between input
-  // data and sigmoid layer. Parameters specify the number of input features
-  // and number of neurons in the next layer.
-  model.Add<Linear<> >(trainX.n_rows, H1);
-  // The first sigmoid layer.
-  model.Add<SigmoidLayer<> >();
-  // Intermediate layer between sigmoid layers.
-  model.Add<Linear<> >(H1, H2);
-  // The second sigmoid layer.
-  model.Add<SigmoidLayer<> >();
-  // Dropout layer for regularization. First parameter is the probability of
-  // setting a specific value to 0.
-  // model.Add<Dropout<> >(0.3, true);
-  // Intermediate layer.
-  model.Add<Linear<> >(H2, 10);
-  // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
-  // output values to log of probabilities of being a specific class.
+
+  // At this point you would be thinking of converting
+  // arma::mat input to arma::cube but that is not needed.
+
+  // Convolution rules are implemented using arma::mat and
+  // passed from one layer to another using a 2d matrix.
+  // Same can be said for pooling layers.
+  
+  // The convolution layers internally use memptr for reshaping
+  // to arma::cube and then back to arma::mat and these implementation
+  // details can be found in convolution.cpp and convolution_impl.cpp
+
+  /*
+   * Construct a convolutional neural network with a 28x28x1 input layer,
+   * 24x24x8 convolution layer, 12x12x8 pooling layer, 8x8x12 convolution layer
+   * and a 4x4x12 pooling layer which is fully connected with the output layer.
+   * The network structure looks like:
+   *
+   * Input    Convolution  Pooling      Convolution  Pooling      Output
+   * Layer    Layer        Layer        Layer        Layer        Layer
+   *
+   *          +---+        +---+        +---+        +---+
+   *          | +---+      | +---+      | +---+      | +---+
+   * +---+    | | +---+    | | +---+    | | +---+    | | +---+    +---+
+   * |   |    | | |   |    | | |   |    | | |   |    | | |   |    |   |
+   * |   +--> +-+ |   +--> +-+ |   +--> +-+ |   +--> +-+ |   +--> |   |
+   * |   |      +-+   |      +-+   |      +-+   |      +-+   |    |   |
+   * +---+        +---+        +---+        +---+        +---+    +---+
+   */
+
+  // The convolution layer takes following parameters: 
+  // inSize  The number of input maps.
+  // outSize The number of output maps.
+  // kW  Width of the filter/kernel.
+  // kH  Height of the filter/kernel.
+  // dW  Stride of filter application in the x direction.
+  // dH  Stride of filter application in the y direction.
+  // padW  Padding width of the input.
+  // padH  Padding height of the input.
+  // inputWidth  The widht of the input data.
+  // inputHeight The height of the input data. 
+  
+  // For first layer we have inSize as 1 and outsize as 8
+  // (28−5+2*0)/1+1 = 24 (W−F+2P)/S+1 
+  // Refer : http://cs231n.github.io/convolutional-networks/#conv
+  model.Add<Convolution<> >(1, 8, 5, 5, 1, 1, 0, 0, 28, 28);
+  // Activation function (remember everythin is passed as 2d matrices).
+  model.Add<ReLULayer<> >();
+  
+  // Maxpooling, parameters :
+  // kW  Width of the pooling window.
+  // kH  Height of the pooling window.
+  // dW  Width of the stride operation.
+  // dH  Width of the stride operation.
+  // floor Rounding operator (floor or ceil). 
+  // (24 - 2) / 2 + 1 = 12 
+  model.Add<MaxPooling<> >(8, 8, 2, 2);
+  
+  // All the next layers are similarly made.
+  model.Add<Convolution<> >(8, 12, 2, 2);
+  model.Add<ReLULayer<> >();
+  model.Add<MaxPooling<> >(2, 2, 2, 2);
+
+  // Linear transformation (remember everythin is passed as 2d matrices).
+  model.Add<Linear<> >(192, 20);
+  model.Add<ReLULayer<> >();
+  model.Add<Linear<> >(20, 10);
+
+  // Use softmax for final layer.
   model.Add<LogSoftMax<> >();
-  
-  cout << "Training ..." << endl;  
-  
+
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
     // Step size of the optimizer.
@@ -131,6 +192,8 @@ int main()
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999)); 
 
+  std::cout<<"Model made and optimizer done.\n";
+  
   // Cycles for monitoring the process of a solution.
   for (int i = 0; i <= CYCLES; i++) {
     
@@ -182,4 +245,5 @@ int main()
     << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition" 
     << endl;
   cout << "Finished" << endl;
+
 }
