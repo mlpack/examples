@@ -52,10 +52,10 @@ int main()
   constexpr int ITERATIONS_PER_CYCLE = 10000;
   
   // Number of cycles.
-  constexpr int CYCLES = 20;
+  constexpr int CYCLES = 100;
   
   // Step size of an optimizer.
-  constexpr double STEP_SIZE = 5e-4;
+  constexpr double STEP_SIZE = 5e-3;
   
   // Number of data points in each iteration of SGD
   constexpr int BATCH_SIZE = 50;
@@ -69,6 +69,7 @@ int main()
   // https://www.kaggle.com/c/digit-recognizer/data
   data::Load("train.csv", tempDataset, true);
 
+  std::cout<<"Data loaded : \n";
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
   mat dataset = tempDataset.submat(0, 1, 
@@ -79,8 +80,14 @@ int main()
   data::Split(dataset, train, valid, RATIO);
   
   // Getting training and validating dataset with features only.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  mat trainX;
+  trainX.set_size(train.n_rows - 1, train.n_cols);
+  mat validX;
+  validX.set_size(valid.n_rows - 1, valid.n_cols);
+  for(size_t i = 0; i < train.n_cols; i++)
+    trainX.col(i) = train.submat(1, i, train.n_rows -1, i), trainX.col(i) /= norm(trainX.col(i), 2);
+  for(size_t i = 0; i < valid.n_cols; i++)
+    validX.col(i) = valid.submat(1, i, valid.n_rows -1, i), validX.col(i) /= norm(validX.col(i), 2);
 
   // According to NegativeLogLikelihood output layer of NN, labels should
   // specify class of a data point and be in the interval from 1 to 
@@ -89,6 +96,8 @@ int main()
   // Creating labels for training and validating dataset.
   const mat trainY = train.row(0) + 1;
   const mat validY = valid.row(0) + 1;
+
+  std::cout<<"Splitting done\n";
 
   // CNNs are implemented as feed forward network in mlpack
   // First template parameter is output layer.
@@ -161,8 +170,6 @@ int main()
   model.Add<Linear<> >(192, 20);
   model.Add<ReLULayer<> >();
   model.Add<Linear<> >(20, 10);
-  model.Add<ReLULayer<> >();
-  model.Add<Linear<> >(10, 2);
 
   // Use softmax for final layer.
   model.Add<LogSoftMax<> >();
@@ -185,6 +192,8 @@ int main()
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999)); 
 
+  std::cout<<"Model made and optimizer done.\n";
+  
   // Cycles for monitoring the process of a solution.
   for (int i = 0; i <= CYCLES; i++) {
     
