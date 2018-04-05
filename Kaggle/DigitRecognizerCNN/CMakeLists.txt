@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(kaggle-digit-recognizer)
+project(kaggle-digit-recognizer-cnn)
 
 option(DEBUG "DEBUG" OFF)
 
@@ -24,5 +24,5 @@ target_link_libraries(DigitRecognizerCNN
 
 add_custom_command(TARGET DigitRecognizerCNN POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/
+  ${CMAKE_CURRENT_SOURCE_DIR}/../DigitRecognizer/data/
     ${PROJECT_BINARY_DIR}/../..)
