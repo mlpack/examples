@@ -47,7 +47,7 @@ int main()
   constexpr double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 5;
+  constexpr int BATCH_SIZE = 1;
 
   cout << "Reading data ..." << endl;
 
