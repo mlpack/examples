@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.6)
-project(kaggle-digit-recognizer)
+project(kaggle-digit-recognizer-batchnorm)
 
 option(DEBUG "DEBUG" OFF)
 
@@ -22,5 +22,5 @@ target_link_libraries(DigitRecognizerBatchNorm
 
 add_custom_command(TARGET DigitRecognizerBatchNorm POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    kaggle-digit-recognizer_SOURCE_DIR/data/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../data/
     ${PROJECT_BINARY_DIR}/../..)

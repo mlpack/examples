@@ -35,7 +35,7 @@ using namespace std;
 int main() {
   // Dataset is randomly split into training
   // and validation parts with following ratio.
-  constexpr double RATIO = 0.9;
+  constexpr double RATIO = 0.1;
   // The number of neurons in the first layer.
   constexpr int H1 = 100;
   // The number of neurons in the second layer.

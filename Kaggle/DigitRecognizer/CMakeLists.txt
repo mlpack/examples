@@ -22,5 +22,5 @@ target_link_libraries(DigitRecognizer
 
 add_custom_command(TARGET DigitRecognizer POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-    kaggle-digit-recognizer_SOURCE_DIR/data/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../data/
     ${PROJECT_BINARY_DIR}/../..)
