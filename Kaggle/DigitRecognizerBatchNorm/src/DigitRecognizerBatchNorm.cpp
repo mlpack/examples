@@ -94,22 +94,19 @@ int main() {
   // from -1 to 1.
   FFN <NegativeLogLikelihood<>, RandomInitialization> model;
   // This is intermediate layer that is needed for connection between input
-  // data and sigmoid layer. Parameters specify the number of input features
+  // data and PRelU layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
   model.Add<Linear<> >(trainX.n_rows, H1);
-  // The first sigmoid layer.
-  model.Add<SigmoidLayer<> >();
-  // BatchNorm layer applied after sigmoid activation as it gives better results practically.
+  // The first PReLU activation layer. parameter can be set as constructor argument.
+  model.Add<PReLU<> >();
+  // BatchNorm layer applied after PReLU activation as it gives better results practically.
   model.Add<BatchNorm<> >(H1);
-  // Intermediate layer between sigmoid layers.
+  // Intermediate layer between PReLU activation layers.
   model.Add<Linear<> >(H1, H2);
-  // The second sigmoid layer.
-  model.Add<SigmoidLayer<> >();
+  // The second PReLU layer.
+  model.Add<PReLU<> >();
   //Second BatchNorm layer
   model.Add<BatchNorm<> >(H2);
-  // Dropout layer for regularization. First parameter is the probability of
-  // setting a specific value to 0.
-  // model.Add<Dropout<> >(0.3, true);
   // Intermediate layer.
   model.Add<Linear<> >(H2, 10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
