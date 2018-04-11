@@ -198,8 +198,8 @@ int main()
     predLabels = getLabels(predOut);
     double validAccuracy = accuracy(predLabels, validY);
 
-    cout << i << " - accuracy: train = "<< trainAccuracy << "%," <<
-        " valid = "<< validAccuracy << "%" <<  endl;
+    cout << "Epoch " << i << ":\tTraining Accuracy = "<< trainAccuracy<< "%,"
+        <<"\tValidation Accuracy = "<< validAccuracy << "%" <<  endl;
   }
 
   cout << "Predicting ..." << endl;
@@ -219,12 +219,10 @@ int main()
   model.Predict(testX, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to \"results.csv\" ..." << endl;
+  cout << "Saving predicted labels to results.csv."<< endl;
 
   // Saving results into Kaggle compatibe CSV file.
   save("results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to \"results.csv\". This file can be uploaded to "
-      << "https://www.kaggle.com/c/digit-recognizer/submissions"
-      << endl;
-  cout << "Finished" << endl;
+  cout << "Results were saved to results.csv. This file can be uploaded to "
+      << "https://www.kaggle.com/c/digit-recognizer/submissions." << endl;
 }
