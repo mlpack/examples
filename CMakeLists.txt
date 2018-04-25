@@ -185,6 +185,7 @@ set(DIRS
   # Model directories.
   Kaggle/DigitRecognizer
   Kaggle/DigitRecognizerBatchNorm
+  Kaggle/DigitRecognizerCNN
 )
 
 foreach(dir ${DIRS})
