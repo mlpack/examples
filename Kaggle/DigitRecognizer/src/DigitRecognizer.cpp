@@ -132,7 +132,8 @@ int main()
     AdamUpdate(1e-8, 0.9, 0.999)); 
 
   // Cycles for monitoring the process of a solution.
-  for (int i = 0; i <= CYCLES; i++) {
+  for (int i = 0; i <= CYCLES; i++)
+  {
     
     // Train neural network. If this is the first iteration, weights are 
     // random, using current values as starting point otherwise.

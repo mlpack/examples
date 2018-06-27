@@ -20,7 +20,13 @@ target_link_libraries(DigitRecognizer
   ${MLPACK_LIBRARIES} 
   ${ARMADILLO_LIBRARIES})
 
+add_custom_command(TARGET DigitRecognizer
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../kaggle_train_test_dataset.zip
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
+  )
+
 add_custom_command(TARGET DigitRecognizer POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory 
-    ${CMAKE_CURRENT_SOURCE_DIR}/data/ 
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/../data/
     ${PROJECT_BINARY_DIR}/../..)
