@@ -186,6 +186,7 @@ set(DIRS
   Kaggle/DigitRecognizer
   Kaggle/DigitRecognizerBatchNorm
   Kaggle/DigitRecognizerCNN
+  vae/vae_mnist
 )
 
 foreach(dir ${DIRS})
