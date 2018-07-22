@@ -24,7 +24,7 @@ using namespace mlpack::ann;
 int main()
 {
   // Whether to load training data.
-  constexpr bool loadData = false;
+  constexpr bool loadData = true;
   // The number of samples to generate.
   constexpr size_t n_samples = 20;
 
@@ -41,14 +41,14 @@ int main()
 
   // Load the trained model.
   FFN<MeanSquaredError<>, HeInitialization> vaeModel;
-  data::Load("saved_models/vaeModel_4.xml", "vaeModel_4", vaeModel);
+  data::Load("saved_models/vaeModelCNN.xml", "vaeModelCNN", vaeModel);
 
   arma::mat outputDists;
 
   // Generate randomly from the trained distribution.
-  arma::mat samples = arma::randn<arma::mat>(10, n_samples);
+  arma::mat samples = arma::randn<arma::mat>(20, n_samples);
 
-  vaeModel.ForwardPartial(samples, outputDists, 3, 3);
+  vaeModel.Forward(samples, outputDists, 3, 3);
   arma::mat outputSamples = outputDists;
 
   outputSamples = outputSamples / 2 + 0.5;

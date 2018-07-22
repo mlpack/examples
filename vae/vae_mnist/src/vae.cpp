@@ -57,7 +57,7 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("../../mnist_full.csv", fullData, true, false);
+  data::Load("vae/mnist_full.csv", fullData, true, false);
   fullData /= 255.0;
   fullData = (fullData - 0.5) * 2;
 
@@ -74,7 +74,7 @@ int main()
   if (loadModel)
   {
     std::cout << "Loading model ..." << std::endl;
-    data::Load("../../saved_models/vaeModel_4.xml", "vaeModel_4", vaeModel);
+    data::Load("vae/saved_models/vaeModel.xml", "vaeModel", vaeModel);
   }
   else
   {
@@ -95,7 +95,6 @@ int main()
     encoder->Add<Linear<> >(h3, h4);
     encoder->Add<ReLULayer<> >();
     encoder->Add<Linear<> >(h4, 2 * latentSize);
-    encoder->Add<TanHLayer<> >();
 
     vaeModel.Add(encoder);
 
@@ -113,7 +112,6 @@ int main()
     decoder->Add<Linear<> >(h3, h2);
     decoder->Add<ReLULayer<> >();
     decoder->Add<Linear<> >(h2, h1);
-    decoder->Add<TanHLayer<> >();
 
     vaeModel.Add(decoder);
   }
@@ -162,7 +160,7 @@ int main()
 
   if (saveModel)
   {
-    data::Save("../../saved_models/vaeModel_5.xml", "vaeModel_5", vaeModel);
-    std::cout << "Model saved in vae/saved_models." << std::endl;
+    data::Save("vae/saved_models/vaeModel.xml", "vaeModel", vaeModel);
+    std::cout << "Model saved in vae/saved_models/." << std::endl;
   }
 }

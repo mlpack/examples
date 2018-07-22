@@ -184,9 +184,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 set(DIRS
   # Model directories.
   Kaggle/DigitRecognizer
-  Kaggle/DigitRecognizerBatchNorm
   Kaggle/DigitRecognizerCNN
+  Kaggle/DigitRecognizerBatchNorm
   vae/vae_mnist
+  vae/vae_cnn_mnist
 )
 
 foreach(dir ${DIRS})
