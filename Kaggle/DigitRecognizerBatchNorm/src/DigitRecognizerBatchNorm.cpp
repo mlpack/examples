@@ -65,7 +65,7 @@ int main() {
   mat tempDataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("train.csv", tempDataset, true);
+  data::Load("Kaggle/data/train.csv", tempDataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -168,7 +168,7 @@ int main() {
 
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("test.csv", tempDataset, true);
+  data::Load("Kaggle/data/test.csv", tempDataset, true);
   mat testX = tempDataset.submat(0, 1,
     tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
@@ -177,10 +177,10 @@ int main() {
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
   Row <size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to \"results.csv\" ..." << endl;
+  cout << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("results.csv", "ImageId,Label", testPred);
+  save("Kaggle/results.csv", "ImageId,Label", testPred);
   cout << "Results were saved to \"results.csv\" and could be uploaded to "
     << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition"
     << endl;

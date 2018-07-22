@@ -47,7 +47,7 @@ int main()
   constexpr double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 1;
+  constexpr int BATCH_SIZE = 50;
 
   cout << "Reading data ..." << endl;
 
@@ -57,7 +57,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("train.csv", tempDataset, true);
+  data::Load("Kaggle/data/train.csv", tempDataset, true);
 
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
@@ -75,7 +75,7 @@ int main()
   const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
 
   // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to 
+  // specify class of a data point and be in the interval from 1 to
   // number of classes (in this case from 1 to 10).
 
   // Create labels for training and validatiion datasets.
@@ -162,7 +162,7 @@ int main()
     // Step size of the optimizer.
     STEP_SIZE,
     // Batch size. Number of data points that are used in each iteration.
-    BATCH_SIZE, 
+    BATCH_SIZE,
     // Max number of iterations.
     ITERATIONS_PER_CYCLE,
     // Tolerance, used as a stopping condition. Such a small value
@@ -171,7 +171,7 @@ int main()
     1e-8,
     // Shuffle. If optimizer should take random data points from the dataset at
     // each iteration.
-    true, 
+    true,
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999));
 
@@ -180,7 +180,7 @@ int main()
     // Train the CNN model. If this is the first iteration, weights are
     // randomly initialized between -1 and 1. Otherwise, the values of weights
     // from the previous iteration are used.
-    model.Train(trainX, trainY, optimizer); 
+    model.Train(trainX, trainY, optimizer);
 
     // Don't reset optimizers parameters between cycles.
     optimizer.ResetPolicy() = false;
@@ -207,7 +207,7 @@ int main()
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("test.csv", tempDataset, true);
+  data::Load("Kaggle/data/test.csv", tempDataset, true);
 
   // As before, it's necessary to get rid of column headings.
   mat testX = tempDataset.submat(0, 1,
@@ -222,7 +222,7 @@ int main()
   cout << "Saving predicted labels to results.csv."<< endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to results.csv. This file can be uploaded to "
+  save("Kaggle/results.csv", "ImageId,Label", testPred);
+  cout << "Results were saved to Kaggle/results.csv. This file can be uploaded to "
       << "https://www.kaggle.com/c/digit-recognizer/submissions." << endl;
 }
