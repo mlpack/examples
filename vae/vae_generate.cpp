@@ -17,43 +17,86 @@
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/reconstruction_loss.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
+#include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
+
+#include "vae_utils.hpp"
 
 using namespace mlpack;
 using namespace mlpack::ann;
 
+// Convenience typedef
+typedef FFN<ReconstructionLoss<arma::mat,
+                               arma::mat,
+                               BernoulliDistribution<arma::mat> >,
+            HeInitialization> ReconModel;
+
 int main()
 {
   // Whether to load training data.
-  constexpr bool loadData = true;
+  constexpr bool loadData = false;
   // The number of samples to generate.
-  constexpr size_t n_samples = 20;
+  constexpr size_t nofSamples = 20;
+  // Whether modelled on binary data.
+  constexpr bool isBinary = false;
+  // the latent size of the VAE model.
+  constexpr size_t latentSize = 20;
 
   arma::mat fullData, train, validation;
 
   if (loadData)
   {
-    data::Load("../mnist_full.csv", fullData, true, false);
+    data::Load("../build/vae/mnist_full.csv", fullData, true, false);
     fullData /= 255.0;
     fullData = (fullData - 0.5) * 2;
 
     data::Split(fullData, validation, train, 0.8);
   }
 
-  // Load the trained model.
+  arma::arma_rng::set_seed_random();
+
   FFN<MeanSquaredError<>, HeInitialization> vaeModel;
-  data::Load("saved_models/vaeModelCNN.xml", "vaeModelCNN", vaeModel);
+  // Load the trained model.
+  if (isBinary)
+  {
+    data::Load("../build/vae/saved_models/vaeModelBinary.xml",
+        "vaeModelBinary", vaeModel);
+    vaeModel.Add<SigmoidLayer<> >();
+  }
+  else
+  {
+    data::Load("../build/vae/saved_models/vaeBeta.xml", "vaeBeta", vaeModel);
+  }
 
-  arma::mat outputDists;
+  arma::mat outputDists, samples;
 
-  // Generate randomly from the trained distribution.
-  arma::mat samples = arma::randn<arma::mat>(20, n_samples);
+  /*
+   * Sampling from the prior.
+   */
+  arma::mat gaussSamples = arma::randn<arma::mat>(latentSize, nofSamples);
 
-  vaeModel.Forward(samples, outputDists, 3, 3);
-  arma::mat outputSamples = outputDists;
+  // Forward pass only through the decoder(and Sigmod layer in case of binary).
+  vaeModel.Forward(gaussSamples,
+                   outputDists,
+                   3 /* Index of the decoder */,
+                   3 + (size_t)isBinary /* Index of the last layer */);
 
-  outputSamples = outputSamples / 2 + 0.5;
-  outputSamples *= 255;
-  outputSamples = arma::clamp(outputSamples, 0, 255);
+  GetSample(outputDists, samples, isBinary);
+  // Save the prior samples as csv.
+  data::Save("samples_prior.csv", samples, false, false);
 
-  data::Save("outputSamples.csv", outputSamples, false, false);
+  /*
+   * Sampling from the posterior.
+   */
+  if (loadData)
+  {
+  // Forward pass through the entire network given an input datapoint.
+  vaeModel.Forward(validation.cols(0, 19),
+                   outputDists,
+                   1 /* Index of the encoder */,
+                   3 + (size_t)isBinary /* Index of the last layer */);
+
+  GetSample(outputDists, samples, isBinary);
+  // Save the posterior samplesa s csv.
+  data::Save("samples_posterior.csv", samples, false, false);
+  }
 }

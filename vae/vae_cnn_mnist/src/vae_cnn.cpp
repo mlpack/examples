@@ -20,10 +20,21 @@
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/reconstruction_loss.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
+#include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
+
+#include <vae/vae_utils.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
 using namespace mlpack::optimization;
+
+// Convenience typedefs
+typedef FFN<ReconstructionLoss<arma::mat,
+                               arma::mat,
+                               BernoulliDistribution<arma::mat> >,
+            HeInitialization> ReconModel;
+
+typedef FFN<MeanSquaredError<>, HeInitialization> MeanSModel;
 
 int main()
 {
@@ -34,15 +45,17 @@ int main()
   // The batch size.
   constexpr int batchSize = 50;
   // The step size of the optimizer.
-  constexpr double stepSize = 0.0008;
+  constexpr double stepSize = 0.001;
   // The number of interations per cycle.
   constexpr int iterPerCycle = 56000;
   // Number of cycles.
-  constexpr int cycles = 3;
+  constexpr int cycles = 10;
   // Whether to load a model to train.
-  constexpr bool loadModel = true;
+  constexpr bool loadModel = false;
   // Whether to save the trained model.
   constexpr bool saveModel = true;
+    // Whether to convert to binary MNIST.
+  constexpr bool isBinary = true;
 
   std::cout << "Reading data ..." << std::endl;
 
@@ -51,14 +64,21 @@ int main()
   arma::mat fullData;
   data::Load("vae/mnist_full.csv", fullData, true, false);
   fullData /= 255.0;
-  fullData = (fullData - 0.5) * 2;
+
+  if (isBinary)
+  {
+    fullData = arma::conv_to<arma::mat>::from(arma::randu<arma::mat>
+        (fullData.n_rows, fullData.n_cols) <= fullData);
+  }
+  else
+    fullData = (fullData - 0.5) * 2;
 
   arma::mat train, validation;
   data::Split(fullData, validation, train, trainRatio);
 
   // Loss is calculated on train_test data after each cycle.
   arma::mat train_test, dump;
-  data::Split(train, dump, train_test, 0.01);
+  data::Split(train, dump, train_test, 0.045);
 
   /**
    * Model architecture:
@@ -86,12 +106,12 @@ int main()
    */
 
   // Creating the VAE model.
-  FFN<MeanSquaredError<>, HeInitialization> vaeModel;
+  ReconModel vaeModel;
 
   if (loadModel)
   {
     std::cout << "Loading model ..." << std::endl;
-    data::Load("vae/saved_models/vaeModelCNN.xml", "vaeModelCNN", vaeModel);
+    data::Load("vae/saved_models/vaeCNNBinary.xml", "vaeCNNBinary", vaeModel);
   }
   else
   {
@@ -180,8 +200,8 @@ int main()
     // Adam update policy.
     AdamUpdate());
 
-  std::cout << "Initial loss -> " << vaeModel.Evaluate(train_test, train_test)
-      << std::endl;
+  std::cout << "Initial loss -> " <<
+      MeanTestLoss<ReconModel>(vaeModel, train_test, 50) << std::endl;
 
   const clock_t begin_time = clock();
 
@@ -196,12 +216,17 @@ int main()
     optimizer.ResetPolicy() = false;
 
     std::cout << "Loss after cycle  " << i << " -> " <<
-        vaeModel.Evaluate(train_test, train_test) << std::endl;
+        MeanTestLoss<ReconModel>(vaeModel, train_test, 50) << std::endl;
     std::cout << "Time taken for cycle -> " << float(clock() - begin_time) /
         CLOCKS_PER_SEC << " seconds" << std::endl;
 
     if (saveModel)
-      data::Save("vae/saved_models/vaeModelCNN.xml", "vaeModelCNN", vaeModel);
+    {
+      data::Save("vae/saved_models/vaeCNNBinary.xml", "vaeCNNBinary",
+          vaeModel);
+      std::cout << "Current progress of the model saved in vae/saved_models."
+          << std::endl;
+    }
   }
 
   std::cout << "Time taken to train -> " << float(clock() - begin_time) /

@@ -1,22 +1,32 @@
 from PIL import Image
 import numpy as np
 
-outputSamples = np.genfromtxt('outputSamples.csv', delimiter=',', dtype=np.uint8)
+def ImagesFromCSV(filename, imgShape = (28, 28), destination = 'samples'):
 
-temp_image = Image.fromarray(np.reshape(outputSamples[:, 0], (28, 28)), 'L')
-temp_image.save('generated_samples_3/image0' + '.jpg')
+  # Import the data into a numpy matrix.
+  samples = np.genfromtxt(filename, delimiter=',', dtype=np.uint8)
 
-latent_varying = temp_image
+  # Reshape and save it as an image in the destination.
+  temp_image = Image.fromarray(np.reshape(samples[:, 0], imgShape), 'L')
+  temp_image.save(destination + '/image0.jpg')
 
-for i in range(1, outputSamples.shape[1]):
-  temp_image = np.reshape(outputSamples[:, i], (28, 28))
+  # All the images will be concatenated to this for a combined image.
+  image_combined = temp_image
 
-  latent_varying = np.concatenate((latent_varying, temp_image), axis=1)
+  for i in range(1, samples.shape[1]):
 
-  temp_image = Image.fromarray(temp_image, 'L')
-  temp_image.save('generated_samples_3/image' + str(i) + '.jpg')
+    temp_image = np.reshape(samples[:, i], imgShape)
 
-latent_varying = Image.fromarray(latent_varying, 'L')
-latent_varying.save('generated_samples_3/image_combined' + '.jpg')
+    image_combined = np.concatenate((image_combined, temp_image), axis=1)
 
-print (str(outputSamples.shape[1]) + ' samples saved in generated_samples_3/.')
+    temp_image = Image.fromarray(temp_image, 'L')
+    temp_image.save(destination + '/image' + str(i) + '.jpg')
+
+  image_combined = Image.fromarray(image_combined, 'L')
+  image_combined.save(destination + '/image_combined' + '.jpg')
+
+  print (str(samples.shape[1]) + ' samples saved in ' + destination + '/.')
+
+
+ImagesFromCSV('samples_prior.csv', destination = 'samples_vae_prior')
+ImagesFromCSV('samples_posterior.csv', destination = 'samples_vae_posterior')
