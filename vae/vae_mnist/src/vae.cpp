@@ -97,7 +97,7 @@ int main()
   if (loadModel)
   {
     std::cout << "Loading model ..." << std::endl;
-    data::Load("vae/saved_models/vae.xml", "vae", vaeModel);
+    data::Load("vae/saved_models/vae.bin", "vae", vaeModel);
   }
   else
   {
@@ -181,7 +181,7 @@ int main()
 
   if (saveModel)
   {
-    data::Save("vae/saved_models/vae.xml", "vae", vaeModel);
+    data::Save("vae/saved_models/vae.bin", "vae", vaeModel);
     std::cout << "Model saved in vae/saved_models/." << std::endl;
   }
 }

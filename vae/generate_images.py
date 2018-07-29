@@ -1,32 +1,78 @@
+"""
+@file generate_images.py
+@author Atharva Khandait
+
+Generates jpg files from csv.
+
+mlpack is free software; you may redistribute it and/or modify it under the
+terms of the 3-clause BSD license.  You should have received a copy of the
+3-clause BSD license along with mlpack.  If not, see
+http://www.opensource.org/licenses/BSD-3-Clause for more information.
+"""
+
 from PIL import Image
 import numpy as np
 
-def ImagesFromCSV(filename, imgShape = (28, 28), destination = 'samples'):
+def ImagesFromCSV(filename,
+                  imgShape = (28, 28),
+                  destination = 'samples',
+                  saveIndividual = False):
 
   # Import the data into a numpy matrix.
   samples = np.genfromtxt(filename, delimiter=',', dtype=np.uint8)
 
   # Reshape and save it as an image in the destination.
   temp_image = Image.fromarray(np.reshape(samples[:, 0], imgShape), 'L')
-  temp_image.save(destination + '/image0.jpg')
+  if saveIndividual:
+    temp_image.save(destination + '/sample0.jpg')
 
   # All the images will be concatenated to this for a combined image.
-  image_combined = temp_image
+  allSamples = temp_image
 
   for i in range(1, samples.shape[1]):
 
     temp_image = np.reshape(samples[:, i], imgShape)
 
-    image_combined = np.concatenate((image_combined, temp_image), axis=1)
+    allSamples = np.concatenate((allSamples, temp_image), axis=1)
 
     temp_image = Image.fromarray(temp_image, 'L')
-    temp_image.save(destination + '/image' + str(i) + '.jpg')
+    if saveIndividual:
+      temp_image.save(destination + '/sample' + str(i) + '.jpg')
 
-  image_combined = Image.fromarray(image_combined, 'L')
-  image_combined.save(destination + '/image_combined' + '.jpg')
+  temp_image = allSamples
+  allSamples = Image.fromarray(allSamples, 'L')
+  allSamples.save(destination + '/allSamples' + '.jpg')
 
-  print (str(samples.shape[1]) + ' samples saved in ' + destination + '/.')
+  print ('Samples saved in ' + destination + '/.')
 
+  return temp_image
 
-ImagesFromCSV('samples_prior.csv', destination = 'samples_vae_prior')
-ImagesFromCSV('samples_posterior.csv', destination = 'samples_vae_posterior')
+# Save posterior samples.
+ImagesFromCSV('samples_csv_files/samples_posterior.csv', destination =
+    'samples_posterior')
+
+# Save prior samples with individual latent varying.
+latentSize = 10
+allLatent = ImagesFromCSV('samples_csv_files/samples_prior_latent0.csv',
+    destination = 'samples_prior')
+
+for i in range(1, latentSize):
+  allLatent = np.concatenate((allLatent,
+      (ImagesFromCSV('samples_csv_files/samples_prior_latent'+str(i)+'.csv',
+      destination = 'samples_prior'))), axis=0)
+
+saved = Image.fromarray(allLatent, 'L')
+saved.save('samples_prior/allLatent.jpg')
+
+# Save prior samples with 2d latent varying.
+nofSamples = 20
+allLatent = ImagesFromCSV('samples_csv_files/samples_prior_latent_2d0.csv',
+    destination = 'latent')
+
+for i in range(1, nofSamples):
+  allLatent = np.concatenate((allLatent,
+      (ImagesFromCSV('samples_csv_files/samples_prior_latent_2d'+str(i)+'.csv',
+      destination = 'samples_prior'))), axis=0)
+
+saved = Image.fromarray(allLatent, 'L')
+saved.save('samples_prior/2dLatent.jpg')

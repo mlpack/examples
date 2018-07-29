@@ -43,7 +43,7 @@ int main()
   // The latent size of the VAE model.
   constexpr int latentSize = 20;
   // The batch size.
-  constexpr int batchSize = 50;
+  constexpr int batchSize = 64;
   // The step size of the optimizer.
   constexpr double stepSize = 0.001;
   // The number of interations per cycle.
@@ -55,7 +55,7 @@ int main()
   // Whether to save the trained model.
   constexpr bool saveModel = true;
     // Whether to convert to binary MNIST.
-  constexpr bool isBinary = true;
+  constexpr bool isBinary = false;
 
   std::cout << "Reading data ..." << std::endl;
 
@@ -106,12 +106,12 @@ int main()
    */
 
   // Creating the VAE model.
-  ReconModel vaeModel;
+  MeanSModel vaeModel;
 
   if (loadModel)
   {
     std::cout << "Loading model ..." << std::endl;
-    data::Load("vae/saved_models/vaeCNNBinary.xml", "vaeCNNBinary", vaeModel);
+    data::Load("vae/saved_models/vaeCNN.bin", "vaeCNN", vaeModel);
   }
   else
   {
@@ -201,7 +201,7 @@ int main()
     AdamUpdate());
 
   std::cout << "Initial loss -> " <<
-      MeanTestLoss<ReconModel>(vaeModel, train_test, 50) << std::endl;
+      MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
 
   const clock_t begin_time = clock();
 
@@ -216,13 +216,13 @@ int main()
     optimizer.ResetPolicy() = false;
 
     std::cout << "Loss after cycle  " << i << " -> " <<
-        MeanTestLoss<ReconModel>(vaeModel, train_test, 50) << std::endl;
+        MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
     std::cout << "Time taken for cycle -> " << float(clock() - begin_time) /
         CLOCKS_PER_SEC << " seconds" << std::endl;
 
     if (saveModel)
     {
-      data::Save("vae/saved_models/vaeCNNBinary.xml", "vaeCNNBinary",
+      data::Save("vae/saved_models/vaeCNN.bin", "vaeCNN",
           vaeModel);
       std::cout << "Current progress of the model saved in vae/saved_models."
           << std::endl;
