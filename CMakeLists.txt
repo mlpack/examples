@@ -151,6 +151,12 @@ find_package(Boost 1.49
     REQUIRED
 )
 
+find_package(OpenMP)
+if (OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif ()
+
 # In Visual Studio, automatic linking is performed, so we don't need to worry
 # about it.  Clear the list of libraries to link against and let Visual Studio
 # handle it.
@@ -167,7 +173,8 @@ set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
                         ${Boost_INCLUDE_DIRS})
 set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
                      ${ARMADILLO_LIBRARIES}
-                     ${Boost_LIBRARIES})
+                     ${Boost_LIBRARIES}
+                     ${OpenMP_LIBRARY})
 
 include_directories(${MODELS_INCLUDE_DIRS})
 
