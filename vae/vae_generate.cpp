@@ -45,7 +45,7 @@ int main()
 
   if (loadData)
   {
-    data::Load("../build/vae/mnist_full.csv", fullData, true, false);
+    data::Load("mnist_full.csv", fullData, true, false);
     fullData /= 255.0;
 
     if (isBinary)
@@ -68,13 +68,12 @@ int main()
   // Load the trained model.
   if (isBinary)
   {
-    data::Load("../build/vae/saved_models/vaeBinaryMS.xml",
-        "vaeBinaryMS", vaeModel);
+    data::Load("saved_models/vaeBinaryMS.xml", "vaeBinaryMS", vaeModel);
     vaeModel.Add<SigmoidLayer<> >();
   }
   else
   {
-    data::Load("../build/vae/saved_models/vaeMS.bin", "vaeMS", vaeModel);
+    data::Load("saved_models/vaeMS.bin", "vaeMS", vaeModel);
   }
 
   arma::mat gaussianSamples, outputDists, samples;

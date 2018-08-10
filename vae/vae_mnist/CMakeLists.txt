@@ -35,3 +35,17 @@ if (NOT EXISTS ${PROJECT_BINARY_DIR}/../saved_models)
     COMMAND ${CMAKE_COMMAND} -E make_directory
       ${PROJECT_BINARY_DIR}/../saved_models)
 endif()
+
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../vae_generate.cpp)
+  add_custom_command(TARGET vae POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+      ${CMAKE_CURRENT_SOURCE_DIR}/../vae_generate.cpp
+    ${PROJECT_BINARY_DIR}/../)
+endif()
+
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../generate_images.py)
+  add_custom_command(TARGET vae POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+      ${CMAKE_CURRENT_SOURCE_DIR}/../generate_images.py
+    ${PROJECT_BINARY_DIR}/../)
+endif()
