@@ -173,8 +173,7 @@ set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
                         ${Boost_INCLUDE_DIRS})
 set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
                      ${ARMADILLO_LIBRARIES}
-                     ${Boost_LIBRARIES}
-                     ${OpenMP_LIBRARY})
+                     ${Boost_LIBRARIES})
 
 include_directories(${MODELS_INCLUDE_DIRS})
 

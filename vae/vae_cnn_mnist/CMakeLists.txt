@@ -6,9 +6,7 @@ option(DEBUG "DEBUG" OFF)
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
-set(SOURCES
-  ${MODEL_SOURCE_DIR}/vae_cnn.cpp
-  )
+set(SOURCES ${MODEL_SOURCE_DIR}/vae_cnn.cpp)
 
 if(DEBUG)
   message("Compilation with debug info (with ggdb3 flag)")

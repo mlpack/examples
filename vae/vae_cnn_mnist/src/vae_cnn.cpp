@@ -219,14 +219,6 @@ int main()
         MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
     std::cout << "Time taken for cycle -> " << float(clock() - begin_time) /
         CLOCKS_PER_SEC << " seconds" << std::endl;
-
-    if (saveModel)
-    {
-      data::Save("vae/saved_models/vaeCNN.bin", "vaeCNN",
-          vaeModel);
-      std::cout << "Current progress of the model saved in vae/saved_models."
-          << std::endl;
-    }
   }
 
   std::cout << "Time taken to train -> " << float(clock() - begin_time) /
@@ -235,6 +227,7 @@ int main()
   // Save the model if specified.
   if (saveModel)
   {
+    data::Save("vae/saved_models/vaeCNN.bin", "vaeCNN", vaeModel);
     std::cout << "Model saved in vae/saved_models." << std::endl;
   }
 }
