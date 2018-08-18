@@ -6,9 +6,7 @@ option(DEBUG "DEBUG" OFF)
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
-set(SOURCES
-  ${MODEL_SOURCE_DIR}/DigitRecognizerCNN.cpp
-  )
+set(SOURCES ${MODEL_SOURCE_DIR}/DigitRecognizerCNN.cpp)
 
 if(DEBUG)
   message("Compilation with debug info (with ggdb3 flag)")
@@ -22,7 +20,8 @@ target_link_libraries(DigitRecognizerCNN
   ${MLPACK_LIBRARIES}
   ${ARMADILLO_LIBRARIES})
 
-add_custom_command(TARGET DigitRecognizerCNN POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-  ${CMAKE_CURRENT_SOURCE_DIR}/../DigitRecognizer/data/
-    ${PROJECT_BINARY_DIR}/../..)
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
+  add_custom_command(TARGET DigitRecognizerCNN POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../kaggle_train_test_dataset.zip
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../)
+endif()

@@ -151,6 +151,12 @@ find_package(Boost 1.49
     REQUIRED
 )
 
+find_package(OpenMP)
+if (OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif ()
+
 # In Visual Studio, automatic linking is performed, so we don't need to worry
 # about it.  Clear the list of libraries to link against and let Visual Studio
 # handle it.
@@ -184,8 +190,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 set(DIRS
   # Model directories.
   Kaggle/DigitRecognizer
-  Kaggle/DigitRecognizerBatchNorm
   Kaggle/DigitRecognizerCNN
+  Kaggle/DigitRecognizerBatchNorm
+  vae/vae_mnist
+  vae/vae_cnn_mnist
 )
 
 foreach(dir ${DIRS})

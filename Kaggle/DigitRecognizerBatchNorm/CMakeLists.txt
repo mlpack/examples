@@ -17,16 +17,11 @@ endif()
 
 add_executable(DigitRecognizerBatchNorm ${SOURCES})
 target_link_libraries(DigitRecognizerBatchNorm
-  ${MLPACK_LIBRARIES} 
+  ${MLPACK_LIBRARIES}
   ${ARMADILLO_LIBRARIES})
 
-add_custom_command(TARGET DigitRecognizerBatchNorm
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../kaggle_train_test_dataset.zip
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../
-  )
-
-add_custom_command(TARGET DigitRecognizerBatchNorm POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/../data/
-    ${PROJECT_BINARY_DIR}/../..)
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
+  add_custom_command(TARGET DigitRecognizerBatchNorm POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../kaggle_train_test_dataset.zip
+    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../)
+endif()
