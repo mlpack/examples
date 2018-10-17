@@ -166,7 +166,7 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
   data::Load("Kaggle/data/test.csv", tempDataset, true);
-  mat testX = tempDataset.submat(0, 1,
+  mat testX = tempDataset.submat(1, 1,
     tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   mat testPredOut;
