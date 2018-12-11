@@ -6,6 +6,7 @@ project(models C CXX)
 option(FORCE_CXX11
     "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS."
     OFF)
+option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
 
 # If we are not forcing C++11 support, check that the compiler supports C++11
 # and enable it.
@@ -151,7 +152,11 @@ find_package(Boost 1.49
     REQUIRED
 )
 
-find_package(OpenMP)
+if (USE_OPENMP)
+  message(WARNING "Only use OpenMP if mlpack has been compiled with OpenMP.")
+  find_package(OpenMP)
+endif ()
+
 if (OPENMP_FOUND)
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
