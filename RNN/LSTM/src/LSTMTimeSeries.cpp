@@ -1,7 +1,8 @@
 /**
  * An example of using Recurrent Neural Network (RNN) 
  * to make forcasts on a time series of international airline passengers,
- * which we aim to solve using the a simple LSTM neural network.
+ * which we aim to solve using a simple LSTM neural network.
+ *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
  * 3-clause BSD license along with mlpack.  If not, see
@@ -16,17 +17,17 @@
 #include <mlpack/prereqs.hpp>
 #include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/core/data/split_data.hpp>
-#include <mlpack/core/optimizers/sgd/sgd.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <mlpack/core/optimizers/adam/adam_update.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
+#include <ensmallen.hpp>
 
 using namespace std;
 using namespace arma;
 using namespace mlpack;
 using namespace mlpack::ann;
-using namespace mlpack::optimization;
+using namespace ens;
+
 using Model = RNN<MeanSquaredError<>,HeInitialization>;
 
 // HYPERPARAMETERS
@@ -100,15 +101,14 @@ void CreateData(InputDataType input, DataType& dataset, LabelType& label, int NU
 */
 template<typename DataType = arma::mat>
 DataType StandardScaler(DataType& dataset){
-    math::Center(dataset, dataset);
     arma::vec sigma = arma::stddev(dataset, 0, 1 /* for each dimension */);
     // If there are any zeroes, make them very small.
     for (size_t i = 0; i < sigma.n_elem; ++i)
         if (sigma[i] == 0) sigma[i] = 1e-50;
+    dataset -= arma::mean(dataset);
     dataset /= arma::repmat(sigma, 1, dataset.n_cols);
     return dataset;
 }
-
 
 
 arma::cube trainX, trainY;
