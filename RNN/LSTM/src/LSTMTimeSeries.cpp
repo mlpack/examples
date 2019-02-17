@@ -52,13 +52,13 @@ const size_t inputSize = 1;
 const size_t outputSize = 1;
 
 // Using previous WINDOW_SIZE values to predict the next value in time series.
-const size_t WINDOW_SIZE = 4;
+const int WINDOW_SIZE = 4;
 
 // No of timesteps to look in RNN.
-const size_t rho = WINDOW_SIZE;
+const int rho = WINDOW_SIZE;
 
 // Max Rho for LSTM 
-const size_t maxRho = rho;
+const int maxRho = rho;
 
 // taking the first 100 Samples
 const int NUM_SAMPLES = 100;
@@ -71,7 +71,7 @@ const bool loadModel = false;
 double calc_mse(arma::cube& pred, arma::cube& Y){
     double err_sum = 0.0;
     cube diff = pred-Y;
-    for(int i = 0;i<diff.n_slices;i++){
+    for(size_t i = 0;i<diff.n_slices;i++){
         mat temp = diff.slice(i);
         err_sum += accu(temp%temp);
     }
@@ -114,13 +114,13 @@ DataType StandardScaler(DataType& dataset){
 arma::cube trainX, trainY;
 arma::cube testX, testY;
 
-int main(int argc, char const *argv[]){
+int main(){
 
     arma::mat dataset;
 
     // In Armadillo rows represent features, columns represent data points.
     cout << "Reading data ..." << endl;
-    data::Load("data/international-airline-passengers.csv", dataset, true);
+    data::Load("RNN/data/international-airline-passengers.csv", dataset, true);
 
     // The dataset CSV file has header, so it's necessary to
     // get rid of the this row, in Armadillo representation it's the first column
@@ -160,7 +160,7 @@ int main(int argc, char const *argv[]){
     //MODEL BUILDING/LOADING
     if (loadModel){
       std::cout << "Loading model ..." << std::endl;
-      data::Load("saved_models/lstm.bin", "lstm", model);
+      data::Load("../saved_models/lstm.bin", "lstm", model);
     }
     else{
         model.Add<IdentityLayer<> >();
@@ -204,7 +204,7 @@ int main(int argc, char const *argv[]){
     cout << "Finished" << endl;
     cout << "Saving Model" << endl;
     if (saveModel){
-      data::Save("saved_models/lstm.bin", "lstm", model);
+      data::Save("../saved_models/lstm.bin", "lstm", model);
       std::cout << "Model saved in saved_models/." << std::endl;
     }
     return 0;
