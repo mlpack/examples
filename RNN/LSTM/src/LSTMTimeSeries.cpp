@@ -63,6 +63,10 @@ const size_t maxRho = rho;
 // taking the first 100 Samples
 const int NUM_SAMPLES = 100;
 
+// Save/Load model
+const bool saveModel = true;
+const bool loadModel = false;
+
 /*Function to calcute MSE for arma::cube*/
 double calc_mse(arma::cube& pred, arma::cube& Y){
     double err_sum = 0.0;
@@ -105,21 +109,6 @@ DataType StandardScaler(DataType& dataset){
     return dataset;
 }
 
-//MODEL BUILDING
-Model CreateModel(size_t inputSize,
-                  size_t outputSize,
-                  size_t rho,
-                  size_t maxRho
-                  ){
-    Model model(rho);
-    model.Add<IdentityLayer<> >();
-    model.Add<LSTM<> >(inputSize, 20, maxRho);
-    model.Add<TanHLayer<> >();
-    model.Add<Linear<> >(20, 10);
-    model.Add<TanHLayer<> >();
-    model.Add<Linear<> >(10, outputSize);
-    return model;
-}
 
 
 arma::cube trainX, trainY;
@@ -166,7 +155,21 @@ int main(int argc, char const *argv[]){
     CreateData(test,testX,testY,NUM_VSAMPLES,WINDOW_SIZE);
     
     // RNN Model
-    Model model = CreateModel(inputSize,outputSize,rho,maxRho);
+    Model model(rho);
+
+    //MODEL BUILDING/LOADING
+    if (loadModel){
+      std::cout << "Loading model ..." << std::endl;
+      data::Load("saved_models/lstm.bin", "lstm", model);
+    }
+    else{
+        model.Add<IdentityLayer<> >();
+        model.Add<LSTM<> >(inputSize, 20, maxRho);
+        model.Add<TanHLayer<> >();
+        model.Add<Linear<> >(20, 10);
+        model.Add<TanHLayer<> >();
+        model.Add<Linear<> >(10, outputSize);
+    }
 
     // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
     SGD<AdamUpdate> optimizer(
@@ -199,5 +202,10 @@ int main(int argc, char const *argv[]){
     }
 
     cout << "Finished" << endl;
+    cout << "Saving Model" << endl;
+    if (saveModel){
+      data::Save("saved_models/lstm.bin", "lstm", model);
+      std::cout << "Model saved in saved_models/." << std::endl;
+    }
     return 0;
 }
