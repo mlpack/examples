@@ -63,7 +63,21 @@ const size_t maxRho = rho;
 // taking the first 100 Samples
 const int NUM_SAMPLES = 100;
 
+/*Function to calcute MSE for arma::cube*/
+double calc_mse(arma::cube& pred, arma::cube& Y){
+    double err_sum = 0.0;
+    cube diff = pred-Y;
+    for(int i = 0;i<diff.n_slices;i++){
+        mat temp = diff.slice(i);
+        err_sum += accu(temp%temp);
+    }
+    return (err_sum)/diff.n_elem;
+}
 
+/*
+* Here, we have a univariate data set which records the number of airline passengers for each month.
+* we modify the date to the time series in order to get some ideas about underlying trends,
+*/
 template<typename InputDataType = arma::mat,typename DataType = arma::cube, typename LabelType = arma::cube>
 void CreateData(InputDataType input, DataType& dataset, LabelType& label, int NUM_SAMPLES, int WINDOW_SIZE)
 {
@@ -76,6 +90,36 @@ void CreateData(InputDataType input, DataType& dataset, LabelType& label, int NU
     }
 }
 
+/* 
+* Standard Scaler (taken from PCA implementation)
+* https://github.com/mlpack/mlpack/blob/master/src/mlpack/methods/pca/pca_impl.hpp
+*/
+template<typename DataType = arma::mat>
+DataType StandardScaler(DataType& dataset){
+    math::Center(dataset, dataset);
+    arma::vec sigma = arma::stddev(dataset, 0, 1 /* for each dimension */);
+    // If there are any zeroes, make them very small.
+    for (size_t i = 0; i < sigma.n_elem; ++i)
+        if (sigma[i] == 0) sigma[i] = 1e-50;
+    dataset /= arma::repmat(sigma, 1, dataset.n_cols);
+    return dataset;
+}
+
+//MODEL BUILDING
+Model CreateModel(size_t inputSize,
+                  size_t outputSize,
+                  size_t rho,
+                  size_t maxRho
+                  ){
+    Model model(rho);
+    model.Add<IdentityLayer<> >();
+    model.Add<LSTM<> >(inputSize, 20, maxRho);
+    model.Add<TanHLayer<> >();
+    model.Add<Linear<> >(20, 10);
+    model.Add<TanHLayer<> >();
+    model.Add<Linear<> >(10, outputSize);
+    return model;
+}
 
 
 arma::cube trainX, trainY;
