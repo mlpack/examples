@@ -17,18 +17,16 @@
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 
-#include <mlpack/core/optimizers/sgd/sgd.hpp>
-#include <mlpack/core/optimizers/adam/adam_update.hpp>
-
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 
+#include <ensmallen.hpp>
 #include <Kaggle/kaggle_utils.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
-using namespace mlpack::optimization;
 
+using namespace ens;
 using namespace arma;
 using namespace std;
 
