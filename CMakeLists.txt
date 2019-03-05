@@ -199,6 +199,8 @@ set(DIRS
   Kaggle/DigitRecognizerBatchNorm
   vae/vae_mnist
   vae/vae_cnn_mnist
+  gan/gan_mnist
+  gan/gan_sample_generator
 )
 
 foreach(dir ${DIRS})
