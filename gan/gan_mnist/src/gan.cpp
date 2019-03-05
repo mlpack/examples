@@ -40,8 +40,6 @@ int main() {
     constexpr int noiseDim = 100;
     // The batch size.
     constexpr int batchSize = 100;
-    // The num of kernels
-    constexpr int dNumKernels = 16;
     // The number of steps to update generator
     constexpr int generatorUpdateStep = 10;
     // The number of pretrain discriminator steps
@@ -58,8 +56,6 @@ int main() {
     constexpr int iterPerCycle = 56000;
     // Number of cycles.
     constexpr int cycles = 10;
-    // The number of samples
-    constexpr int numSamples = 10;
     // Whether to shuffle data
     constexpr bool shuffle = true;
     // Whether to convert to binary MNIST.
