@@ -225,7 +225,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 # Include directories for the previous dependencies.
 set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
                         ${ARMADILLO_INCLUDE_DIR}
-                        ${Boost_INCLUDE_DIRS})
+                        ${Boost_INCLUDE_DIRS}
+                        ${ENSMALLEN_INCLUDE_DIR})
+
 set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
                      ${ARMADILLO_LIBRARIES}
                      ${Boost_LIBRARIES})
