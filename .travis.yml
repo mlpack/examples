@@ -8,8 +8,7 @@ before_install:
   - curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz | tar xvz && cd armadillo*
   - cmake . && make && sudo make install && cd ..
   - wget http://ensmallen.org/files/ensmallen-1.14.0.tar.gz
-  - tar xvz ensmallen-1.14.0.tar.gz && tar -xzf ensmallen-1.14.0.tar.gz
-  - cd ensmallen-1.14.0
+  - tar -xzf ensmallen-1.14.0.tar.gz && cd ensmallen-1.14.0
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
