@@ -23,12 +23,16 @@
 #include <Kaggle/kaggle_utils.hpp>
 #include <ensmallen.hpp>
 
+#include <ensmallen.hpp>
+
 using namespace mlpack;
 using namespace mlpack::ann;
 
 using namespace ens;
 using namespace arma;
 using namespace std;
+
+using namespace ens;
 
 int main() {
   // Dataset is randomly split into training

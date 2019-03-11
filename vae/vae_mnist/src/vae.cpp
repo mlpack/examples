@@ -21,10 +21,12 @@
 #include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
 
 #include <vae/vae_utils.hpp>
+
 #include <ensmallen.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
+
 using namespace ens;
 
 // Convenience typedefs

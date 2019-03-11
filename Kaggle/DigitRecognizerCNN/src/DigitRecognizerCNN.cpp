@@ -20,14 +20,16 @@
 #include <mlpack/methods/ann/ffn.hpp>
 
 #include <Kaggle/kaggle_utils.hpp>
+
 #include <ensmallen.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
-using namespace ens;
 
 using namespace arma;
 using namespace std;
+
+using namespace ens;
 
 int main()
 {
