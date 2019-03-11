@@ -12,9 +12,6 @@
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 
-#include <mlpack/core/optimizers/sgd/sgd.hpp>
-#include <mlpack/core/optimizers/adam/adam_update.hpp>
-
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
@@ -24,9 +21,12 @@
 
 #include <vae/vae_utils.hpp>
 
+#include <ensmallen.hpp>
+
 using namespace mlpack;
 using namespace mlpack::ann;
-using namespace mlpack::optimization;
+
+using namespace ens;
 
 // Convenience typedefs
 typedef FFN<ReconstructionLoss<arma::mat,
