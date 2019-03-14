@@ -16,6 +16,7 @@ environment:
   build/Debug/armadillo.lib"
   BLAS_LIBRARY: "%APPVEYOR_BUILD_FOLDER%/OpenBLAS.0.2.14.1/lib/native/lib/x64/\
   libopenblas.dll.a"
+  MLPACK_DIR: "C:\projects\mlpack"
   MLPACK_LIBRARY: "C:/projects/mlpack/build/Release/mlpack.lib"
   MLPACK_INCLUDE: "C:/projects/mlpack/build/include"
   BOOST_INCLUDE: "C:/projects/mlpack/boost.1.60.0.0/lib/native/include"
@@ -31,23 +32,23 @@ os: Visual Studio 2015
 
 install:
   - ps : cd C:\projects
-  - ps: nuget install boost -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
+  - ps: nuget install boost -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_unit_test_framework-vc140
-      -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
+      -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_program_options-vc140
-      -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
+      -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_random-vc140
-      -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
+      -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_serialization-vc140
-      -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
+      -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_math_c99-vc140
-      -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
-  - ps: nuget install OpenBLAS -o "${env:APPVEYOR_BUILD_FOLDER}"
+      -o %MLPACK_DIR% -Version 1.60.0
+  - ps: nuget install OpenBLAS -o %MLPACK_DIR%
   - set path=C:\Program Files (x86)\WiX Toolset v3.11\bin;%path%
 
 build_script:
