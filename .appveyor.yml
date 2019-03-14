@@ -49,9 +49,8 @@ install:
       -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
   - ps: nuget install OpenBLAS -o "${env:APPVEYOR_BUILD_FOLDER}"
   - set path=C:\Program Files (x86)\WiX Toolset v3.11\bin;%path%
-  -
+
 build_script:
-  - ps: cd C:\projects\mlpack
   - mkdir boost_libs
   - ps: cp ${env:BOOST_PROG_OPTION} C:\projects\mlpack\boost_libs\
   - ps: cp ${env:BOOST_MATH} C:\projects\mlpack\boost_libs\
