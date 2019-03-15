@@ -1,5 +1,5 @@
 /**
- * @file vae.cpp
+ * @file gan.cpp
  * @author Kwon Soonmok
  *
  * A Generative Adverserial Network(GAN) model to generate
