@@ -33,6 +33,7 @@ os: Visual Studio 2015
 
 install:
   - ps: cd C:\projects
+  - ps: git clone -q --depth=2 --branch=master https://github.com/mlpack/mlpack.git C:\projects\mlpack 2>$null
   - ps: nuget install boost -o %MLPACK_DIR% -Version 1.60.0
   - ps: >
       nuget install boost_unit_test_framework-vc140
@@ -50,7 +51,6 @@ install:
       nuget install boost_math_c99-vc140
       -o %MLPACK_DIR% -Version 1.60.0
   - ps: nuget install OpenBLAS -o %MLPACK_DIR%
-  - set path=C:\Program Files (x86)\WiX Toolset v3.11\bin;%path%
 
 build_script:
   # build mlpack
