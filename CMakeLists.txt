@@ -244,7 +244,7 @@ set(DIRS
   vae/vae_mnist
   vae/vae_cnn_mnist
   gan/gan_sample_generator
-  gan/gan
+  gan/gan_mnist
 )
 
 foreach(dir ${DIRS})
