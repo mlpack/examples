@@ -139,7 +139,7 @@ int main() {
     FFN<CrossEntropyError<> > trainedGenerator = gan.Generator();
     if (saveModel)
     {
-        data::Save("saved_models/gan.bin", "gan", trainedGenerator);
+        data::Save("../gan/saved_models/gan.bin", "gan", trainedGenerator);
         std::cout << "Model saved in saved_models" << std::endl;
     }
 

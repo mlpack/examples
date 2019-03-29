@@ -49,7 +49,7 @@ int main() {
 
     // load gan model
     FFN<> generator;
-    data::Load("gan/saved_models/gan.bin", "gan", generator);
+    data::Load("../gan/saved_models/gan.bin", "gan", generator);
 
     // Generate samples
     Log::Info << "Sampling..." << std::endl;
@@ -80,5 +80,5 @@ int main() {
 
 
     std::cout << generatedData.n_cols << " / " << generatedData.n_rows << std::endl;
-    data::Save("../../gan/samples_csv_files.csv", generatedData, false, false);
+    data::Save("../gan/samples_csv_files.csv", generatedData, false, false);
 }
