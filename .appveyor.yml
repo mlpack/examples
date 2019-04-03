@@ -2,25 +2,18 @@ clone_depth: 10
 
 environment:
 
-  BOOST_PROG_OPTION: "C:/projects/mlpack/\
-  boost_program_options-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
-  BOOST_MATH: "C:/projects/mlpack/\
-  boost_math_c99-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
-  BOOST_RANDOM: "C:/projects/mlpack/\
-  boost_random-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
-  BOOST_SERIALIZATION: "C:/projects/mlpack/\
-  boost_serialization-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
-  BOOST_UNIT_TEST: "C:/projects/mlpack/\
-  boost_unit_test_framework-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
-  ARMADILLO_INCLUDE: "C:/projects/mlpack/armadillo-7.800.2/include"
-  ARMADILLO_LIBRARY: "C:/projects/mlpack/armadillo-7.800.2/\
-  build/Debug/armadillo.lib"
-  BLAS_LIBRARY: "C:/projects/mlpack/OpenBLAS.0.2.14.1/lib/native/lib/x64/\
-  libopenblas.dll.a"
+  BOOST_PROG_OPTION: "C:/projects/boost_program_options-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
+  BOOST_MATH: "C:/projects/boost_math_c99-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
+  BOOST_RANDOM: "C:/projects/boost_random-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
+  BOOST_SERIALIZATION: "C:/projects/boost_serialization-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
+  BOOST_UNIT_TEST: "C:/projects/boost_unit_test_framework-vc140.1.60.0.0/lib/native/address-model-64/lib/*.*"
+  ARMADILLO_INCLUDE: "C:/projects/armadillo-7.800.2/include"
+  ARMADILLO_LIBRARY: "C:/projects/armadillo-7.800.2/build/Debug/armadillo.lib"
+  BLAS_LIBRARY: "C:/projects/OpenBLAS.0.2.14.1/lib/native/lib/x64/libopenblas.dll.a"
   MLPACK_DIR: "C:/projects/mlpack"
-  MLPACK_LIBRARY: "C:/projects/mlpack/build/Release/mlpack.lib"
+  MLPACK_LIBRARY: "C:/projects/build/Release/mlpack.lib"
   MLPACK_INCLUDE: "C:/projects/mlpack/build/include"
-  BOOST_INCLUDE: "C:/projects/mlpack/boost.1.60.0.0/lib/native/include"
+  BOOST_INCLUDE: "C:/projects/boost.1.60.0.0/lib/native/include"
   matrix:
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
       VSVER: Visual Studio 14 2015 Win64
