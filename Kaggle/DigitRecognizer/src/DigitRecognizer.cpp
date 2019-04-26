@@ -76,9 +76,9 @@ int main()
   // Getting training and validating dataset with features only and then
   // normalising
   const mat trainX = train.submat(1, 0, train.n_rows - 1,
-      train.n_cols - 1)/255.0;
+      train.n_cols - 1) / 255.0;
   const mat validX = valid.submat(1, 0, valid.n_rows - 1,
-      valid.n_cols - 1)/255.0;
+      valid.n_cols - 1) / 255.0;
   
   const int ITERATIONS_PER_CYCLE = trainX.n_cols;
   // According to NegativeLogLikelihood output layer of NN, labels should
