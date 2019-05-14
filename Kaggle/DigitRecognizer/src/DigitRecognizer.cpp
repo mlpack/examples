@@ -18,6 +18,7 @@
 
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
+#include <mlpack/methods/ann/init_rules/glorot_init.hpp>
 
 #include <Kaggle/kaggle_utils.hpp>
 
@@ -34,28 +35,25 @@ using namespace ens;
 int main()
 {
   // Dataset is randomly split into validation
-  // and training parts with following ratio.
+  // and training parts in the following ratio.
   constexpr double RATIO = 0.1;
   // The number of neurons in the first layer.
-  constexpr int H1 = 100;
+  constexpr int H1 = 200;
   // The number of neurons in the second layer.
   constexpr int H2 = 100;
 
   // The solution is done in several approaches (CYCLES), so each approach
-  // uses previous results as starting point and have a different optimizer
+  // uses previous results as a starting point and has different optimizer
   // options (here the step size is different).
-
-  // Number of iteration per cycle.
-  constexpr int ITERATIONS_PER_CYCLE = 10000;
 
   // Number of cycles.
   constexpr int CYCLES = 20;
 
-  // Step size of an optimizer.
-  constexpr double STEP_SIZE = 5e-4;
+  // Step size of the optimizer.
+  constexpr double STEP_SIZE = 5e-3;
 
   // Number of data points in each iteration of SGD
-  constexpr int BATCH_SIZE = 50;
+  constexpr int BATCH_SIZE = 64;
 
   cout << "Reading data ..." << endl;
 
@@ -75,10 +73,14 @@ int main()
   mat train, valid;
   data::Split(dataset, train, valid, RATIO);
 
-  // Getting training and validating dataset with features only.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
-
+  // Getting training and validating dataset with features only and then
+  // normalising
+  const mat trainX = train.submat(1, 0, train.n_rows - 1,
+      train.n_cols - 1) / 255.0;
+  const mat validX = valid.submat(1, 0, valid.n_rows - 1,
+      valid.n_cols - 1) / 255.0;
+  
+  const int ITERATIONS_PER_CYCLE = trainX.n_cols;
   // According to NegativeLogLikelihood output layer of NN, labels should
   // specify class of a data point and be in the interval from 1 to
   // number of classes (in this case from 1 to 10).
@@ -88,23 +90,22 @@ int main()
   const mat validY = valid.row(0) + 1;
 
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
-  // is used for classification problem. RandomInitialization means that
-  // initial weights in neurons are generated randomly in the interval
-  // from -1 to 1.
-  FFN<NegativeLogLikelihood<>, RandomInitialization> model;
+  // is used for classification problem. GlorotInitialization means that
+  // initial weights in neurons are a uniform gaussian distribution
+  FFN<NegativeLogLikelihood<>, GlorotInitialization> model;
   // This is intermediate layer that is needed for connection between input
-  // data and sigmoid layer. Parameters specify the number of input features
+  // data and relu layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
   model.Add<Linear<> >(trainX.n_rows, H1);
-  // The first sigmoid layer.
-  model.Add<SigmoidLayer<> >();
-  // Intermediate layer between sigmoid layers.
+  // The first relu layer.
+  model.Add<ReLULayer<> >();
+  // Intermediate layer between relu layers.
   model.Add<Linear<> >(H1, H2);
-  // The second sigmoid layer.
-  model.Add<SigmoidLayer<> >();
+  // The second relu layer.
+  model.Add<ReLULayer<> >();
   // Dropout layer for regularization. First parameter is the probability of
   // setting a specific value to 0.
-  // model.Add<Dropout<> >(0.3, true);
+  model.Add<Dropout<> >(0.2);
   // Intermediate layer.
   model.Add<Linear<> >(H2, 10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
