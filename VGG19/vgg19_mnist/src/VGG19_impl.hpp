@@ -44,7 +44,7 @@ Sequential<>* VGG19::CompileModel()
     // Block 1
     VGGNet->Add<Convolution<> >(
       inputChannel,  // Number of input activation maps.
-      6,  // Number of output activation maps.
+      64,  // Number of output activation maps.
       3,  // Filter width.
       3,  // Filter height.
       1,  // Stride along width.

@@ -31,15 +31,10 @@ if (NOT EXISTS ${PROJECT_BINARY_DIR}/../saved_models)
       ${PROJECT_BINARY_DIR}/../saved_models)
 endif()
 
-if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
-  add_custom_command(TARGET vgg19 POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${PROJECT_BINARY_DIR}/../data)
-endif()
+## Avoiding uncessary copy
+#if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
+#  add_custom_command(TARGET vgg19 POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../../Kaggle/kaggle_train_test_dataset.zip
+#    WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../)
+#endif()
 
-if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data/train.csv)
-  add_custom_command(TARGET vgg19 POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-      ${CMAKE_CURRENT_SOURCE_DIR}/../../data/train.csv
-    ${PROJECT_BINARY_DIR}/../data/)
-endif()

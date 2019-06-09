@@ -83,7 +83,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
   mat tempDataset;
-  data::Load("VGG19/data/train.csv", tempDataset, true);
+  data::Load("./Kaggle/data/train.csv", tempDataset, true);
   mat dataset = tempDataset.submat(0, 1,
       tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
