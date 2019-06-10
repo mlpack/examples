@@ -63,7 +63,7 @@ int main()
   constexpr double RATIO = 0.1;
 
   // Number of iteration per cycle.
-  constexpr int ITERATIONS_PER_CYCLE = 10000;
+  constexpr int ITERATIONS_PER_CYCLE = 10;
 
   // Number of cycles.
   constexpr int CYCLES = 42;
@@ -72,7 +72,7 @@ int main()
   constexpr double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 51;
+  constexpr int BATCH_SIZE = 32;
 
   constexpr int numClasses = 10;
 

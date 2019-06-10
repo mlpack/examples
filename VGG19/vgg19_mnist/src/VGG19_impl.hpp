@@ -67,9 +67,13 @@ Sequential<>* VGG19::CompileModel()
         2,  // Stride along height.
         true
       );
-    // valid padding 
-    inputWidth = std::ceil((inputWidth - 2 + 1.0) /2 );
-    inputHeight = std::ceil((inputHeight - 2 + 1.0) /2 );
+
+    std::cout << "Width" << " " << "Height" << std::endl;
+
+    // same padding
+    inputWidth = std::ceil(inputWidth / 2.0);
+    inputHeight = std::ceil(inputHeight / 2.0);
+    std::cout << inputWidth << " " << inputHeight << std::endl;
 
     // Block 2
     VGGNet->Add<Convolution<> >(64, 128, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
@@ -77,9 +81,11 @@ Sequential<>* VGG19::CompileModel()
     VGGNet->Add<Convolution<> >(128, 128, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
     VGGNet->Add<LeakyReLU<> >();
     VGGNet->Add<MaxPooling<> >(2, 2, 2, 2, true);
-    // valid padding 
-    inputWidth = std::ceil((inputWidth - 2 + 1.0) /2 );
-    inputHeight = std::ceil((inputHeight - 2 + 1.0) /2 );
+
+    // same padding
+    inputWidth = std::ceil(inputWidth / 2.0);
+    inputHeight = std::ceil(inputHeight / 2.0);
+    std::cout << inputWidth << " " << inputHeight << std::endl;
 
     // Block 3
     VGGNet->Add<Convolution<> >(128, 256, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
@@ -91,10 +97,11 @@ Sequential<>* VGG19::CompileModel()
     VGGNet->Add<Convolution<> >(256, 256, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
     VGGNet->Add<LeakyReLU<> >();
     VGGNet->Add<MaxPooling<> >(2, 2, 2, 2, true);
-    // valid padding 
-    inputWidth = std::ceil((inputWidth - 2 + 1.0) /2 );
-    inputHeight = std::ceil((inputHeight - 2 + 1.0) /2 );
 
+    // same padding
+    inputWidth = std::ceil(inputWidth / 2.0);
+    inputHeight = std::ceil(inputHeight / 2.0);
+    std::cout << inputWidth << " " << inputHeight << std::endl;
 
     // Block 4
     VGGNet->Add<Convolution<> >(256, 512, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
@@ -106,9 +113,11 @@ Sequential<>* VGG19::CompileModel()
     VGGNet->Add<Convolution<> >(512, 512, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
     VGGNet->Add<LeakyReLU<> >();
     VGGNet->Add<MaxPooling<> >(2, 2, 2, 2, true);
-    // valid padding 
-    inputWidth = std::ceil((inputWidth - 2 + 1.0) /2 );
-    inputHeight = std::ceil((inputHeight - 2 + 1.0) /2 );
+
+    // same padding
+    inputWidth = std::ceil(inputWidth / 2.0);
+    inputHeight = std::ceil(inputHeight / 2.0);
+    std::cout << inputWidth << " " << inputHeight << std::endl;
 
     // Block 5
     VGGNet->Add<Convolution<> >(512, 512, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
@@ -120,9 +129,11 @@ Sequential<>* VGG19::CompileModel()
     VGGNet->Add<Convolution<> >(512, 512, 3, 3, 1, 1, 1, 1, inputHeight, inputWidth);
     VGGNet->Add<LeakyReLU<> >();
     VGGNet->Add<MaxPooling<> >(2, 2, 2, 2, true);
-    // valid padding 
-    inputWidth = std::ceil((inputWidth - 2 + 1.0) / 2);
-    inputHeight = std::ceil((inputHeight - 2 + 1.0) / 2);
+
+    // same padding
+    inputWidth = std::ceil(inputWidth / 2.0);
+    inputHeight = std::ceil(inputHeight / 2.0);
+    std::cout << inputWidth << " " << inputHeight << std::endl;
 
     if (includeTop)
     {
