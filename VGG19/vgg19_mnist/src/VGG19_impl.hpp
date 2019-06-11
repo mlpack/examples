@@ -1,5 +1,5 @@
 /**
- * @file VGG19.hpp
+ * @file VGG19_impl.hpp
  * @author Mehul Kumar Nirala
  *
  * An implementation of VGG19.
@@ -21,8 +21,7 @@ VGG19::VGG19(const size_t inputWidth,
              const size_t numClasses,
              const bool includeTop,
              const std::string pooling,
-             const std::string weights
-            ):
+             const std::string weights):
             inputWidth(inputWidth),
             inputHeight(inputHeight),
             inputChannel(inputChannel),
@@ -68,7 +67,7 @@ Sequential<>* VGG19::CompileModel()
         true
       );
 
-    std::cout << "Width" << " " << "Height" << std::endl;
+    std::cout << "inputWidth" << " " << "inputHeight" << std::endl;
 
     // same padding
     inputWidth = std::ceil(inputWidth / 2.0);
