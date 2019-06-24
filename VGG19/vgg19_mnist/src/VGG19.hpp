@@ -42,8 +42,7 @@ public:
   *
   * @param inputWidth Width of the input image.
   * @param inputHeight Height of the input image.
-  * @param inputHeight Height of the input image.
-  * @param inputChannels Channels of the input image.
+  * @param inputChannels Number of input channels of the input image.
   * @param numClasses optional number of classes to classify images into,
   *      only to be specified if include_top is  true.
   * @param includeTop Whether to include the 3 fully-connected layers at
@@ -57,8 +56,8 @@ public:
         const size_t inputChannel,
         const size_t numClasses,
         const bool includeTop = true,
-        const std::string pooling = "max",
-        const std::string weights = "imagenet");
+        const std::string& pooling = "max",
+        const std::string& weights = "imagenet");
 
   ~VGG19();
 
@@ -71,14 +70,14 @@ public:
   * @param filePath Path to load the model from.
   * @return Sequential Pointer to a sequential model.
   */
-  Sequential<>* LoadModel(const std::string filePath);
+  Sequential<>* LoadModel(const std::string& filePath);
   
   /**
   * Save model to a location.
   *
   * @param filePath Path to save the model to.
   */
-  void SaveModel(const std::string filePath);
+  void SaveModel(const std::string& filePath);
 
   size_t GetOutputShape();
 

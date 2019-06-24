@@ -20,15 +20,15 @@ VGG19::VGG19(const size_t inputWidth,
              const size_t inputChannel,
              const size_t numClasses,
              const bool includeTop,
-             const std::string pooling,
-             const std::string weights):
-            inputWidth(inputWidth),
-            inputHeight(inputHeight),
-            inputChannel(inputChannel),
-            numClasses(numClasses),
-            includeTop(includeTop),
-            pooling(pooling),
-            weights(weights)
+             const std::string& pooling,
+             const std::string& weights) :
+             inputWidth(inputWidth),
+             inputHeight(inputHeight),
+             inputChannel(inputChannel),
+             numClasses(numClasses),
+             includeTop(includeTop),
+             pooling(pooling),
+             weights(weights)
 {
     VGGNet = new Sequential<>();
 }
@@ -146,10 +146,17 @@ Sequential<>* VGG19::CompileModel()
     {   
         outputShape = inputWidth * inputHeight * 512;
         if (pooling == "max")
-            ; // Global maax pooling
-
+        {
+            // Global max pooling.
+            VGGNet->Add<MaxPooling<> >(inputWidth, inputHeight, 1, 1, true);
+            outputShape = 512; // 1 * 1 * 512 .
+        }
         else if (pooling == "avg")
-            ; // Global avg pooling
+        {
+            // Global avg pooling.
+            VGGNet->Add<MeanPooling<> >(inputWidth, inputHeight, 1, 1, true);
+            outputShape = 512; // 1 * 1 * 512 .
+        }
     }
     return VGGNet;
 }
@@ -159,14 +166,14 @@ size_t VGG19::GetOutputShape()
     return outputShape;
 }
 
-Sequential<>* VGG19::LoadModel(std::string filePath)
+Sequential<>* VGG19::LoadModel(const std::string& filePath)
 {
     std::cout << "Loading model ..." << std::endl;
     data::Load(filePath, "VGG19", VGGNet);
     return VGGNet;
 }
 
-void VGG19::SaveModel(std::string filePath)
+void VGG19::SaveModel(const std::string& filePath)
 {
     std::cout << "Saving model ..." << std::endl;
     data::Save(filePath, "VGG19", VGGNet);
