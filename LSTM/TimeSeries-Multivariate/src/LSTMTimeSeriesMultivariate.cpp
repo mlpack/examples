@@ -89,7 +89,7 @@ int main()
   const int EPOCH = 25;
 
   // Number of iteration per epoch.
-  const int ITERATIONS_PER_EPOCH = 100;
+  const int ITERATIONS_PER_EPOCH = 100000;
 
   // Step size of an optimizer.
   const double STEP_SIZE = 5e-4;
@@ -102,9 +102,6 @@ int main()
 
   // Max Rho for LSTM 
   const int maxRho = rho;
-
-  // taking the first 100 Samples
-  const int numSamples = 100;
 
   // Save/Load model
   const bool saveModel = true;
@@ -136,10 +133,8 @@ int main()
   CreateTimeSeriesData(dataset, X, y, rho);
 
   // Split the data into training and testing sets.
-  size_t trainingSize = (1 - RATIO) * X.n_cols;
-  size_t testingSize = RATIO * X.n_cols;
-
   arma::cube trainX, trainY, testX, testY;
+  size_t trainingSize = (1 - RATIO) * X.n_cols;
   trainX = X.subcube(span(), span(0, trainingSize-1), span());
   trainY = y.subcube(span(), span(0, trainingSize-1), span());
   testX = X.subcube(span(), span(trainingSize, X.n_cols-1), span());
@@ -207,4 +202,3 @@ int main()
   }
   return 0;
 }
-
