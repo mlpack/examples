@@ -1,6 +1,6 @@
 /**
  * An example of using Recurrent Neural Network (RNN) 
- * to make forcasts on a time series of international airline passengers,
+ * to make forcasts on a time series of Google stock prices.
  * which we aim to solve using a simple LSTM neural network.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
@@ -8,6 +8,7 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  *
+ * @file LSTMTimeSeriesMultivariate.cpp
  * @author Mehul Kumar Nirala
  */
 
