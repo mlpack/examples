@@ -12,11 +12,9 @@
  * @author Mehul Kumar Nirala
  */
 
-#include <iostream>
 #include <mlpack/core.hpp>
 #include <mlpack/prereqs.hpp>
 #include <mlpack/methods/ann/rnn.hpp>
-#include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
@@ -28,7 +26,9 @@ using namespace mlpack;
 using namespace mlpack::ann;
 using namespace ens;
 
-/*Function to calcute MSE for arma::cube*/
+/*
+ * Function to calcute MSE for arma::cube
+ */
 double MSE(arma::cube& pred, arma::cube& Y)
 {
   double err_sum = 0.0;
@@ -64,14 +64,9 @@ DataType MinMaxScaler(DataType& dataset)
 {
   arma::vec rangeValues = arma::range(dataset, 1 /* for each dimension */);
   arma::vec minValues = arma::min(dataset, 1 /* for each dimension */);
-  // If there are any zeroes, make them very small.
-  for (size_t i = 0; i < rangeValues.n_elem; ++i)
-  {
-    if (rangeValues[i] == 0)
-    {
-      rangeValues[i] = 1e-50;
-    }
-  }
+
+  // Add a very small value if there are any zeros.
+  rangeValues += 1e-25;
 
   dataset -= arma::repmat(minValues , 1, dataset.n_cols);
   dataset /= arma::repmat(rangeValues , 1, dataset.n_cols);
@@ -81,15 +76,14 @@ DataType MinMaxScaler(DataType& dataset)
 int main()
 {
   /* HYPERPARAMETERS */
-
-  // Training data is randomly taken from the dataset in this ratio.
-  const double RATIO = 0.1;
+  // Testing data is taken from the dataset in this ratio.
+  const double RATIO = 0.3;
 
   // Number of cycles.
-  const int EPOCH = 25;
+  const int EPOCH = 100;
 
   // Number of iteration per epoch.
-  const int ITERATIONS_PER_EPOCH = 100000;
+  const int ITERATIONS_PER_EPOCH = 10000;
 
   // Step size of an optimizer.
   const double STEP_SIZE = 5e-4;
@@ -98,7 +92,7 @@ int main()
   const size_t BATCH_SIZE = 16;
 
   // No of timesteps to look in RNN.
-  const int rho = 50;
+  const int rho = 25;
 
   // Max Rho for LSTM 
   const int maxRho = rho;
@@ -147,7 +141,7 @@ int main()
   if (loadModel)
   {
     std::cout << "Loading model ..." << std::endl;
-    data::Load("saved_models/lstm.bin", "lstm", model);
+    data::Load("saved_models/LSTMMulti.bin", "LSTMMulti", model);
   }
   else
   {
