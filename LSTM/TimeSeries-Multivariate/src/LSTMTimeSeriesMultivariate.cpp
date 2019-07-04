@@ -62,8 +62,10 @@ void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size
 template<typename DataType = arma::mat>
 DataType MinMaxScaler(DataType& dataset)
 {
-  arma::vec rangeValues = arma::range(dataset, 1 /* for each dimension */);
+  arma::vec maxValues = arma::max(dataset, 1 /* for each dimension */);
   arma::vec minValues = arma::min(dataset, 1 /* for each dimension */);
+
+  arma::vec rangeValues = maxValues - minValues;
 
   // Add a very small value if there are any zeros.
   rangeValues += 1e-25;
@@ -80,13 +82,13 @@ int main()
   const double RATIO = 0.3;
 
   // Number of cycles.
-  const int EPOCH = 100;
+  const int EPOCH = 256;
 
   // Number of iteration per epoch.
   const int ITERATIONS_PER_EPOCH = 10000;
 
   // Step size of an optimizer.
-  const double STEP_SIZE = 5e-4;
+  const double STEP_SIZE = 5e-2;
 
   // Number of data points in each iteration of SGD.
   const size_t BATCH_SIZE = 16;
