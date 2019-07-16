@@ -15,11 +15,13 @@
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/core/data/one_hot_encoding.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
+using namespace mlpack::data;
 
 using namespace arma;
 using namespace std;
@@ -55,7 +57,6 @@ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batc
   return loss;
 }
 
-
 int main()
 {
   // Dataset is randomly split into validation
@@ -82,34 +83,33 @@ int main()
 
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
-  mat tempDataset;
+  arma::mat tempDataset;
   data::Load("./Kaggle/data/train.csv", tempDataset, true);
-  mat dataset = tempDataset.submat(0, 1,
-      tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  arma::mat dataset = tempDataset.submat(0, 1, tempDataset.n_rows - 1, 501 - 1);
+
+  arma::mat X, Y;
+  X = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1);
+  X /= 255.0;
+  // Create labels for the datasets.
+  data::OneHotEncoding(arma::conv_to<arma::irowvec>::from(dataset.row(0)), Y);
+  Y = Y.t();
 
   // Split the dataset into training and validation sets.
-  mat train, valid;
-  data::Split(dataset, train, valid, RATIO);
+  arma::mat trainX, validX;
+  arma::mat trainY, validY;
+  size_t trainingSize = (1 - RATIO) * X.n_cols;
 
-  // The train and valid datasets contain both - the features as well as the
-  // class labels. Split these into separate mats.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  trainX = X.submat(0, 0, X.n_rows - 1, trainingSize - 1);
+  validX = X.submat(0, trainingSize, X.n_rows - 1, X.n_cols - 1);
 
-  // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to
-  // number of classes (in this case from 1 to 10).
+  trainY = Y.submat(0, 0, Y.n_rows - 1, trainingSize - 1);
+  validY = Y.submat(0, trainingSize, Y.n_rows - 1, Y.n_cols - 1);
 
-  // Create labels for training and validatiion datasets.
-  const mat trainY = train.row(0) + 1;
-  const mat validY = valid.row(0) + 1;
-
-  cout << "Input Shape" << std::endl;
-  cout << trainX.n_rows << " " << trainX.n_cols << endl;
+  std::cout << "Input Shape" << std::endl;
+  std::cout << trainX.n_rows << " " << trainX.n_cols << endl;
 
   // INPUT
   size_t inputWidth = 28, inputChannel = 1, inputHeight = 28;
-
 
   VGG19 vggnet(inputWidth, inputHeight, inputChannel, numClasses, false, "max", "mnist");
   Sequential<>* vgg19 = vggnet.CompileModel();
