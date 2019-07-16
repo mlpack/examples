@@ -57,8 +57,8 @@ We loop through all the samples and for each day we go back 25 business days in 
 
 @code
   /*
-   * The time series data for today should contain
-   * the [Volume of stocks traded, Average stock price]
+   * The time series data for today should contain the [Volume of stocks traded,
+   * Opening stock price, Closing stock price, Min stock price, Max stock price]
    * for past 'rho' days and the target variable will be Google’s
    * stock price today (high, low) and so on.
    */
@@ -77,7 +77,7 @@ We loop through all the samples and for each day we go back 25 business days in 
 
 @section model_lstmtut LSTM Model
 
-We add 30 RNN cells that will be stacked one after the other in the RNN, implementing an efficient stacked RNN. Finally, the output will have only one unit as this is a regression problem.
+We add 4 LSTM cells that will be stacked one after the other in the RNN, implementing an efficient stacked RNN. Finally, the output will have only one unit as this is a regression problem.
 
 @code
   // No of timesteps to look in RNN.
@@ -87,14 +87,15 @@ We add 30 RNN cells that will be stacked one after the other in the RNN, impleme
   // RNN model.
   RNN<MeanSquaredError<>,HeInitialization> model(rho);
   model.Add<IdentityLayer<> >();
-  model.Add<LSTM<> > (inputSize, outputSize, maxRho);
+  model.Add<LSTM<> > (inputSize, 10, maxRho);
   model.Add<Dropout<> >(0.5);
   model.Add<LeakyReLU<> >();
-  model.Add<LSTM<> > (outputSize, outputSize, maxRho);
+  model.Add<LSTM<> > (10, 10, maxRho);
   model.Add<Dropout<> >(0.5);
   model.Add<LeakyReLU<> >();
-  model.Add<LSTM<> > (outputSize, outputSize, maxRho);
-  model.Add<Linear<> >(outputSize, outputSize);
+  model.Add<LSTM<> > (10, 10, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<Linear<> >(10, outputSize);
 
 @endcode
 
@@ -139,32 +140,17 @@ Setting parameters Stochastic Gradient Descent (SGD) optimizer.
 
 @section results_lstmtut Results
 
-Mean Squared error upto 25 iterations.
- 1 - Mean Squared Error := 0.474642
- 2 - Mean Squared Error := 0.472394
- 3 - Mean Squared Error := 0.470225
- 4 - Mean Squared Error := 0.468131
- 5 - Mean Squared Error := 0.466106
- 6 - Mean Squared Error := 0.464155
- 7 - Mean Squared Error := 0.462268
- 8 - Mean Squared Error := 0.460441
- 9 - Mean Squared Error := 0.458667
-10 - Mean Squared Error := 0.456942
-11 - Mean Squared Error := 0.455263
-12 - Mean Squared Error := 0.453628
-13 - Mean Squared Error := 0.452037
-14 - Mean Squared Error := 0.450487
-15 - Mean Squared Error := 0.44897
-16 - Mean Squared Error := 0.447486
-17 - Mean Squared Error := 0.446029
-18 - Mean Squared Error := 0.444597
-19 - Mean Squared Error := 0.443195
-20 - Mean Squared Error := 0.441819
-21 - Mean Squared Error := 0.440465
-22 - Mean Squared Error := 0.43913
-23 - Mean Squared Error := 0.437834
-24 - Mean Squared Error := 0.43656
-25 - Mean Squared Error := 0.435301
+Mean Squared error upto 10 iterations.
+ 1 - Mean Squared Error := 0.236375
+ 2 - Mean Squared Error := 0.233769
+ 3 - Mean Squared Error := 0.2336
+ 4 - Mean Squared Error := 0.12196
+ 5 - Mean Squared Error := 0.0666709
+ 6 - Mean Squared Error := 0.143383
+ 7 - Mean Squared Error := 0.14387
+ 8 - Mean Squared Error := 0.143908
+ 9 - Mean Squared Error := 0.143437
+10 - Mean Squared Error := 0.17364
 ....
 
 */

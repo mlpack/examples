@@ -32,18 +32,18 @@ using namespace ens;
 double MSE(arma::cube& pred, arma::cube& Y)
 {
   double err_sum = 0.0;
-  cube diff = pred-Y;
+  arma::cube diff = pred-Y;
   for(size_t i = 0;i<diff.n_slices;i++)
   {
     mat temp = diff.slice(i);
     err_sum += accu(temp%temp);
   }
-  return (err_sum)/diff.n_elem;
+  return (err_sum) / (diff.n_elem + 1e-50);
 }
 
 /*
- * The time series data for today should contain
- * the [Volume of stocks traded, Average stock price]
+ * The time series data for today should contain the [Volume of stocks traded,
+ * Opening stock price, Closing stock price, Min stock price, Max stock price]
  * for past 'rho' days and the target variable will be Google’s
  * stock price today (high, low) and so on.
  */
@@ -79,13 +79,13 @@ int main()
 {
   /* HYPERPARAMETERS */
   // Testing data is taken from the dataset in this ratio.
-  const double RATIO = 0.3;
+  const double RATIO = 0.1;
 
   // Number of cycles.
   const int EPOCH = 256;
 
   // Number of iteration per epoch.
-  const int ITERATIONS_PER_EPOCH = 10000;
+  const int ITERATIONS_PER_EPOCH = 1000;
 
   // Step size of an optimizer.
   const double STEP_SIZE = 5e-2;
@@ -148,14 +148,15 @@ int main()
   else
   {
     model.Add<IdentityLayer<> >();
-    model.Add<LSTM<> > (inputSize, outputSize, maxRho);
+    model.Add<LSTM<> > (inputSize, 10, maxRho);
     model.Add<Dropout<> >(0.5);
     model.Add<LeakyReLU<> >();
-    model.Add<LSTM<> > (outputSize, outputSize, maxRho);
+    model.Add<LSTM<> > (10, 10, maxRho);
     model.Add<Dropout<> >(0.5);
     model.Add<LeakyReLU<> >();
-    model.Add<LSTM<> > (outputSize, outputSize, maxRho);
-    model.Add<Linear<> >(outputSize, outputSize);
+    model.Add<LSTM<> > (10, 10, maxRho);
+    model.Add<LeakyReLU<> >();
+    model.Add<Linear<> >(10, outputSize);
   }
 
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
