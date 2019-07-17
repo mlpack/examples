@@ -15,23 +15,21 @@
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/core/data/one_hot_encoding.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
+#include <mlpack/methods/ann/init_rules/glorot_init.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
-using namespace mlpack::data;
 
 using namespace arma;
 using namespace std;
 using namespace ens;
 
 // Convenience typedefs
-typedef FFN<NegativeLogLikelihood<>, HeInitialization> VGGModel;
+typedef FFN<NegativeLogLikelihood<>, XavierInitialization > VGGModel;
 
 // Calculates Log Likelihood Loss over batches.
-template<typename NetworkType = FFN<NegativeLogLikelihood<>, HeInitialization>,
+template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization >,
          typename DataType = arma::mat>
 double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batchSize)
 {
@@ -57,8 +55,11 @@ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batc
   return loss;
 }
 
+
 int main()
 {
+  // INPUT
+  const size_t inputWidth = 28, inputHeight = 28, inputChannel = 1;
   // Dataset is randomly split into validation
   // and training parts with following ratio.
   constexpr double RATIO = 0.1;
@@ -67,7 +68,7 @@ int main()
   constexpr int ITERATIONS_PER_CYCLE = 10;
 
   // Number of cycles.
-  constexpr int CYCLES = 42;
+  constexpr int CYCLES = 32;
 
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 1.2e-3;
@@ -83,33 +84,31 @@ int main()
 
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
-  arma::mat tempDataset;
+  mat tempDataset;
   data::Load("./Kaggle/data/train.csv", tempDataset, true);
-  arma::mat dataset = tempDataset.submat(0, 1, tempDataset.n_rows - 1, 501 - 1);
-
-  arma::mat X, Y;
-  X = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1);
-  X /= 255.0;
-  // Create labels for the datasets.
-  data::OneHotEncoding(arma::conv_to<arma::irowvec>::from(dataset.row(0)), Y);
-  Y = Y.t();
+  mat dataset = tempDataset.submat(0, 1,
+      tempDataset.n_rows - 1, 501 - 1);
 
   // Split the dataset into training and validation sets.
-  arma::mat trainX, validX;
-  arma::mat trainY, validY;
-  size_t trainingSize = (1 - RATIO) * X.n_cols;
+  mat train, valid;
+  data::Split(dataset, train, valid, RATIO);
 
-  trainX = X.submat(0, 0, X.n_rows - 1, trainingSize - 1);
-  validX = X.submat(0, trainingSize, X.n_rows - 1, X.n_cols - 1);
+  // The train and valid datasets contain both - the features as well as the
+  // class labels. Split these into separate mats.
+  arma::mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
+  arma::mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  trainX /= 255.0;
+  validX /= 255.0;
 
-  trainY = Y.submat(0, 0, Y.n_rows - 1, trainingSize - 1);
-  validY = Y.submat(0, trainingSize, Y.n_rows - 1, Y.n_cols - 1);
+  // According to NegativeLogLikelihood output layer of NN, labels should
+  // specify class of a data point and be in the interval from 1 to
+  // number of classes (in this case from 1 to 10).
+  // Create labels for training and validatiion datasets.
+  arma::mat trainY = train.row(0) + 1;
+  arma::mat validY = valid.row(0) + 1;
 
-  std::cout << "Input Shape" << std::endl;
-  std::cout << trainX.n_rows << " " << trainX.n_cols << endl;
-
-  // INPUT
-  size_t inputWidth = 28, inputChannel = 1, inputHeight = 28;
+  cout << "Input Shape" << std::endl;
+  cout << trainX.n_rows << " " << trainX.n_cols << endl;
 
   VGG19 vggnet(inputWidth, inputHeight, inputChannel, numClasses, false, "max", "mnist");
   Sequential<>* vgg19 = vggnet.CompileModel();
@@ -117,9 +116,11 @@ int main()
   VGGModel model;
   model.Add<IdentityLayer<> >();
   model.Add(vgg19);
-  /* Can be used if Top is not included in the VggNet.*/
+  
+  // /*Can be used if Top is not included in the VggNet.*/
   // size_t outputShape = vgg19.GetOutputShape();
   // model.Add<Linear<> >(outputShape, numClasses);
+  
   model.Add<LogSoftMax<> >();
 
   // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
@@ -167,5 +168,4 @@ int main()
     data::Save("VGG19/saved_models/vgg19.bin", "VGG19", model);
     std::cout << "Model saved in VGG19/saved_models/" << std::endl;
   }
-
 }

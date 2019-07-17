@@ -100,14 +100,14 @@ private:
   // Number of output classes.
   size_t numClasses;
 
-  // Type of pre-trained weights.
-  std::string weights;
-
   // Include the final dense layer.
   bool includeTop;
 
   // Parameter for final pooling layer.
   std::string pooling;
+
+  // Type of pre-trained weights.
+  std::string weights;
 
   // Stores the output shape of the VGG19
   size_t outputShape;

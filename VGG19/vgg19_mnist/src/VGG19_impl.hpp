@@ -28,7 +28,8 @@ VGG19::VGG19(const size_t inputWidth,
              numClasses(numClasses),
              includeTop(includeTop),
              pooling(pooling),
-             weights(weights)
+             weights(weights),
+             outputShape(512)
 {
     VGGNet = new Sequential<>();
 }
@@ -184,5 +185,4 @@ Sequential<>* VGG19::GetModel()
 {
     return VGGNet;
 }
-
 #endif
