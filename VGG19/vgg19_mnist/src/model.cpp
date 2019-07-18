@@ -87,7 +87,7 @@ int main()
   mat tempDataset;
   data::Load("./Kaggle/data/train.csv", tempDataset, true);
   mat dataset = tempDataset.submat(0, 1,
-      tempDataset.n_rows - 1, 501 - 1);
+      tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   // Split the dataset into training and validation sets.
   mat train, valid;
