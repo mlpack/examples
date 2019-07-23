@@ -243,6 +243,7 @@ set(DIRS
   Kaggle/DigitRecognizerBatchNorm
   vae/vae_mnist
   vae/vae_cnn_mnist
+  LSTM/Sentiment-Analysis
 )
 
 foreach(dir ${DIRS})
