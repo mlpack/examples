@@ -33,7 +33,7 @@ double MSE(arma::cube& pred, arma::cube& Y)
 {
   double err_sum = 0.0;
   arma::cube diff = pred-Y;
-  for(size_t i = 0;i<diff.n_slices;i++)
+  for(size_t i = 0;i < diff.n_slices; i++)
   {
     mat temp = diff.slice(i);
     err_sum += accu(temp%temp);
@@ -52,7 +52,7 @@ template<typename InputDataType = arma::mat,
      typename LabelType = arma::cube>
 void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size_t rho)
 {
-  for(size_t i = 0;i<dataset.n_cols - rho - 1 ;i++)
+  for(size_t i = 0;i < dataset.n_cols - rho - 1 ;i++)
   {
     X.subcube(span(), span(i), span()) = dataset.submat(span(), span(i, i+rho-1));
     y.subcube(span(), span(i), span()) = dataset.submat(span(3,4), span(i, i+rho-1));
@@ -181,13 +181,13 @@ int main()
     // Don't reset optimizer's parameters between cycles.
     optimizer.ResetPolicy() = false;
 
-    cube predOut;
+    arma::cube predOut;
     // Getting predictions on test data points.
     model.Predict(testX, predOut);
 
     // Calculating mse on test data points.
-    double testMSE = MSE(predOut,testY);
-    cout << i+1<< " - Mean Squared Error := "<< testMSE <<   endl;
+    double testMSE = MSE(predOut, testY);
+    cout << i+1 << " - Mean Squared Error := "<< testMSE <<   endl;
   }
 
   cout << "Finished" << endl;
