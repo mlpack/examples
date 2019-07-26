@@ -63,11 +63,11 @@ We loop through all the samples and for each day we go back 25 business days in 
    * stock price today (high, low) and so on.
    */
   template<typename InputDataType = arma::mat,
-       typename DataType = arma::cube,
-       typename LabelType = arma::cube>
+           typename DataType = arma::cube,
+           typename LabelType = arma::cube>
   void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size_t rho)
   {
-    for(size_t i = 0;i<dataset.n_cols - rho - 1 ;i++)
+    for(size_t i = 0;i < dataset.n_cols - rho - 1 ;i++)
     {
       X.subcube(span(), span(i), span()) = dataset.submat(span(), span(i, i+rho-1));
       y.subcube(span(), span(i), span()) = dataset.submat(span(3,4), span(i, i+rho-1));
@@ -134,7 +134,7 @@ Setting parameters Stochastic Gradient Descent (SGD) optimizer.
 
     // Calculating mse on test data points.
     double testMSE = MSE(predOut,testY);
-    cout << i+1<< " - Mean Squared Error := "<< testMSE <<   endl;
+    cout << i+1 << " - Mean Squared Error := "<< testMSE <<   endl;
   }
 @endcode
 
@@ -151,6 +151,5 @@ Mean Squared error upto 10 iterations.
  8 - Mean Squared Error := 0.143908
  9 - Mean Squared Error := 0.143437
 10 - Mean Squared Error := 0.17364
-....
 
 */
