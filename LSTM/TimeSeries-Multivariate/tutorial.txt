@@ -140,7 +140,7 @@ Setting parameters Stochastic Gradient Descent (SGD) optimizer.
 
 @section results_lstmtut Results
 
-Mean Squared error upto 10 iterations.
+Mean Squared error upto 100 iterations.
  1 - Mean Squared Error := 0.236375
  2 - Mean Squared Error := 0.233769
  3 - Mean Squared Error := 0.2336
@@ -151,5 +151,97 @@ Mean Squared error upto 10 iterations.
  8 - Mean Squared Error := 0.143908
  9 - Mean Squared Error := 0.143437
 10 - Mean Squared Error := 0.17364
+11 - Mean Squared Error := 0.173863
+12 - Mean Squared Error := 0.173103
+13 - Mean Squared Error := 0.172775
+14 - Mean Squared Error := 0.173811
+15 - Mean Squared Error := 0.173757
+16 - Mean Squared Error := 0.173243
+17 - Mean Squared Error := 0.172399
+18 - Mean Squared Error := 0.172358
+19 - Mean Squared Error := 0.172354
+20 - Mean Squared Error := 0.172286
+21 - Mean Squared Error := 0.164439
+22 - Mean Squared Error := 0.164439
+23 - Mean Squared Error := 0.15857
+24 - Mean Squared Error := 0.115357
+25 - Mean Squared Error := 0.126169
+26 - Mean Squared Error := 0.170857
+27 - Mean Squared Error := 0.102091
+28 - Mean Squared Error := 0.102131
+29 - Mean Squared Error := 0.101352
+30 - Mean Squared Error := 0.0871095
+31 - Mean Squared Error := 0.0915397
+32 - Mean Squared Error := 0.0608284
+33 - Mean Squared Error := 0.101486
+34 - Mean Squared Error := 0.118897
+35 - Mean Squared Error := 0.157499
+36 - Mean Squared Error := 0.123698
+37 - Mean Squared Error := 0.120925
+38 - Mean Squared Error := 0.120485
+39 - Mean Squared Error := 0.122089
+40 - Mean Squared Error := 0.123703
+41 - Mean Squared Error := 0.121248
+42 - Mean Squared Error := 0.115864
+43 - Mean Squared Error := 0.111401
+44 - Mean Squared Error := 0.199107
+45 - Mean Squared Error := 0.198944
+46 - Mean Squared Error := 0.198938
+47 - Mean Squared Error := 0.198931
+48 - Mean Squared Error := 0.19892
+49 - Mean Squared Error := 0.198593
+50 - Mean Squared Error := 0.152314
+51 - Mean Squared Error := 0.198554
+52 - Mean Squared Error := 0.170493
+53 - Mean Squared Error := 0.190916
+54 - Mean Squared Error := 0.190563
+55 - Mean Squared Error := 0.188142
+56 - Mean Squared Error := 0.188204
+57 - Mean Squared Error := 0.1849
+58 - Mean Squared Error := 0.181032
+59 - Mean Squared Error := 0.164479
+60 - Mean Squared Error := 0.151979
+61 - Mean Squared Error := 0.152478
+62 - Mean Squared Error := 0.18466
+63 - Mean Squared Error := 0.180347
+64 - Mean Squared Error := 0.181344
+65 - Mean Squared Error := 0.161524
+66 - Mean Squared Error := 0.141533
+67 - Mean Squared Error := 0.144807
+68 - Mean Squared Error := 0.166642
+69 - Mean Squared Error := 0.148973
+70 - Mean Squared Error := 0.203383
+71 - Mean Squared Error := 0.175114
+72 - Mean Squared Error := 0.153967
+73 - Mean Squared Error := 0.18701
+74 - Mean Squared Error := 0.200092
+75 - Mean Squared Error := 0.14802
+76 - Mean Squared Error := 0.143452
+77 - Mean Squared Error := 0.143236
+78 - Mean Squared Error := 0.143233
+79 - Mean Squared Error := 0.1122285
+80 - Mean Squared Error := 0.1106924
+81 - Mean Squared Error := 0.1116105
+82 - Mean Squared Error := 0.1121355
+83 - Mean Squared Error := 0.1118596
+84 - Mean Squared Error := 0.1196523
+85 - Mean Squared Error := 0.1100242
+86 - Mean Squared Error := 0.1192389
+87 - Mean Squared Error := 0.1185851
+88 - Mean Squared Error := 0.1174079
+89 - Mean Squared Error := 0.1161247
+90 - Mean Squared Error := 0.1171614
+91 - Mean Squared Error := 0.1139373
+92 - Mean Squared Error := 0.137471
+93 - Mean Squared Error := 0.146974
+94 - Mean Squared Error := 0.145858
+95 - Mean Squared Error := 0.143716
+96 - Mean Squared Error := 0.144713
+97 - Mean Squared Error := 0.143604
+98 - Mean Squared Error := 0.150909
+99 - Mean Squared Error := 0.147452
+
+MSE Plot
+![Figure_1-1](https://user-images.githubusercontent.com/23444642/61946563-92069f80-afc0-11e9-9788-c396376a6aa8.png)
 
 */
