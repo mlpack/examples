@@ -1,0 +1,116 @@
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@brief Tutorial on Sentiment Analysis using LSTM.
+
+@page rnntutorial LSTM Sentiment Analysis
+
+@section intro_lstmtut Introduction
+
+We will build a classifier on IMDB movie dataset using a Deep Learning technique called RNN which can be implemented using Long Short Term Memory (LSTM) architecture.
+
+@section toc_lstmtut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_lstmtut
+ - \ref toc_lstmtut
+ - \ref data_lstmtut
+ - \ref model_lstmtut
+ - \ref training_lstmtut
+ - \ref results_lstmtut
+
+@section data_lstmtut Encoded IMDB Dataset
+ The encoded dataset for IMDB contains a vocab file along with sentences encoded as sequences. A sample datapoint [1, 14, 22, 16, 43, 530,..., 973, 1622, 1385, 65]. This sentence contains 1st word, 14th word and so on from the vocabulary.
+
+ A vectorized input has to be fed into the LSTM to explot the RNN architecture. To vectorize the sequence dictionary encoding is used. The sample shown would be transformed to [[1, 0, 0,.., 0], [0,..,1,0,...], ....], here the first list has !st position as 1 and rest as 0, similarly the second list has 14th element 1 and rest 0. Each list has a size of the numbers of words in the vocabulary.
+
+@code
+  // Vectorization.
+  // dataset contains the encoded sequence.
+  // The first row stores the target label.
+  arma::cube datasetX = arma::zeros<arma::cube>(vocabSize, dataset.n_cols, mean_seq_length);
+  arma::cube datasetY(1, dataset.n_cols, mean_seq_length);
+
+  for (size_t j = 0; j < dataset.n_cols; j++)
+  {
+    for (size_t i = 0; i < mean_seq_length; i++)
+    {
+      datasetX.at(dataset.at(i, j), j, i) = 1;
+      datasetY.at(0, j, i) = labels.at(0, j);
+    }
+  }
+@endcode
+
+Here `datasetX` is contains the features, `datasetY` contains the labels.
+
+@section model_lstmtut LSTM Model
+
+We add a LSTM cell followed by a dense layer to make final pre
+
+@code
+  // No of timesteps to look in RNN.
+  const size_t rho = mean_seq_length;
+
+  const size_t inputSize = vocabSize, outputSize = 1;
+
+  // RNN model.
+  model.Add<IdentityLayer<> >();
+  model.Add<LSTM<> > (inputSize, 10, rho);
+  model.Add<Dropout<> >(0.5);
+  model.Add<LeakyReLU<> >();
+  model.Add<Linear<> >(10, outputSize);
+  model.Add<SigmoidLayer<> >();
+
+@endcode
+
+Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+  // Bracket values depict parameter values for the experiment.
+  SGD<AdamUpdate> optimizer(
+    STEP_SIZE, // Step size of the optimizer (5e-3).
+    BATCH_SIZE, // Batch size. Number of data points that are used in each iteration (16).
+    ITERATIONS_PER_EPOCH, // Max number of iterations (1000).
+    1e-8,// Tolerance.
+    true,// Shuffle.
+    AdamUpdate(1e-8, 0.9, 0.999)// Adam update policy.
+  );
+
+@endcode
+
+@section training_lstmtut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Cycles for monitoring the process of a solution.
+  for (size_t i = 0; i < EPOCH; i++)
+  {
+    // Train neural network. If this is the first iteration, weights are
+    // random, using current values as starting point otherwise.
+    model.Train(trainX, trainY, optimizer);
+
+    // Don't reset optimizer's parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    arma::cube predOut;
+    // Getting predictions on test data points.
+    model.Predict(testX, predOut);
+
+    // Calculating accuracy on test data points.
+    double testAcc = Accuracy(predOut, testY);
+    cout << i + 1 << " - Accuracy := "<< testAcc << endl;
+  }
+@endcode
+
+@section results_lstmtut Results
+
+Mean Squared error upto 25 iterations.
+Training ...
+
+....
+
+Accuracy Plots
+
+*/

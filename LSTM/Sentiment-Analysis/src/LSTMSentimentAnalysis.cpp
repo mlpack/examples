@@ -36,10 +36,12 @@ double Accuracy(arma::cube& pred, arma::cube& Y, double tolerance = 0.5)
   {
     mat temp = diff.slice(i);
     for (size_t j = 0; j < temp.n_cols; j++)
-      if (temp.at(0, j) < tolerance)
+      if (abs(temp.at(0, j)) < tolerance)
         count ++;
   }
-  return count / diff.n_cols / (diff.n_slices + 1e-50);
+  // diff.print("dd");
+  // cout<< count << " " <<diff.n_cols<<" "<<diff.n_slices<<std::endl;
+  return (count / (diff.n_cols + 1e-50)) / (diff.n_slices + 1e-50);
 }
 
 int main()
@@ -49,13 +51,13 @@ int main()
   const double RATIO = 0.1;
 
   // Number of cycles.
-  const size_t EPOCH = 10;
+  const size_t EPOCH = 100;
 
   // Number of iteration per epoch.
-  const size_t ITERATIONS_PER_EPOCH = 1000;
+  const size_t ITERATIONS_PER_EPOCH = 100;
 
   // Step size of an optimizer.
-  const double STEP_SIZE = 5e-2;
+  const double STEP_SIZE = 5e-3;
 
   // Number of data points in each iteration of SGD.
   const size_t BATCH_SIZE = 16;
@@ -86,13 +88,15 @@ int main()
 
   // Average length of sentence.
   size_t mean_seq_length = seq_lengths/ data.size() - 1;
+
+  // Creating dataset with mean sequence length x no. of data points.
   arma::mat dataset(mean_seq_length, data.size());
   arma::mat labels(1, data.size());
   for (size_t i = 0; i < data.size(); i++)
   { 
     labels.col(i) = data[i][0];
-    for (size_t j = 1; j < std::min(mean_seq_length, data[i].size()); j++)
-      dataset.col(i).row(j) = data[i][j];
+    for (size_t j = 0; j < std::min(mean_seq_length, data[i].size() - 1); j++)
+      dataset.col(i).row(j) = data[i][j+1];
 
     // Pad zeros.
     for (size_t j = data[i].size(); j < mean_seq_length; j++)
@@ -137,10 +141,10 @@ int main()
   {
     model.Add<IdentityLayer<> >();
     model.Add<LSTM<> > (inputSize, 10, rho);
+    model.Add<Dropout<> >(0.5);
     model.Add<LeakyReLU<> >();
     model.Add<Linear<> >(10, outputSize);
-    model.Add<Dropout<> >(0.5);
-    model.Add<LogSoftMax<> >();
+    model.Add<SigmoidLayer<> >();
   }
 
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
