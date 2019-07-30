@@ -7,7 +7,7 @@
 
 @section intro_lstmtut Introduction
 
-An example of using Recurrent Neural Network (RNN) to make forcasts on a time series of international airline passengers, which we aim to solve using a simple LSTM neural network.
+An example of using Recurrent Neural Network (RNN) to make forcasts on a time series of electric usage (in kWh), which we aim to solve using a simple neural network with LSTM.
 
 @section toc_lstmtut Table of Contents
 
@@ -21,9 +21,7 @@ This tutorial is split into the following sections:
  - \ref results_lstmtut
 
 @section data_lstmtut Time Series data
- We will look at the International Airline Passengers prediction problem.
-
- This is a problem where, given a year and a month, the task is to predict the number of international airline passengers in units of 1,000. The data ranges from January 1949 to December 1960, or 12 years, with 144 observations.
+ We will look at the number of kilowatt-hours used in a residential home over a 3.5 month period, 25 November 2011 to 17 March 2012, prediction problem. Electricity usage as recorded by the local utility company on an hour-by-hour basis.
 
  
  Initially we normalize the input data using MinMaxScaler so that all the input features are on the scale from 0 to 1. Normally, it is a good idea to investigate various data preparation techniques to rescale the data and to make it stationary.
@@ -50,7 +48,7 @@ This tutorial is split into the following sections:
 @endcode
 
 
-This will create a dataset where X is the number of passengers at a given time (t) and Y is the number of passengers at the next time (t + 1) over the period of 'rho' frames.
+This will create a dataset where X is the number of passengers at a given time (t) and Y is the number of kilowatt-hours used in a residential home at the next time (t + 1) over the period of 'rho' frames.
 
 @code
   /*
@@ -133,18 +131,36 @@ Setting parameters Stochastic Gradient Descent (SGD) optimizer.
 
 @section results_lstmtut Results
 
-Mean Squared error upto 10 iterations.
+Mean Squared error upto 25 iterations.
 Training ...
-1 - MeanSquaredError := 0.146075
-2 - MeanSquaredError := 0.144882
-3 - MeanSquaredError := 0.09501
-4 - MeanSquaredError := 0.0875479
-5 - MeanSquaredError := 0.0836975
-6 - MeanSquaredError := 0.0796567
-7 - MeanSquaredError := 0.0804368
-8 - MeanSquaredError := 0.0803483
-9 - MeanSquaredError := 0.0809061
-10 - MeanSquaredError := 0.076797
+ 1 - MeanSquaredError := 0.0106786
+ 2 - MeanSquaredError := 0.00775854
+ 3 - MeanSquaredError := 0.00697656
+ 4 - MeanSquaredError := 0.00650758
+ 5 - MeanSquaredError := 0.00613264
+ 6 - MeanSquaredError := 0.00583417
+ 7 - MeanSquaredError := 0.00562829
+ 8 - MeanSquaredError := 0.00549189
+ 9 - MeanSquaredError := 0.00540688
+10 - MeanSquaredError := 0.00530006
+11 - MeanSquaredError := 0.00522753
+12 - MeanSquaredError := 0.00517781
+13 - MeanSquaredError := 0.00512234
+14 - MeanSquaredError := 0.00509232
+15 - MeanSquaredError := 0.00509135
+16 - MeanSquaredError := 0.00504938
+17 - MeanSquaredError := 0.00503501
+18 - MeanSquaredError := 0.00503148
+19 - MeanSquaredError := 0.00500136
+20 - MeanSquaredError := 0.00498127
+21 - MeanSquaredError := 0.00496021
+22 - MeanSquaredError := 0.00496749
+23 - MeanSquaredError := 0.00495549
+24 - MeanSquaredError := 0.0049459
+25 - MeanSquaredError := 0.00493764
 ....
+
+MSE Plot
+![Figure_1](https://user-images.githubusercontent.com/23444642/62147853-17b68200-b316-11e9-84d5-1aa4dffaf796.png)
 
 */

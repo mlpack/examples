@@ -40,9 +40,9 @@ if (NOT EXISTS ${PROJECT_BINARY_DIR}/../../../saved_models)
 endif()
 
 
-if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data/international-airline-passengers.csv)
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data/electricity-usage.csv)
   add_custom_command(TARGET LSTMTimeSeriesUnivariate POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-      ${CMAKE_CURRENT_SOURCE_DIR}/../../data/international-airline-passengers.csv
-    ${PROJECT_BINARY_DIR}/../data/international-airline-passengers.csv)
+      ${CMAKE_CURRENT_SOURCE_DIR}/../../data/electricity-usage.csv
+    ${PROJECT_BINARY_DIR}/../data/electricity-usage.csv)
 endif()

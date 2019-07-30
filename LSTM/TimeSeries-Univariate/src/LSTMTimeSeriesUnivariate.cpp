@@ -1,7 +1,9 @@
 /**
  * An example of using Recurrent Neural Network (RNN) 
- * to make forcasts on a time series of international airline passengers,
- * which we aim to solve using a simple LSTM neural network.
+ * to make forcasts on a time series of number of kilowatt-hours used in a
+ * residential home over a 3.5 month period, 25 November 2011 to 17 March 2012,
+ * which we aim to solve using a simple LSTM neural network. Electricity usage
+ * as recorded by the local utility company on an hour-by-hour basis.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
@@ -37,7 +39,7 @@ const size_t EPOCH = 100;
 const size_t ITERATIONS_PER_EPOCH = 100000;
 
 // Step size of an optimizer.
-const double STEP_SIZE = 1e-3;
+const double STEP_SIZE = 5e-5;
 
 // Number of data points in each iteration of SGD
 const size_t BATCH_SIZE = 16;
@@ -111,12 +113,12 @@ int main()
 
   // In Armadillo rows represent features, columns represent data points.
   cout << "Reading data ..." << endl;
-  data::Load("LSTM/data/international-airline-passengers.csv", dataset, true);
+  data::Load("LSTM/data/electricity-usage.csv", dataset, true);
 
   // The dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column
   // the first col in CSV is not required so removing the first row as well.
-  dataset = dataset.submat(1, 1, dataset.n_rows - 1, dataset.n_cols - 1);
+  dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
 
   //Scale data for increased numerical stability.
   dataset = MinMaxScaler(dataset);
@@ -148,14 +150,11 @@ int main()
   else
   {
     model.Add<IdentityLayer<> >();
-    model.Add<LSTM<> > (inputSize, outputSize, maxRho);
-    model.Add<Dropout<> >(0.5);
+    model.Add<LSTM<> > (inputSize, 4, maxRho);
     model.Add<LeakyReLU<> >();
-    model.Add<LSTM<> > (outputSize, outputSize, maxRho);
-    model.Add<Dropout<> >(0.5);
+    model.Add<LSTM<> > (4, 4, maxRho);
     model.Add<LeakyReLU<> >();
-    model.Add<LSTM<> > (outputSize, outputSize, maxRho);
-    model.Add<Linear<> >(outputSize, outputSize);
+    model.Add<Linear<> >(4, outputSize);
   }
 
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
