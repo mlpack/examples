@@ -114,3 +114,173 @@ Training ...
 Accuracy Plots
 
 */
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@brief Tutorial on Sentiment Analysis using LSTM.
+
+@page rnntutorial LSTM Sentiment Analysis
+
+@section intro_lstmtut Introduction
+
+We will build a classifier on IMDB movie dataset using a Deep Learning technique called RNN which can be implemented using Long Short Term Memory (LSTM) architecture.
+
+@section toc_lstmtut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_lstmtut
+ - \ref toc_lstmtut
+ - \ref data_lstmtut
+ - \ref model_lstmtut
+ - \ref training_lstmtut
+ - \ref results_lstmtut
+
+@section data_lstmtut Encoded IMDB Dataset
+ The encoded dataset for IMDB contains a vocab file along with sentences encoded as sequences. A sample datapoint [1, 14, 22, 16, 43, 530,..., 973, 1622, 1385, 65]. This sentence contains 1st word, 14th word and so on from the vocabulary.
+
+ A vectorized input has to be fed into the LSTM to explot the RNN architecture. To vectorize the sequence dictionary encoding is used. The sample shown would be transformed to [[1, 0, 0,.., 0], [0,..,1,0,...], ....], here the first list has !st position as 1 and rest as 0, similarly the second list has 14th element 1 and rest 0. Each list has a size of the numbers of words in the vocabulary.
+
+@code
+  // Vectorization.
+  // dataset contains the encoded sequence.
+  // The first row stores the target label.
+  arma::cube datasetX = arma::zeros<arma::cube>(vocabSize, dataset.n_cols, mean_seq_length);
+  arma::cube datasetY(1, dataset.n_cols, mean_seq_length);
+
+  for (size_t j = 0; j < dataset.n_cols; j++)
+  {
+    for (size_t i = 0; i < mean_seq_length; i++)
+    {
+      datasetX.at(dataset.at(i, j), j, i) = 1;
+      datasetY.at(0, j, i) = labels.at(0, j);
+    }
+  }
+@endcode
+
+Here `datasetX` is contains the features, `datasetY` contains the labels.
+
+@section model_lstmtut LSTM Model
+
+We add a LSTM cell followed by a dense layer to make final pre
+
+@code
+  // No of timesteps to look in RNN.
+  const size_t rho = mean_seq_length;
+
+  const size_t inputSize = vocabSize, outputSize = 1;
+
+  // RNN model.
+  model.Add<IdentityLayer<> >();
+  model.Add<LSTM<> > (inputSize, 10, rho);
+  model.Add<Dropout<> >(0.5);
+  model.Add<LeakyReLU<> >();
+  model.Add<Linear<> >(10, outputSize);
+  model.Add<SigmoidLayer<> >();
+
+@endcode
+
+Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+  // Bracket values depict parameter values for the experiment.
+  SGD<AdamUpdate> optimizer(
+    STEP_SIZE, // Step size of the optimizer (5e-3).
+    BATCH_SIZE, // Batch size. Number of data points that are used in each iteration (16).
+    ITERATIONS_PER_EPOCH, // Max number of iterations (1000).
+    1e-8,// Tolerance.
+    true,// Shuffle.
+    AdamUpdate(1e-8, 0.9, 0.999)// Adam update policy.
+  );
+
+@endcode
+
+@section training_lstmtut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Cycles for monitoring the process of a solution.
+  for (size_t i = 0; i < EPOCH; i++)
+  {
+    // Train neural network. If this is the first iteration, weights are
+    // random, using current values as starting point otherwise.
+    model.Train(trainX, trainY, optimizer);
+
+    // Don't reset optimizer's parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    arma::cube predOut;
+    // Getting predictions on test data points.
+    model.Predict(testX, predOut);
+
+    // Calculating accuracy on test data points.
+    double testAcc = Accuracy(predOut, testY);
+    cout << i + 1 << " - Accuracy := "<< testAcc << endl;
+  }
+@endcode
+
+@section results_lstmtut Results
+
+Accuracy score for a few epochs.
+Training ...
+...
+28 - Accuracy := 0.495966  
+29 - Accuracy := 0.495895  
+30 - Accuracy := 0.495894  
+31 - Accuracy := 0.495894  
+32 - Accuracy := 0.495894  
+33 - Accuracy := 0.495894  
+34 - Accuracy := 0.495894  
+35 - Accuracy := 0.495894  
+36 - Accuracy := 0.495899  
+37 - Accuracy := 0.4959
+38 - Accuracy := 0.495907  
+39 - Accuracy := 0.495913  
+40 - Accuracy := 0.495918  
+41 - Accuracy := 0.495935  
+42 - Accuracy := 0.49595   
+43 - Accuracy := 0.495988  
+44 - Accuracy := 0.496057  
+45 - Accuracy := 0.496212  
+46 - Accuracy := 0.496578  
+47 - Accuracy := 0.499143  
+48 - Accuracy := 0.526104  
+49 - Accuracy := 0.60844   
+50 - Accuracy := 0.606088  
+51 - Accuracy := 0.610224  
+52 - Accuracy := 0.607067  
+53 - Accuracy := 0.607631  
+54 - Accuracy := 0.608148  
+55 - Accuracy := 0.611324  
+56 - Accuracy := 0.612938  
+57 - Accuracy := 0.612189  
+58 - Accuracy := 0.611154  
+59 - Accuracy := 0.60908   
+60 - Accuracy := 0.609087  
+61 - Accuracy := 0.609309  
+62 - Accuracy := 0.609969  
+63 - Accuracy := 0.609978  
+64 - Accuracy := 0.613019  
+65 - Accuracy := 0.615359  
+66 - Accuracy := 0.614017 
+67 - Accuracy := 0.61157   
+68 - Accuracy := 0.611082  
+69 - Accuracy := 0.610913  
+70 - Accuracy := 0.610526  
+71 - Accuracy := 0.611908  
+72 - Accuracy := 0.613356  
+73 - Accuracy := 0.613615  
+74 - Accuracy := 0.613361  
+75 - Accuracy := 0.613979  
+76 - Accuracy := 0.614451  
+77 - Accuracy := 0.617918  
+78 - Accuracy := 0.61936   
+79 - Accuracy := 0.617659  
+...
+....
+
+Accuracy Plots
+![SA](https://user-images.githubusercontent.com/23444642/62192158-b7195a80-b392-11e9-819e-c7edc8c8a6dc.png)
+
+*/

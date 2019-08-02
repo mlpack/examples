@@ -48,7 +48,7 @@ int main()
 {
   /* HYPERPARAMETERS */
   // Testing data is taken from the dataset in this ratio.
-  const double RATIO = 0.1;
+  const double RATIO = 0.2;
 
   // Number of cycles.
   const size_t EPOCH = 100;
@@ -57,7 +57,7 @@ int main()
   const size_t ITERATIONS_PER_EPOCH = 100;
 
   // Step size of an optimizer.
-  const double STEP_SIZE = 5e-3;
+  const double STEP_SIZE = 1e-3;
 
   // Number of data points in each iteration of SGD.
   const size_t BATCH_SIZE = 16;
