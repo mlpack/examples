@@ -26,7 +26,7 @@ using namespace mlpack::ann;
 using namespace ens;
 
 /*
- * Function to calcute Accuracy for arma::cube
+ * Function to calcute Accuracy for arma::cube.
  */
 double Accuracy(arma::cube& pred, arma::cube& Y, double tolerance = 0.5)
 {
@@ -37,7 +37,7 @@ double Accuracy(arma::cube& pred, arma::cube& Y, double tolerance = 0.5)
     mat temp = diff.slice(i);
     for (size_t j = 0; j < temp.n_cols; j++)
       if (abs(temp.at(0, j)) < tolerance)
-        count ++;
+        count++;
   }
   // diff.print("dd");
   // cout<< count << " " <<diff.n_cols<<" "<<diff.n_slices<<std::endl;
@@ -69,46 +69,46 @@ int main()
   std::ifstream in("data_1000.txt");
   size_t vocabSize = 1000;
   std::vector<std::vector<int> > data;
-  size_t seq_lengths = 0;
+  size_t seqLengths = 0;
   if (in)
   {
     std::string line;
     while (std::getline(in, line))
     {
       data.push_back(std::vector<int>());
-      // Break down the row into column values
+      // Break down the row into column values.
       std::stringstream split(line);
       int value;
       while (split >> value)
           data.back().push_back(value);
 
-      seq_lengths += data.back().size();
+      seqLengths += data.back().size();
     }
   }
 
   // Average length of sentence.
-  size_t mean_seq_length = seq_lengths/ data.size() - 1;
+  size_t meanSeqLength = seqLengths/ data.size() - 1;
 
   // Creating dataset with mean sequence length x no. of data points.
-  arma::mat dataset(mean_seq_length, data.size());
+  arma::mat dataset(meanSeqLength, data.size());
   arma::mat labels(1, data.size());
   for (size_t i = 0; i < data.size(); i++)
   { 
     labels.col(i) = data[i][0];
-    for (size_t j = 0; j < std::min(mean_seq_length, data[i].size() - 1); j++)
+    for (size_t j = 0; j < std::min(meanSeqLength, data[i].size() - 1); j++)
       dataset.col(i).row(j) = data[i][j+1];
 
     // Pad zeros.
-    for (size_t j = data[i].size(); j < mean_seq_length; j++)
+    for (size_t j = data[i].size(); j < meanSeqLength; j++)
       dataset.col(i).row(j) = 0;
   }
 
-  arma::cube datasetX = arma::zeros<arma::cube>(vocabSize, dataset.n_cols, mean_seq_length);
-  arma::cube datasetY(1, dataset.n_cols, mean_seq_length);
+  arma::cube datasetX = arma::zeros<arma::cube>(vocabSize, dataset.n_cols, meanSeqLength);
+  arma::cube datasetY(1, dataset.n_cols, meanSeqLength);
 
   for (size_t j = 0; j < dataset.n_cols; j++)
   {
-    for (size_t i = 0; i < mean_seq_length; i++)
+    for (size_t i = 0; i < meanSeqLength; i++)
     {
       datasetX.at(dataset.at(i, j), j, i) = 1;
       datasetY.at(0, j, i) = labels.at(0, j);
@@ -126,7 +126,7 @@ int main()
   const size_t inputSize = vocabSize, outputSize = 1;
 
   // No of timesteps to look in RNN.
-  const size_t rho = mean_seq_length;
+  const size_t rho = meanSeqLength;
 
   RNN<CrossEntropyError<>,HeInitialization> model(rho);
 
