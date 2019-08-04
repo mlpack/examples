@@ -8,8 +8,8 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 set(SOURCES
   ${MODEL_SOURCE_DIR}/model.cpp
-  ${MODEL_SOURCE_DIR}/VGG19_impl.hpp
-  ${MODEL_SOURCE_DIR}/VGG19.hpp
+  ${MODEL_SOURCE_DIR}/../../VGG19_impl.hpp
+  ${MODEL_SOURCE_DIR}/../../VGG19.hpp
   )
 
 if(DEBUG)

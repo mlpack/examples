@@ -10,7 +10,7 @@
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
 
-#include "VGG19.hpp"
+#include "../../VGG19.hpp"
 #include <ensmallen.hpp>
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
