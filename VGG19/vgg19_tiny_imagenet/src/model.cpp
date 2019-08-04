@@ -56,11 +56,11 @@ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batc
   return loss;
 }
 
-int main(int argc, char const *argv[])
+int main()
 {
 	Dataloader d;
-	d.LoadTrainData("./IMagenet/tiny-imagenet-200/train");
-	d.LoadValData("./IMagenet/tiny-imagenet-200/val");
+	d.LoadTrainData("./imagenet/src/imagenet/tiny-imagenet-200/train");
+	d.LoadValData("./imagenet/src/imagenet/tiny-imagenet-200/val");
 
 	arma::Mat<unsigned char> X, valX;
 	arma::Mat<size_t> y, valY;
@@ -75,13 +75,13 @@ int main(int argc, char const *argv[])
   constexpr int ITERATIONS_PER_CYCLE = 10;
 
   // Number of cycles.
-  constexpr int CYCLES = 32;
+  constexpr int CYCLES = 10;
 
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 32;
+  constexpr int BATCH_SIZE = 16;
 
   constexpr bool saveModel = true;
 
@@ -131,9 +131,9 @@ int main(int argc, char const *argv[])
     // Don't reset optimizers parameters between cycles.
     optimizer.ResetPolicy() = false;
 
-    std::cout << "Loss after cycle " << i << " -> " << NLLLoss<VGGModel>(model,
-				arma::conv_to<arma::mat>::from(valX),
-				arma::conv_to<arma::mat>::from(valY), 50) << std::endl;
+    // std::cout << "Loss after cycle " << i << " -> " << NLLLoss<VGGModel>(model,
+				// arma::conv_to<arma::mat>::from(valX),
+				// arma::conv_to<arma::mat>::from(valY), 50) << std::endl;
   }
 
   std::cout << "Time taken to train -> " << float(clock() - begin_time) /
