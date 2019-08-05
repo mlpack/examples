@@ -244,6 +244,7 @@ set(DIRS
   vae/vae_mnist
   vae/vae_cnn_mnist
   LSTM/TimeSeries-Multivariate
+  VGG19/vgg19_tiny_imagenet
 )
 
 foreach(dir ${DIRS})
