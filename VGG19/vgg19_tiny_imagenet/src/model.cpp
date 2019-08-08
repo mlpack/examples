@@ -1,13 +1,13 @@
 /**
- * @file model.cpp
- * @author Mehul Kumar Nirala
- *
- * An example model using VGG19 on tiny-imagent dataset.
+ * A model using VGG19 on tiny-imagent dataset for classification.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
+ *
+ * @file model.cpp
+ * @author Mehul Kumar Nirala
  */
 
 #include "dataloader.hpp"
@@ -27,10 +27,10 @@ using namespace std;
 using namespace ens;
 
 // Convenience typedefs
-typedef FFN<NegativeLogLikelihood<>, XavierInitialization > VGGModel;
+typedef FFN<NegativeLogLikelihood<>, XavierInitialization> VGGModel;
 
 // Calculates Log Likelihood Loss over batches.
-template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization >,
+template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization>,
          typename DataType = arma::mat>
 double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batchSize)
 {
@@ -58,17 +58,22 @@ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batc
 
 int main()
 {
-	Dataloader d;
+  // Dataloader object for loading tiny imagenet dataset.
+	Dataloader d(200);
 	d.LoadTrainData("./imagenet/src/imagenet/tiny-imagenet-200/train");
 	d.LoadValData("./imagenet/src/imagenet/tiny-imagenet-200/val");
 
 	arma::Mat<unsigned char> X, valX;
 	arma::Mat<size_t> y, valY;
 
+  // Loading the first 10000 randonly shuffled images for training.
 	d.LoadImageData(X, y, true, 10000);
+  inplace_trans(y, "lowmem");
+
+  // Loading the first 1000 randonly shuffled images for validation.
 	d.LoadImageData(valX, valY, false, 1000);
 
-	// INPUT
+	// Input parameters, the dataset contains images with shape 64x64x3.
   const size_t inputWidth = 64, inputHeight = 64, inputChannel = 3;
 
   // Number of iteration per cycle.
@@ -83,19 +88,28 @@ int main()
   // Number of data points in each iteration of SGD.
   constexpr int BATCH_SIZE = 16;
 
+  // Save/ Load model.
   constexpr bool saveModel = true;
+  constexpr bool loadModel = false;
 
-	VGG19 vggnet(inputWidth, inputHeight, inputChannel, d.numClasses, false, "max", "mnist");
+	VGG19 vggnet(inputWidth, inputHeight, inputChannel, d.numClasses, true, "max", "mnist");
   Sequential<>* vgg19 = vggnet.CompileModel();
   VGGModel model;
-  model.Add<IdentityLayer<> >();
-  model.Add(vgg19);
-  
-  // /*Can be used if Top is not included in the VggNet.*/
-  // size_t outputShape = vgg19.GetOutputShape();
-  // model.Add<Linear<> >(outputShape, numClasses);
-  
-  model.Add<LogSoftMax<> >();
+
+  if (loadModel)
+  {
+    std::cout << "Loading model ..." << std::endl;
+    data::Load("VGG19/saved_models/vgg19_imagenet.bin", "VGG19", model);
+  }
+  else
+  {
+    model.Add<IdentityLayer<> >();
+    model.Add(vgg19);
+    // /*Can be used if Top is not included in the VggNet.*/
+    // size_t outputShape = vgg19.GetOutputShape();
+    // model.Add<Linear<> >(outputShape, numClasses);
+    model.Add<LogSoftMax<> >();
+  }
 
   // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
@@ -117,7 +131,18 @@ int main()
 
   cout << "Training ..." << endl;
   const clock_t begin_time = clock();
+  arma::mat testX = arma::conv_to<arma::mat>::from(valX);
+  arma::mat testY = arma::conv_to<arma::mat>::from(valY);
+  inplace_trans(testY, "lowmem");
 
+
+  std::cout << "Training dataset shape " << X.n_rows << " x " << X.n_cols << std::endl;
+  std::cout << "Training label shape " << y.n_rows << " x " << y.n_cols << std::endl;
+
+  std::cout << "Validation dataset shape " << testX.n_rows << " x " 
+      << testX.n_cols << std::endl;
+  std::cout << "Validation label shape " << testY.n_rows << " x " 
+      << testY.n_cols << std::endl;
   for (int i = 0; i < CYCLES; i++)
   {
     // Train the CNN vgg19 If this is the first iteration, weights are
@@ -131,18 +156,16 @@ int main()
     // Don't reset optimizers parameters between cycles.
     optimizer.ResetPolicy() = false;
 
-    // std::cout << "Loss after cycle " << i << " -> " << NLLLoss<VGGModel>(model,
-				// arma::conv_to<arma::mat>::from(valX),
-				// arma::conv_to<arma::mat>::from(valY), 50) << std::endl;
+    std::cout << "Loss after cycle " << i << " -> " 
+        << NLLLoss<VGGModel>(model, testX, testY, 50) << std::endl;
   }
 
   std::cout << "Time taken to train -> " << float(clock() - begin_time) /
       CLOCKS_PER_SEC << " seconds" << std::endl;
 
-  // Vggnet SaveModel("vgg19.bin");
   if (saveModel)
   {
-    data::Save("VGG19/saved_models/vgg19.bin", "VGG19", model);
+    data::Save("VGG19/saved_models/vgg19_imagenet.bin", "VGG19", model);
     std::cout << "Model saved in VGG19/saved_models/" << std::endl;
   }
 }

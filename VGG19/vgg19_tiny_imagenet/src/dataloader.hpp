@@ -7,9 +7,12 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  *
- * @file dataloader.cpp
+ * @file dataloader.hpp
  * @author Mehul Kumar Nirala
  */
+
+#ifndef DATALOADER_HPP
+#define DATALOADER_HPP
 
 #include <mlpack/core.hpp>
 #include <mlpack/prereqs.hpp>
@@ -22,20 +25,59 @@ using namespace mlpack;
 using namespace mlpack::data;
 namespace fs = boost::filesystem;
 
+/**
+ * Dataloader implementation to load tiny-imagenet dataset
+ * (https://github.com/seshuad/IMagenet.git) into armadillo
+ * matrix to be fed into VGG19 network.
+ */
 class Dataloader
 {
  public:
-	Dataloader();
+ 	/**
+ 	* Dataloader constructor.
+ 	*
+ 	* @param numClasses Number of classes in the dataset.
+ 	*/
+	Dataloader(size_t numClasses);
+
 	~Dataloader();
+
+	// To store the name of class labels.
 	std::map<std::string, size_t> targetName;
+
+	// To store filenames of training and validation images.
 	std::vector<std::string> trainX, valX;
-  	std::vector<size_t> trainY, valY;
-  	size_t numClasses;
 
-  	void LoadTrainData(const std::string folderPath, bool shuffle = true);
+	// To store labels of training and validation images.
+	std::vector<size_t> trainY, valY;
 
-  	void LoadValData(const std::string folderPath);
+	// Number of classes in the dataset.
+	size_t numClasses;
+
+	/**
+	* Loads the name of training files from the tiny imagenet dataset.
+	*
+	* @param folderPath Path of the training images.
+	* @param shuffle Randomly shuffle the training data.
+	*/
+	void LoadTrainData(const std::string folderPath, bool shuffle = true);
+
+	/**
+	* Loads the name of validation files from the tiny imagenet dataset.
+	*
+	* @param folderPath Path of the training images.
+	*/
+	void LoadValData(const std::string folderPath);
 	
+	/**
+	* Loads images into armadillo matrix.
+	*
+	* @param X Matrix where images are loaded.
+	* @param y Labels associated with the images
+	* @param train Boolean variable to identify the dataset type (i.e train/val).
+	* @param limit Number of datapoints to be stored (0 means all datapoints).
+	* @param offset Starting point (in trainX, etc.) from where data is loaded.
+	*/
 	template<typename dataType, typename labelType>
 	void LoadImageData(arma::Mat<dataType>& X,
 					   arma::Mat<labelType>& y,
@@ -45,125 +87,6 @@ class Dataloader
 	
 };
 
-Dataloader::Dataloader()
-{
-	targetName.clear();
-	numClasses = 0;
-}
+#include "dataloader_impl.hpp"
 
-Dataloader::~Dataloader()
-{
-	trainX.clear();
-	trainY.clear();
-	valX.clear();
-	valY.clear();
-	targetName.clear();
-}
-
-void Dataloader::LoadTrainData(const std::string folderPath, bool shuffle)
-{
-	size_t count = 1;
-
-	fs::path p(folderPath);
-	fs::directory_iterator end_itr;
-	
-	// cycle through the directory
-	for (fs::directory_iterator itr(p); itr != end_itr; ++itr)
-	{
-	  if (fs::is_directory(itr->path()))
-	  {
-	    targetName[itr->path().filename().string()] = count;
-	    fs::path folder(itr->path().string());
-	    fs::path file ("images");
-	    for(auto& entry : boost::make_iterator_range(fs
-	    		::directory_iterator(folder / file), {}))
-	    {
-	      trainX.push_back(entry.path().string());
-	      trainY.push_back(count);
-	    }
-	    count++;
-	  }
-	}
-	if(shuffle)
-	{
-	  auto seed = unsigned ( std::time(0) );
-
-	  std::srand(seed);
-	  std::random_shuffle(trainX.begin(), trainX.end());
-
-	  std::srand(seed);
-	  std::random_shuffle(trainY.begin(), trainY.end());
-	}
-	numClasses = count-1;
-}
-
-void Dataloader::LoadValData(const std::string folderPath)
-{
-
-	std::ifstream dataFile(folderPath+"/val_annotations.txt");
-	while (!dataFile.eof())
-	{
-	  std::string str;
-	  std::getline( dataFile, str);
-	  std::stringstream buffer(str);
-	  std::string temp;
-	  std::vector<std::string> values;
-	 
-	  while (getline( buffer, temp, '\t'))
-	    values.push_back(temp.c_str());
-
-	  if (values.size() == 0)
-	    break;
-	  valX.push_back(folderPath+"/images/"+values[0]);
-	  valY.push_back(targetName[values[1]]);
-	}
-}
-
-template<typename dataType, typename labelType>
-void Dataloader::LoadImageData(arma::Mat<dataType>& X,
-						       arma::Mat<labelType>& y,
-						       bool train,
-						       size_t limit,
-						       size_t offset)
-{
-	arma::Mat<unsigned char> colImg;
-  	std::vector<size_t> tempY;
-	data::ImageInfo info(64, 64, 3);
-
-	std::vector<std::string> dataset;
-  	std::vector<size_t> labels;
-  	if (train)
-  	{
-  		dataset = trainX;
-  		labels = trainY;
-  	}
-  	else
-  	{
-  		dataset = valX;
-  		labels = valY;
-  	}
-  	size_t numFiles;
-  	if (limit == 0)
-  		numFiles = dataset.size();
-  	else
-  		numFiles = std::min(dataset.size(), offset+limit);
-
-	data::Load(dataset[offset], X, info, false, true);
-	tempY.push_back(labels[offset]);
-	for (size_t i = offset; i < numFiles; i++)
-	{
-	  try
-	  {
-	    data::Load(dataset[i], colImg, info, false, true);
-	    X = arma::join_rows(X, colImg);
-	    tempY.push_back(labels[i]);
-	  }
-	  catch (std::exception& e)
-	  {
-	    // Ignore.
-	  }
-   	cout << "Done  with (" << i << "/" << numFiles << ") of data.\n";
-	}
-	cout<<X.n_rows<<" "<<X.n_cols<<endl;
-	y = arma::Mat<size_t>(tempY);
-}
+#endif
