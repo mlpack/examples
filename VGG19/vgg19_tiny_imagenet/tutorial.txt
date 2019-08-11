@@ -1,0 +1,193 @@
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@brief Tutorial on VGG19 for Tiny Imagenet dataset.
+
+@page vgg19tutorial VGG19 on tiny imagenet dataset.
+
+@section intro_vgg19tut Introduction
+
+Tiny ImageNet Challenge is the default course project for Stanford [CS231N](http://cs231n.stanford.edu/). It runs similar to the [ImageNet challenge](http://www.image-net.org/challenges/LSVRC/2014/) (ILSVRC). The goal of the challenge is for you to do as well as possible on the Image Classification problem.
+
+@section toc_vgg19tut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_vgg19tut
+ - \ref toc_vgg19tut
+ - \ref data_vgg19tut
+ - \ref model_vgg19tut
+ - \ref training_vgg19tut
+ - \ref results_vgg19tut
+
+@section data_vgg19tut Tiny Imagenet data
+Tiny Imagenet has 200 classes. Each class has 500 training images, 50 validation images, and 50 test images.
+
+We create a dataloader class to load tiny imagenet dataset.
+@code
+  /**
+  * Dataloader constructor.
+  *
+  * @param numClasses Number of classes in the dataset.
+  */
+  Dataloader(size_t numClasses);
+@endcode
+
+@code
+  /**
+  * Loads the name of training files from the tiny imagenet dataset.
+  *
+  * @param folderPath Path of the training images.
+  * @param shuffle Randomly shuffle the training data.
+  */
+  void LoadTrainData(const std::string folderPath, bool shuffle = true);
+
+  /**
+  * Loads the name of validation files from the tiny imagenet dataset.
+  *
+  * @param folderPath Path of the training images.
+  */
+@encode
+
+Loading image data into armadillo matrix.
+@code
+  /**
+  * Loads images into armadillo matrix.
+  *
+  * @param X Matrix where images are loaded.
+  * @param y Labels associated with the images
+  * @param train Boolean variable to identify the dataset type (i.e train/val).
+  * @param limit Number of datapoints to be stored (0 means all datapoints).
+  * @param offset Starting point (in trainX, etc.) from where data is loaded.
+  */
+  template<typename dataType, typename labelType>
+  void LoadImageData(arma::Mat<dataType>& X,
+             arma::Mat<labelType>& y,
+             bool train,
+             size_t limit = 0,
+             size_t offset = 0);
+@endcode
+
+Loading the imagenet datatset for training and validation.
+@code
+  // Dataloader object for loading tiny imagenet dataset.
+  Dataloader d(200);
+  d.LoadTrainData("./imagenet/src/imagenet/tiny-imagenet-200/train");
+  d.LoadValData("./imagenet/src/imagenet/tiny-imagenet-200/val");
+
+  // Loading the first 10000 randonly shuffled images for training.
+  d.LoadImageData(X, y, true, 10000);
+  // y is converted to a column vector so that it can be fed into the method model.Train().
+  inplace_trans(y, "lowmem");
+
+  // Loading the first 1000 randonly shuffled images for validation.
+  d.LoadImageData(valX, valY, false, 1000);
+@endcode
+
+@section model_vgg19tut LSTM Model
+
+The model uses VGG19 to make classify the images into 200 classes.
+
+@code
+  // Input parameters, the dataset contains images with shape 64x64x3.
+  const size_t inputWidth = 64, inputHeight = 64, inputChannel = 3;
+  bool includeTop = true;
+
+  VGG19 vggnet(inputWidth, inputHeight, inputChannel, numClasses, , "max", "mnist");
+  Sequential<>* vgg19 = vggnet.CompileModel();
+@endcode
+
+Compiling the architecture.
+@code
+  FFN<NegativeLogLikelihood<>, XavierInitialization> model;
+  model.Add<IdentityLayer<> >();
+  model.Add(vgg19);
+
+  /*Can be used if Top is not included in the VggNet (includeTop = false); .*/
+  // size_t outputShape = vgg19.GetOutputShape();
+  // model.Add<Linear<> >(outputShape, numClasses);
+
+  model.Add<LogSoftMax<> >();
+@encode
+
+Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+  SGD<AdamUpdate> optimizer(
+    // Step size of the optimizer.
+    STEP_SIZE,
+    // Batch size. Number of data points that are used in each iteration.
+    BATCH_SIZE,
+    // Max number of iterations.
+    ITERATIONS_PER_CYCLE,
+    // Tolerance, used as a stopping condition. Such a small value
+    // means we almost never stop by this condition, and continue gradient
+    // descent until the maximum number of iterations is reached.
+    1e-8,
+    // Shuffle. If optimizer should take random data points from the dataset at
+    // each iteration.
+    true,
+    // Adam update policy.
+    AdamUpdate(1e-8, 0.9, 0.999));
+@endcode
+
+@section training_vgg19tut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Cycles for monitoring the process of a solution.
+  for (int i = 0; i < CYCLES; i++)
+  {
+    // Train the CNN vgg19 If this is the first iteration, weights are
+    // randomly initialized between -1 and 1. Otherwise, the values of weights
+    // from the previous iteration are used.
+    model.Train(arma::conv_to<arma::mat>::from(X),
+                arma::conv_to<arma::mat>::from(y),
+                optimizer);
+
+    cout << "Epoch " << i << endl;
+    // Don't reset optimizers parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    std::cout << "Loss after cycle " << i << " -> " 
+        << NLLLoss<VGGModel>(model, testX, testY, 50) << std::endl;
+  }
+@endcode
+
+The model calculates Log Likelihood Loss over batches for evaluation of the model.
+
+@code
+ // Calculates Log Likelihood Loss over batches.
+ template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization>,
+          typename DataType = arma::mat>
+ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batchSize)
+ {
+   double loss = 0;
+   size_t nofPoints = testX.n_cols;
+   size_t i;
+
+   for (i = 0; i < (size_t)(nofPoints / batchSize); i++)
+   {
+     loss += model.Evaluate(testX.cols(batchSize * i, batchSize * (i + 1) - 1),
+         testY.cols(batchSize * i, batchSize * (i + 1) - 1));
+   }
+
+   if (nofPoints % batchSize != 0)
+   {
+     loss += model.Evaluate(testX.cols(batchSize * i, nofPoints - 1),
+         testY.cols(batchSize * i, nofPoints - 1));
+     loss /= (int)nofPoints / batchSize + 1;
+   }
+   else
+     loss /= nofPoints / batchSize;
+
+   return loss;
+ }
+@endcode
+
+@section results_vgg19tut Results
+
+Training...
+
+*/
