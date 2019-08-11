@@ -3,7 +3,7 @@
 @author Mehul Kumar Nirala
 @brief Tutorial on VGG19 for Tiny Imagenet dataset.
 
-@page vgg19tutorial VGG19 on tiny imagenet dataset.
+@page vgg19tutorial VGG19 on Tiny Imagenet dataset.
 
 @section intro_vgg19tut Introduction
 
@@ -84,11 +84,35 @@ Loading the imagenet datatset for training and validation.
   d.LoadImageData(valX, valY, false, 1000);
 @endcode
 
-@section model_vgg19tut LSTM Model
+@section model_vgg19tut Tiny Imagenet VGG19 Model
 
 The model uses VGG19 to make classify the images into 200 classes.
 
 @code
+  /**
+  * VGG19 Constructor initializes the image input shape,
+  * and numClasses.
+  *
+  * @param inputWidth Width of the input image.
+  * @param inputHeight Height of the input image.
+  * @param inputChannels Number of input channels of the input image.
+  * @param numClasses optional number of classes to classify images into,
+  *      only to be specified if include_top is  true.
+  * @param includeTop Whether to include the 3 fully-connected layers at
+  *      the top of the network.
+  * @param pooling Optional pooling mode for feature extraction when
+  *      include_top is false.
+  * @param weights One of 'none', 'imagenet'(pre-training on ImageNet).
+  */
+  VGG19(const size_t inputWidth,
+        const size_t inputHeight,
+        const size_t inputChannel,
+        const size_t numClasses,
+        const bool includeTop = true,
+        const std::string& pooling = "max",
+        const std::string& weights = "imagenet"); // "None" for MNIST handwritten digits.
+  ....
+
   // Input parameters, the dataset contains images with shape 64x64x3.
   const size_t inputWidth = 64, inputHeight = 64, inputChannel = 3;
   bool includeTop = true;
