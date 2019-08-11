@@ -244,6 +244,7 @@ set(DIRS
   vae/vae_mnist
   vae/vae_cnn_mnist
   VGG19/vgg19_mnist
+  LSTM/TimeSeries-Univariate
   LSTM/TimeSeries-Multivariate
 )
 
