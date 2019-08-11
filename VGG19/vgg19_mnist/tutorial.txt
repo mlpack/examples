@@ -1,0 +1,166 @@
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@brief Tutorial on VGG19 for the MNIST handwritten digits.
+
+@page vgg19tutorial VGG19 classification on the MNIST handwritten digits.
+
+@section intro_vgg19tut Introduction
+
+The MNIST database (Modified National Institute of Standards and Technology database) of handwritten digits consists of a training set of 60,000 examples, and a test set of 10,000 examples. It is a subset of a larger set available from NIST. Additionally, the black and white images from NIST were size-normalized and centered to fit into a 28x28 pixel bounding box and anti-aliased, which introduced grayscale levels.
+
+The first number of each line is the label, i.e. the digit which is depicted in the image. The following 784 numbers are the pixels of the 28 x 28 image.
+
+![Examples-from-the-MNIST-dataset](https://user-images.githubusercontent.com/23444642/62833669-2c710f00-bc60-11e9-8e24-759222aaf156.png)
+
+
+@section toc_vgg19tut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_vgg19tut
+ - \ref toc_vgg19tut
+ - \ref data_vgg19tut
+ - \ref model_vgg19tut
+ - \ref training_vgg19tut
+ - \ref results_vgg19tut
+
+@section data_vgg19tut MNIST handwritten digits
+
+@code
+  // Labeled dataset that contains data for training is loaded from CSV file.
+  // Rows represent features, columns represent data points.
+  mat tempDataset;
+  data::Load("./Kaggle/data/train.csv", tempDataset, true);
+@endcode
+
+@section model_vgg19tut Handwritten Digits CLassification Model
+
+The VGG19 model used for classification. It creates a sequential layer that encompasses the various layers of the VGG19.
+@code
+  /**
+  * VGG19 Constructor initializes the image input shape,
+  * and numClasses.
+  *
+  * @param inputWidth Width of the input image.
+  * @param inputHeight Height of the input image.
+  * @param inputChannels Number of input channels of the input image.
+  * @param numClasses optional number of classes to classify images into,
+  *      only to be specified if include_top is  true.
+  * @param includeTop Whether to include the 3 fully-connected layers at
+  *      the top of the network.
+  * @param pooling Optional pooling mode for feature extraction when
+  *      include_top is false.
+  * @param weights One of 'none', 'imagenet'(pre-training on ImageNet).
+  */
+  VGG19(const size_t inputWidth,
+        const size_t inputHeight,
+        const size_t inputChannel,
+        const size_t numClasses,
+        const bool includeTop = true,
+        const std::string& pooling = "max",
+        const std::string& weights = "imagenet"); // "None" for MNIST handwritten digits.
+  
+@endcode
+
+@code
+  // Input parameters, the dataset contains images with shape 28x28x1.
+  const size_t inputWidth = 28, inputHeight = 28, inputChannel = 1;
+  bool includeTop = true;
+
+  VGG19 vggnet(inputWidth, inputHeight, inputChannel, numClasses, , "max", "mnist");
+  Sequential<>* vgg19 = vggnet.CompileModel();
+
+  // Compiling the architecture.
+  FFN<NegativeLogLikelihood<>, XavierInitialization> model;
+  model.Add<IdentityLayer<> >();
+  model.Add(vgg19);
+
+  /*Can be used if Top is not included in the VggNet (includeTop = false); .*/
+  // size_t outputShape = vgg19.GetOutputShape();
+  // model.Add<Linear<> >(outputShape, numClasses);
+
+  model.Add<LogSoftMax<> >();
+@encode
+
+Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+  SGD<AdamUpdate> optimizer(
+    // Step size of the optimizer.
+    STEP_SIZE,
+    // Batch size. Number of data points that are used in each iteration.
+    BATCH_SIZE,
+    // Max number of iterations.
+    ITERATIONS_PER_CYCLE,
+    // Tolerance, used as a stopping condition. Such a small value
+    // means we almost never stop by this condition, and continue gradient
+    // descent until the maximum number of iterations is reached.
+    1e-8,
+    // Shuffle. If optimizer should take random data points from the dataset at
+    // each iteration.
+    true,
+    // Adam update policy.
+    AdamUpdate(1e-8, 0.9, 0.999));
+@endcode
+
+@section training_vgg19tut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Cycles for monitoring the process of a solution.
+  for (int i = 0; i < CYCLES; i++)
+  {
+    // Train the CNN vgg19 If this is the first iteration, weights are
+    // randomly initialized between -1 and 1. Otherwise, the values of weights
+    // from the previous iteration are used.
+    model.Train(arma::conv_to<arma::mat>::from(X),
+                arma::conv_to<arma::mat>::from(y),
+                optimizer);
+
+    cout << "Epoch " << i << endl;
+    // Don't reset optimizers parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    std::cout << "Loss after cycle " << i << " -> " 
+        << NLLLoss<VGGModel>(model, testX, testY, 50) << std::endl;
+  }
+@endcode
+
+The model calculates Log Likelihood Loss over batches for evaluation of the model.
+
+@code
+ // Calculates Log Likelihood Loss over batches.
+ template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization>,
+          typename DataType = arma::mat>
+ double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batchSize)
+ {
+   double loss = 0;
+   size_t nofPoints = testX.n_cols;
+   size_t i;
+
+   for (i = 0; i < (size_t)(nofPoints / batchSize); i++)
+   {
+     loss += model.Evaluate(testX.cols(batchSize * i, batchSize * (i + 1) - 1),
+         testY.cols(batchSize * i, batchSize * (i + 1) - 1));
+   }
+
+   if (nofPoints % batchSize != 0)
+   {
+     loss += model.Evaluate(testX.cols(batchSize * i, nofPoints - 1),
+         testY.cols(batchSize * i, nofPoints - 1));
+     loss /= (int)nofPoints / batchSize + 1;
+   }
+   else
+     loss /= nofPoints / batchSize;
+
+   return loss;
+ }
+@endcode
+
+@section results_vgg19tut Results
+
+Training...
+
+*/
