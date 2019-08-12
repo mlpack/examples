@@ -37,13 +37,13 @@ include(ExternalProject)
 find_package(Git REQUIRED)
 
 ExternalProject_Add(
-    imagenet
-    PREFIX ${PROJECT_BINARY_DIR}/../../imagenet
-    GIT_REPOSITORY https://github.com/seshuad/IMagenet.git
-    TIMEOUT 10
-    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ""
-    LOG_DOWNLOAD ON
+  imagenet
+  PREFIX ${PROJECT_BINARY_DIR}/../../imagenet
+  GIT_REPOSITORY https://github.com/seshuad/IMagenet.git
+  TIMEOUT 10
+  UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+  LOG_DOWNLOAD ON
 )
