@@ -244,6 +244,8 @@ set(DIRS
   vae/vae_mnist
   vae/vae_cnn_mnist
   LSTM/Sentiment-Analysis
+  LSTM/TimeSeries-Univariate
+  LSTM/TimeSeries-Multivariate
 )
 
 foreach(dir ${DIRS})
