@@ -1,4 +1,7 @@
 /**
+ * @file LSTMSentimentAnalysis.cpp
+ * @author Mehul Kumar Nirala
+ *
  * An example of using Recurrent Neural Network (RNN) 
  * for sentiment analysis on encoded imdb dataset.
  *
@@ -7,8 +10,6 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  *
- * @file LSTMSentimentAnalysis.cpp
- * @author Mehul Kumar Nirala
  */
 
 #include <mlpack/core.hpp>
@@ -26,7 +27,7 @@ using namespace mlpack::ann;
 using namespace ens;
 
 /*
- * Function to calcute Accuracy for arma::cube.
+ * Function to calculate Accuracy for arma::cube.
  */
 double Accuracy(arma::cube& pred, arma::cube& Y, double tolerance = 0.5)
 {
@@ -39,8 +40,6 @@ double Accuracy(arma::cube& pred, arma::cube& Y, double tolerance = 0.5)
       if (abs(temp.at(0, j)) < tolerance)
         count++;
   }
-  // diff.print("dd");
-  // cout<< count << " " <<diff.n_cols<<" "<<diff.n_slices<<std::endl;
   return (count / (diff.n_cols + 1e-50)) / (diff.n_slices + 1e-50);
 }
 
