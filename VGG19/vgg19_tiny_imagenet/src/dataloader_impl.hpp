@@ -38,7 +38,7 @@ void Dataloader::LoadTrainData(const std::string folderPath, bool shuffle)
   fs::path p(folderPath);
   fs::directory_iterator end_itr;
   
-  // cycle through the directory
+  // Cycle through the directory.
   for (fs::directory_iterator itr(p); itr != end_itr; ++itr)
   {
     if (fs::is_directory(itr->path()))
@@ -71,17 +71,16 @@ void Dataloader::LoadTrainData(const std::string folderPath, bool shuffle)
 
 void Dataloader::LoadValData(const std::string folderPath)
 {
-
   std::ifstream dataFile(folderPath+"/val_annotations.txt");
   while (!dataFile.eof())
   {
     std::string str;
-    std::getline( dataFile, str);
+    std::getline(dataFile, str);
     std::stringstream buffer(str);
     std::string temp;
     std::vector<std::string> values;
    
-    while (getline( buffer, temp, '\t'))
+    while (getline(buffer, temp, '\t'))
       values.push_back(temp.c_str());
 
     if (values.size() == 0)
@@ -93,32 +92,32 @@ void Dataloader::LoadValData(const std::string folderPath)
 
 template<typename dataType, typename labelType>
 void Dataloader::LoadImageData(arma::Mat<dataType>& X,
-                   arma::Mat<labelType>& y,
-                   bool train,
-                   size_t limit,
-                   size_t offset)
+                               arma::Mat<labelType>& y,
+                               bool train,
+                               size_t limit,
+                               size_t offset)
 {
   arma::Mat<unsigned char> colImg;
-    std::vector<size_t> tempY;
+  std::vector<size_t> tempY;
   data::ImageInfo info(64, 64, 3);
 
   std::vector<std::string> dataset;
-    std::vector<size_t> labels;
-    if (train)
-    {
-      dataset = trainX;
-      labels = trainY;
-    }
-    else
-    {
-      dataset = valX;
-      labels = valY;
-    }
-    size_t numFiles;
-    if (limit == 0)
-      numFiles = dataset.size();
-    else
-      numFiles = std::min(dataset.size(), offset+limit);
+  std::vector<size_t> labels;
+  if (train)
+  {
+    dataset = trainX;
+    labels = trainY;
+  }
+  else
+  {
+    dataset = valX;
+    labels = valY;
+  }
+  size_t numFiles;
+  if (limit == 0)
+    numFiles = dataset.size();
+  else
+    numFiles = std::min(dataset.size(), offset+limit);
 
   data::Load(dataset[offset], X, info, false, true);
   tempY.push_back(labels[offset]);

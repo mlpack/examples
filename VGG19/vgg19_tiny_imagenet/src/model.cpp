@@ -32,7 +32,10 @@ typedef FFN<NegativeLogLikelihood<>, XavierInitialization> VGGModel;
 // Calculates Log Likelihood Loss over batches.
 template<typename NetworkType = FFN<NegativeLogLikelihood<>, XavierInitialization>,
          typename DataType = arma::mat>
-double NLLLoss(NetworkType& model, DataType& testX, DataType& testY, size_t batchSize)
+double NLLLoss(NetworkType& model,
+               const DataType& testX,
+               const DataType& testY,
+               size_t batchSize)
 {
   double loss = 0;
   size_t nofPoints = testX.n_cols;
@@ -130,7 +133,9 @@ int main()
     AdamUpdate(1e-8, 0.9, 0.999));
 
   cout << "Training ..." << endl;
-  const clock_t begin_time = clock();
+  arma::wall_clock timer;
+  timer.tic();
+
   arma::mat testX = arma::conv_to<arma::mat>::from(valX);
   arma::mat testY = arma::conv_to<arma::mat>::from(valY);
   inplace_trans(testY, "lowmem");
@@ -160,8 +165,7 @@ int main()
         << NLLLoss<VGGModel>(model, testX, testY, 50) << std::endl;
   }
 
-  std::cout << "Time taken to train -> " << float(clock() - begin_time) /
-      CLOCKS_PER_SEC << " seconds" << std::endl;
+  std::cout << "Time taken to train -> " << timer.toc() << " seconds" << std::endl;
 
   if (saveModel)
   {
