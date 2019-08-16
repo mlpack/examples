@@ -62,21 +62,21 @@ double NLLLoss(NetworkType& model,
 int main()
 {
   // Dataloader object for loading tiny imagenet dataset.
-	Dataloader d(200);
-	d.LoadTrainData("./imagenet/src/imagenet/tiny-imagenet-200/train");
-	d.LoadValData("./imagenet/src/imagenet/tiny-imagenet-200/val");
+  Dataloader d(200);
+  d.LoadTrainData("./imagenet/src/imagenet/tiny-imagenet-200/train");
+  d.LoadValData("./imagenet/src/imagenet/tiny-imagenet-200/val");
 
-	arma::Mat<unsigned char> X, valX;
-	arma::Mat<size_t> y, valY;
+  arma::Mat<unsigned char> X, valX;
+  arma::Mat<size_t> y, valY;
 
   // Loading the first 10000 randonly shuffled images for training.
-	d.LoadImageData(X, y, true, 10000);
+  d.LoadImageData(X, y, true, 10000);
   inplace_trans(y, "lowmem");
 
   // Loading the first 1000 randonly shuffled images for validation.
-	d.LoadImageData(valX, valY, false, 1000);
+  d.LoadImageData(valX, valY, false, 1000);
 
-	// Input parameters, the dataset contains images with shape 64x64x3.
+  // Input parameters, the dataset contains images with shape 64x64x3.
   const size_t inputWidth = 64, inputHeight = 64, inputChannel = 3;
 
   // Number of iteration per cycle.
@@ -95,7 +95,7 @@ int main()
   constexpr bool saveModel = true;
   constexpr bool loadModel = false;
 
-	VGG19 vggnet(inputWidth, inputHeight, inputChannel, d.numClasses, true, "max", "mnist");
+  VGG19 vggnet(inputWidth, inputHeight, inputChannel, d.numClasses, true, "max", "mnist");
   Sequential<>* vgg19 = vggnet.CompileModel();
   VGGModel model;
 
@@ -116,21 +116,21 @@ int main()
 
   // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
-    // Step size of the optimizer.
-    STEP_SIZE,
-    // Batch size. Number of data points that are used in each iteration.
-    BATCH_SIZE,
-    // Max number of iterations.
-    ITERATIONS_PER_CYCLE,
-    // Tolerance, used as a stopping condition. Such a small value
-    // means we almost never stop by this condition, and continue gradient
-    // descent until the maximum number of iterations is reached.
-    1e-8,
-    // Shuffle. If optimizer should take random data points from the dataset at
-    // each iteration.
-    true,
-    // Adam update policy.
-    AdamUpdate(1e-8, 0.9, 0.999));
+      // Step size of the optimizer.
+      STEP_SIZE,
+      // Batch size. Number of data points that are used in each iteration.
+      BATCH_SIZE,
+      // Max number of iterations.
+      ITERATIONS_PER_CYCLE,
+      // Tolerance, used as a stopping condition. Such a small value
+      // means we almost never stop by this condition, and continue gradient
+      // descent until the maximum number of iterations is reached.
+      1e-8,
+      // Shuffle. If optimizer should take random data points from the dataset at
+      // each iteration.
+      true,
+      // Adam update policy.
+      AdamUpdate(1e-8, 0.9, 0.999));
 
   cout << "Training ..." << endl;
   arma::wall_clock timer;
@@ -154,8 +154,8 @@ int main()
     // randomly initialized between -1 and 1. Otherwise, the values of weights
     // from the previous iteration are used.
     model.Train(arma::conv_to<arma::mat>::from(X),
-    						arma::conv_to<arma::mat>::from(y),
-    						optimizer);
+                arma::conv_to<arma::mat>::from(y),
+                optimizer);
 
     cout << "Epoch " << i << endl;
     // Don't reset optimizers parameters between cycles.
