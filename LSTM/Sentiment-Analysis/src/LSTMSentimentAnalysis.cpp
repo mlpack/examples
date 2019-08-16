@@ -65,8 +65,9 @@ int main()
   const bool saveModel = true;
   const bool loadModel = false;
 
-  std::ifstream in("data_1000.txt");
+  std::ifstream in("LSTM/data/data_1000.txt");
   size_t vocabSize = 1000;
+
   std::vector<std::vector<int> > data;
   size_t seqLengths = 0;
   if (in)
@@ -84,7 +85,11 @@ int main()
       seqLengths += data.back().size();
     }
   }
-
+  else
+  {
+    std::cout << "File not found." << std::endl;
+    return 0;
+  }
   // Average length of sentence.
   size_t meanSeqLength = seqLengths/ data.size() - 1;
 
@@ -123,6 +128,7 @@ int main()
   testY = datasetY.subcube(span(), span(trainingSize, datasetY.n_cols-1), span());
 
   const size_t inputSize = vocabSize, outputSize = 1;
+  const size_t embSize = 100;
 
   // No of timesteps to look in RNN.
   const size_t rho = meanSeqLength;
@@ -139,7 +145,8 @@ int main()
   else
   {
     model.Add<IdentityLayer<> >();
-    model.Add<LSTM<> > (inputSize, 10, rho);
+    model.Add<Linear<> >(inputSize, embSize);
+    model.Add<LSTM<> > (embSize, 10, rho);
     model.Add<Dropout<> >(0.5);
     model.Add<LeakyReLU<> >();
     model.Add<Linear<> >(10, outputSize);
