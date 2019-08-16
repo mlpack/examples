@@ -16,6 +16,7 @@
 #include <mlpack/prereqs.hpp>
 #include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <ensmallen.hpp>
@@ -59,22 +60,6 @@ void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size
   }
 }
 
-template<typename DataType = arma::mat>
-DataType MinMaxScaler(DataType& dataset)
-{
-  arma::vec maxValues = arma::max(dataset, 1 /* for each dimension */);
-  arma::vec minValues = arma::min(dataset, 1 /* for each dimension */);
-
-  arma::vec rangeValues = maxValues - minValues;
-
-  // Add a very small value if there are any zeros.
-  rangeValues += 1e-25;
-
-  dataset -= arma::repmat(minValues , 1, dataset.n_cols);
-  dataset /= arma::repmat(rangeValues , 1, dataset.n_cols);
-  return dataset;
-}
-
 int main()
 {
   /* HYPERPARAMETERS */
@@ -116,7 +101,9 @@ int main()
   dataset = dataset.submat(1, 1, dataset.n_rows - 1, dataset.n_cols - 1);
 
   // Scale data for increased numerical stability.
-  dataset = MinMaxScaler(dataset);
+  data::MinMaxScaler scale;
+  scale.Fit(dataset);
+  scale.Transform(dataset, dataset);
 
 
   size_t inputSize = 5, outputSize = 2;
