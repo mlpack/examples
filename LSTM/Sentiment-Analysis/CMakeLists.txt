@@ -41,7 +41,7 @@ endif()
 
 
 if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data/data_1000.txt)
-  file(DOWNLOAD https://transfer.sh/wTUKg/data_1000.txt
+  file(DOWNLOAD http://mlpack.org/datasets/data_1000.txt
           "${PROJECT_BINARY_DIR}/../data/data_1000.txt"
           STATUS IMDB_DATA_STATUS_LIST
           LOG IMDB_DATA_LOG
