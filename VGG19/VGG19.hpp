@@ -26,11 +26,16 @@ using namespace mlpack::ann;
  * million images from the ImageNet database. The network is 19 layers
  * deep and can classify images into 1000 object categories. Details about
  * the network architecture can be found in the following arXiv paper:
+ * For more information, read the following paper:
  *
- * Very Deep Convolutional Networks for Large-Scale Image Recognition
- * K. Simonyan, A. Zisserman
- * arXiv:1409.1556
- * https://arxiv.org/abs/1409.1556
+ * @code
+ * @article{Clevert2015,
+ *   author  = {Simonyan, K. and Zisserman, A.},
+ *   title   = {Very Deep Convolutional Networks for Large-Scale Image Recognition},
+ *   journal = {CoRR},
+ *   year    = {2014}
+ * }
+ * @endcode
  */
 
 class VGG19
