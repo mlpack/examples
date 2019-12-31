@@ -132,13 +132,13 @@ int main()
 {
   //Change the names of these files as necessary. They should be correct 
   //already, if your program's working directory contains the data and/or model.
-  const string dataFile = "D:/_WORK5/mlpackn/sample-ml-app/sample-ml-app/data/Google2016-2019.csv";
+  const string dataFile = "Google2016-2019.csv";
   // example: const string dataFile = "C:/mlpack-model-app/Google2016-2019.csv";
   // example: const string dataFile = "/home/user/mlpack-model-app/Google2016-2019.csv";
-  const string modelFile = "D:/_WORK5/mlpackn/sample-ml-app/sample-ml-app/saved_models/lstm_multi.bin";
+  const string modelFile = "lstm_multi.bin";
   // example: const string modelFile = "C:/mlpack-model-app/lstm_multi.bin";
   // example: const string modelFile = "/home/user/mlpack-model-app/lstm_multi.bin";
-  const string predFile = "D:/_WORK5/mlpackn/sample-ml-app/sample-ml-app/saved_models/lstm_multi_predictions.csv";
+  const string predFile = "lstm_multi_predictions.csv";
 
   //If true the model will be trained; if false the saved model will be
   //read and used for prediction
