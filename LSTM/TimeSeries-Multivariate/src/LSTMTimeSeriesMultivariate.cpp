@@ -90,7 +90,7 @@ void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size
  * the predictions, the preceding columns are the data used to generate those 
  * predictions.
  */
-void saveAndResults(const std::string filename, const arma::cube& predictions, data::MinMaxScaler& scale,
+void saveAndResults(const string filename, const arma::cube& predictions, data::MinMaxScaler& scale,
   const arma::cube& testX)
 {
   mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
@@ -123,9 +123,9 @@ void saveAndResults(const std::string filename, const arma::cube& predictions, d
   //because we did not use it for the training, therefore the prediction result 
   //will be for the day before! In your own application you may of course load 
   //any dataset for prediction!
-  std::cout << "The predicted Google stock (high, low) for the last day is: " << std::endl;
-  std::cout << "  (" << flatDataAndPreds(flatDataAndPreds.n_rows - 2, flatDataAndPreds.n_cols - 1) << " ,";
-  std::cout << flatDataAndPreds(flatDataAndPreds.n_rows - 1, flatDataAndPreds.n_cols - 1) << ")" << std::endl;
+  cout << "The predicted Google stock (high, low) for the last day is: " << endl;
+  cout << "  (" << flatDataAndPreds(flatDataAndPreds.n_rows - 2, flatDataAndPreds.n_cols - 1) << " ,";
+  cout << flatDataAndPreds(flatDataAndPreds.n_rows - 1, flatDataAndPreds.n_cols - 1) << ")" << endl;
 }
 
 int main()
@@ -198,7 +198,7 @@ int main()
   size_t inputSize = 5, outputSize = 2;
 
   //We need to represent the input data for RNN in arma::cube (3D matrix)! The 
-  //3rd dimension is the rho number of past data records the RNN uses for 
+  //3rd dimension is rho, the number of past data records the RNN uses for.
   //learning.
   arma::cube X, y;
   X.set_size(inputSize, dataset.n_cols - rho + 1, rho);
@@ -222,7 +222,7 @@ int main()
 
   if (bLoadAndTrain) {
     //the model will be trained further
-    std::cout << "Loading and further training model..." << std::endl;
+    cout << "Loading and further training model..." << endl;
     data::Load(modelFile, "LSTMMulti", model);
   }
   else {
@@ -273,7 +273,7 @@ int main()
     cout << "Finished training." << endl;
     cout << "Saving Model" << endl;
     data::Save(modelFile, "LSTMMulti", model);
-    std::cout << "Model saved in " << modelFile << std::endl;
+    cout << "Model saved in " << modelFile << endl;
   }
 
   //NOTE: the below is added in order to show how in a real application the 
@@ -284,7 +284,7 @@ int main()
 
   //Load RNN model and use it for prediction
   RNN<MeanSquaredError<>, HeInitialization> modelP(rho);
-  std::cout << "Loading model ..." << std::endl;
+  cout << "Loading model ..." << endl;
   data::Load(modelFile, "LSTMMulti", modelP);
   arma::cube predOutP;
   // Getting predictions on test data points.
@@ -296,8 +296,9 @@ int main()
   //save the output predictions and show the results
   saveAndResults(predFile, predOutP, scale, testX);
 
-  cout << "Ready!" << std::endl;
-  getchar();
+  //Use this on Windows in order to keep the console window open
+  //cout << "Ready!" << endl;
+  //getchar();
 
   return 0;
 }
