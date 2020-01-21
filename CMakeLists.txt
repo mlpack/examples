@@ -1,10 +1,18 @@
-cmake_minimum_required(VERSION 2.6)
-project(models C CXX)
+cmake_minimum_required(VERSION 3.10)
+
+# set the project name and version
+project(models VERSION 1.0)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # First, define all the compilation options.
 # We default to debugging mode for developers.
 option(FORCE_CXX11
-    "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS."
+    "Don't check that the compiler supports C++11,
+    just assume it.  Make sure to specify any necessary
+     flag to enable C++11 as part of CXXFLAGS."
     OFF)
 option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
 option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
