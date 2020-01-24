@@ -1,69 +1,23 @@
-cmake_minimum_required(VERSION 3.10)
-
-# set the project name and version
-project(models VERSION 1.0)
-
-# specify the C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+cmake_minimum_required(VERSION 3.1...3.16)
+project(models LANGUAGES C CXX)
 
 # First, define all the compilation options.
 # We default to debugging mode for developers.
 option(FORCE_CXX11
-    "Don't check that the compiler supports C++11,
-    just assume it.  Make sure to specify any necessary
-     flag to enable C++11 as part of CXXFLAGS."
+    "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS."
     OFF)
 option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
 option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
-
-# If we are not forcing C++11 support, check that the compiler supports C++11
-# and enable it.
-if (NOT FORCE_CXX11)
-  include(CMake/CXX11.cmake)
-  check_for_cxx11_compiler(HAS_CXX11)
-
-  if(NOT HAS_CXX11)
-    message(FATAL_ERROR "No C++11 compiler available!")
-  endif()
-  enable_cxx11()
-endif ()
 
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-# Set the CFLAGS and CXXFLAGS.
-# Set the CFLAGS and CXXFLAGS depending on the options the user specified.
-# Only GCC-like compilers support -Wextra, and other compilers give tons of
-# output for -Wall, so only -Wall and -Wextra on GCC.
-if(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -Wall -Wextra -ftemplate-depth=1000")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
-endif()
 
-# If using clang, we have to link against libc++ depending on the
-# OS (at least on some systems). Further, gcc sometimes optimizes calls to
-# math.h functions, making -lm unnecessary with gcc, but it may still be
-# necessary with clang.
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  IF (APPLE)
-    # detect OS X version. Use '/usr/bin/sw_vers -productVersion' to
-    # extract V from '10.V.x'.)
-    EXEC_PROGRAM(/usr/bin/sw_vers ARGS
-        -productVersion OUTPUT_VARIABLE MACOSX_VERSION_RAW)
-    string(REGEX REPLACE
-        "10\\.([0-9]+).*" "\\1"
-        MACOSX_VERSION
-        "${MACOSX_VERSION_RAW}")
-
-     # OSX Lion (10.7) and OS X Mountain Lion (10.8) doesn't automatically
-     # select the right stdlib.
-    if(${MACOSX_VERSION} LESS 9)
-      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-     endif(${MACOSX_VERSION} LESS 9)
-  endif(APPLE)
-endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+# Set required C++ standard to C++11.
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Now, find the libraries we need to compile against.  Several variables can be
 # set to manually specify the directory in which each of these libraries
@@ -74,7 +28,7 @@ endif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 #   MLPACK_INCLUDE_DIR - include directory for mlpack
 #   MLPACK_LIBRARY - library directory for mlpack
 
-find_package(Armadillo 4.200.0 REQUIRED)
+find_package(Armadillo ${ARMADILLO_VERSION_STRING} REQUIRED)
 
 # If Armadillo was compiled without ARMA_64BIT_WORD and we are on a 64-bit
 # system (where size_t will be 64 bits), suggest to the user that they should
@@ -194,7 +148,9 @@ endif ()
 # Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
 set(Boost_ADDITIONAL_VERSIONS
-  "1.49.0" "1.50.0" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55.0")
+  "1.49.0" "1.50.0" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55.0" "1.56.0" "1.57.0"
+  "1.58.0" "1.59.0" "1.60.0" "1.61.0" "1.62.0" "1.63.0" "1.64.0" "1.65.0" "1.66.0" "1.67.0" 
+  "1.68.0" "1.69.0" "1.70.0" "1.71.0" "1.72.0")
 find_package(Boost 1.49
     COMPONENTS
       program_options
@@ -203,15 +159,20 @@ find_package(Boost 1.49
     REQUIRED
 )
 
-if (USE_OPENMP)
-  message(WARNING "Only use OpenMP if mlpack has been compiled with OpenMP.")
-  find_package(OpenMP)
-endif ()
+if ( USE_OPENMP )
+  if ( NOT TARGET OpenMP::OpenMP_CXX )
+    find_package( Threads REQUIRED )
+    add_library( OpenMP::OpenMP_CXX IMPORTED INTERFACE )
+    set_property(TARGET OpenMP::OpenMP_CXX
+              PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
+  # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang).
+    set_property(TARGET OpenMP::OpenMP_CXX
+              PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+  endif()
+    target_link_libraries(ensmallen INTERFACE OpenMP::OpenMP_CXX)
+endif()
 
-if (OPENMP_FOUND)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif ()
+
 
 # In Visual Studio, automatic linking is performed, so we don't need to worry
 # about it.  Clear the list of libraries to link against and let Visual Studio
@@ -258,3 +219,5 @@ set(DIRS
 foreach(dir ${DIRS})
   add_subdirectory(${dir})
 endforeach()
+
+enable_testing()
