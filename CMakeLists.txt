@@ -28,7 +28,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #   MLPACK_INCLUDE_DIR - include directory for mlpack
 #   MLPACK_LIBRARY - library directory for mlpack
 
-find_package(Armadillo ${ARMADILLO_VERSION_STRING} REQUIRED)
+find_package(Armadillo 9.800.2 REQUIRED)
 
 # If Armadillo was compiled without ARMA_64BIT_WORD and we are on a 64-bit
 # system (where size_t will be 64 bits), suggest to the user that they should
