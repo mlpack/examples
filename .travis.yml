@@ -5,7 +5,7 @@ language: cpp
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
-  - curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz | tar xvz && cd armadillo*
+  - curl http://sourceforge.net/projects/arma/files/armadillo-9.800.2.tar.xz | tar xvz && cd armadillo*
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
