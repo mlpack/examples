@@ -2,10 +2,19 @@ sudo: required
 dist: trusty
 language: cpp
 
+env:
+  - ARMADILLO=latest
+  - ARMADILLO=minimum
+
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
-  - curl http://sourceforge.net/projects/arma/files/armadillo-9.800.2.tar.xz | tar xvz && cd armadillo*
+  - if [ $ARMADILLO == "latest" ]; then
+      curl https://ftp.fau.de/macports/distfiles/armadillo/`curl https://ftp.fau.de/macports/distfiles/armadillo/ -- | grep '.tar.xz' | sed 's/^.*<a href="\(armadillo-[0-9]*.[0-9]*.[0-9]*.tar.xz\)".*$/\1/' | tail -1` | tar xvJ && cd armadillo*;
+    fi
+  - if [ $ARMADILLO == "minimum" ]; then
+      curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-8.400.0.tar.xz | tar -xvJ && cd armadillo*;
+    fi
   - cmake . && make && sudo make install && cd ..
   - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
