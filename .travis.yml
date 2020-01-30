@@ -16,7 +16,6 @@ before_install:
       curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-8.400.0.tar.xz | tar -xvJ && cd armadillo*;
     fi
   - cmake . && make && sudo make install && cd ..
-  - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
   - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
   - cd mlpack && mkdir build && cd build && cmake .. && make -j2 && sudo make install
   
