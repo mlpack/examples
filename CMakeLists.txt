@@ -3,12 +3,16 @@ project(models LANGUAGES C CXX)
 
 # First, define all the compilation options.
 # We default to debugging mode for developers.
-option(FORCE_CXX11
-    "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS."
-    OFF)
+option(DEBUG "Compile with debugging information." OFF)
+option(PROFILE "Compile with profiling information." OFF)
+option(BUILD_TESTS "Build tests." ON)
+option(BUILD_CLI_EXECUTABLES "Build command-line executables." ON)
 option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
-option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
+option(FORCE_CXX11
+    "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS." OFF)
+option(USE_OPENMP "If available, use OpenMP for parallelization." ON)
 
+enable_testing()
 # Include modules in the CMake directory.
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
@@ -17,7 +21,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 # Set required C++ standard to C++11.
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Now, find the libraries we need to compile against.  Several variables can be
 # set to manually specify the directory in which each of these libraries
@@ -28,7 +31,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 #   MLPACK_INCLUDE_DIR - include directory for mlpack
 #   MLPACK_LIBRARY - library directory for mlpack
 
-find_package(Armadillo 9.800.2 REQUIRED)
+find_package(Armadillo 8.400.0 REQUIRED)
 
 # If Armadillo was compiled without ARMA_64BIT_WORD and we are on a 64-bit
 # system (where size_t will be 64 bits), suggest to the user that they should
@@ -70,6 +73,174 @@ else()
   if (CMAKE_SIZEOF_VOID_P EQUAL 4)
     add_definitions(-DARMA_32BIT_WORD)
   endif ()
+endif()
+
+# If we are on a Unix-like system, use the GNU install directories module.
+# Otherwise set the values manually.
+if (UNIX)
+  include(GNUInstallDirs)
+else ()
+  set(CMAKE_INSTALL_BINDIR ${CMAKE_INSTALL_PREFIX}/bin)
+  set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
+  set(CMAKE_INSTALL_MANDIR ${CMAKE_INSTALL_PREFIX}/man)
+  set(CMAKE_INSTALL_DOCDIR ${CMAKE_INSTALL_PREFIX}/share/doc/mlpack)
+  set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
+endif ()
+
+# This is as of yet unused.
+#option(PGO "Use profile-guided optimization if not a debug build" ON)
+
+# Set the CFLAGS and CXXFLAGS depending on the options the user specified.
+# Only GCC-like compilers support -Wextra, and other compilers give tons of
+# output for -Wall, so only -Wall and -Wextra on GCC.
+if(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  # Ensure that we can't compile with clang 3.4, since this causes strange
+  # issues.
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 3.5)
+    message(FATAL_ERROR "mlpack does not build correctly with clang < 3.5.  "
+        "Please upgrade your compiler and reconfigure mlpack.")
+  endif ()
+
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -ftemplate-depth=1000")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+
+  # To remove unused functions warnings.
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-function")
+endif()
+# These support libraries are used if we need to link against something
+# specific.  This list is a subset of MLPACK_LIBRARIES.
+set(COMPILER_SUPPORT_LIBRARIES "")
+
+# If we are using MSVC, we need /bigobj.
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif ()
+
+# If we are using MINGW, we need sections and big-obj, otherwise we create too
+# many sections.
+if(CMAKE_COMPILER_IS_GNUCC AND WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections -Wa,-mbig-obj")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wa,-mbig-obj")
+endif()
+
+# If using clang, we have to link against libc++ depending on the
+# OS (at least on some systems). Further, gcc sometimes optimizes calls to
+# math.h functions, making -lm unnecessary with gcc, but it may still be
+# necessary with clang.
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  if (APPLE)
+    # Detect OS X version. Use '/usr/bin/sw_vers -productVersion' to
+    # extract V from '10.V.x'.
+    exec_program(/usr/bin/sw_vers ARGS
+        -productVersion OUTPUT_VARIABLE MACOSX_VERSION_RAW)
+    string(REGEX REPLACE
+        "10\\.([0-9]+).*" "\\1"
+        MACOSX_VERSION
+        "${MACOSX_VERSION_RAW}")
+
+     # OSX Lion (10.7) and OS X Mountain Lion (10.8) doesn't automatically
+     # select the right stdlib.
+    if(${MACOSX_VERSION} LESS 9)
+      set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
+      set(CMAKE_SHARED_LINKER_FLAGS
+          "${CMAKE_SHARED_LINKER_FLAGS} -stdlib=libc++")
+      set(CMAKE_MODULE_LINKER_FLAGS
+          "${CMAKE_MODULE_LINKER_FLAGS} -stdlib=libc++")
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+     endif()
+  endif()
+
+  # Link everything with -lm.
+  set(COMPILER_SUPPORT_LIBRARIES ${COMPILER_SUPPORT_LIBRARIES} "m")
+  set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} "m")
+  # Use -pthread, but not on OS X.
+  if (NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+  endif ()
+endif()
+
+# If we're using gcc, then we need to link against pthreads to use std::thread,
+# which we do in the tests.
+if(CMAKE_COMPILER_IS_GNUCC)
+  find_package(Threads)
+  set(COMPILER_SUPPORT_LIBRARIES ${COMPILER_SUPPORT_LIBRARIES}
+      ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
+# Setup build for test coverage
+if(BUILD_WITH_COVERAGE)
+  # Currently coverage only works with GNU g++.
+  if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # Find gcov and lcov
+    find_program(GCOV gcov)
+    find_program(LCOV lcov)
+
+    if(NOT GCOV)
+      message(FATAL_ERROR
+          "gcov not found! gcov is required when BUILD_WITH_COVERAGE=ON.")
+    endif()
+
+    set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} "supc++")
+    set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} "quadmath")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -fprofile-arcs -fkeep-inline-functions")
+    message(STATUS "Adding debug compile options for code coverage.")
+    # Remove optimizations for better line coverage
+    set(DEBUG ON)
+
+    if(LCOV)
+      configure_file(CMake/mlpack_coverage.in mlpack_coverage @ONLY)
+      add_custom_target(mlpack_coverage DEPENDS mlpack_test COMMAND ${PROJECT_BINARY_DIR}/mlpack_coverage)
+    else()
+      message(WARNING "'lcov' not found; local coverage report is disabled. "
+          "Install 'lcov' and rerun cmake to generate local coverage report.")
+    endif()
+  else()
+    message(FATAL_ERROR "BUILD_WITH_COVERAGE can only work with GNU environment.")
+  endif()
+endif()
+
+# Debugging CFLAGS.  Turn optimizations off; turn debugging symbols on.
+if(DEBUG)
+  if (NOT MSVC)
+    add_definitions(-DDEBUG)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0 -ftemplate-backtrace-limit=0")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -g -O0")
+  endif()
+
+  # mlpack uses it's own mlpack::backtrace class based on Binary File Descriptor
+  # <bfd.h> and linux Dynamic Loader <libdl.h> and more portable version in future
+  if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(Bfd)
+    find_package(LibDL)
+    if(LIBBFD_FOUND AND LIBDL_FOUND)
+      set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -rdynamic")
+      set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${LIBBFD_INCLUDE_DIRS}
+          ${LIBDL_INCLUDE_DIRS})
+      set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} ${LIBBFD_LIBRARIES}
+          ${LIBDL_LIBRARIES})
+      add_definitions(-DHAS_BFD_DL)
+    else()
+      message(WARNING "No libBFD and/or libDL has been found!")
+    endif()
+  endif()
+else()
+  add_definitions(-DARMA_NO_DEBUG)
+  add_definitions(-DNDEBUG)
+  if (NOT MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -O3")
+  else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /O3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /O3")
+  endif ()
+endif()
+
+# Profiling CFLAGS.  Turn profiling information on.
+if(CMAKE_COMPILER_IS_GNUCC AND PROFILE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pg")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pg")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pg")
 endif()
 
 # On Windows, Armadillo should be using LAPACK and BLAS but we still need to
@@ -148,9 +319,14 @@ endif ()
 # Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
 set(Boost_ADDITIONAL_VERSIONS
-  "1.49.0" "1.50.0" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55.0" "1.56.0" "1.57.0"
-  "1.58.0" "1.59.0" "1.60.0" "1.61.0" "1.62.0" "1.63.0" "1.64.0" "1.65.0" "1.66.0" "1.67.0" 
-  "1.68.0" "1.69.0" "1.70.0" "1.71.0" "1.72.0")
+  "1.49.0" "1.50.0" "1.51.0"
+  "1.52.0" "1.53.0" "1.54.0"
+  "1.55.0" "1.56.0" "1.57.0"
+  "1.58.0" "1.59.0" "1.60.0"
+  "1.61.0" "1.62.0" "1.63.0"
+  "1.64.0" "1.65.0" "1.66.0" 
+  "1.67.0" "1.68.0" "1.69.0"
+  "1.70.0" "1.71.0" "1.72.0")
 find_package(Boost 1.49
     COMPONENTS
       program_options
@@ -159,18 +335,23 @@ find_package(Boost 1.49
     REQUIRED
 )
 
-if ( USE_OPENMP )
-  if ( NOT TARGET OpenMP::OpenMP_CXX )
-    find_package( Threads REQUIRED )
-    add_library( OpenMP::OpenMP_CXX IMPORTED INTERFACE )
-    set_property(TARGET OpenMP::OpenMP_CXX
-              PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
-  # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang).
-    set_property(TARGET OpenMP::OpenMP_CXX
-              PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-  endif()
-    target_link_libraries(ensmallen INTERFACE OpenMP::OpenMP_CXX)
-endif()
+if (USE_OPENMP)
+  find_package(OpenMP)
+endif ()
+
+if (OPENMP_FOUND)
+  add_definitions(-DHAS_OPENMP)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+else ()
+  # Disable warnings for all the unknown OpenMP pragmas.
+  if (NOT MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas")
+  else ()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4068")
+  endif ()
+  set(OpenMP_CXX_FLAGS "")
+endif ()
 
 
 
