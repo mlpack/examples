@@ -2,16 +2,14 @@ image: Ubuntu
 
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
-  - curl -O https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz -o armadillo-6.500.5.tar.gz && tar xvzf armadillo-6.500.5.tar.gz && cd armadillo-6.500.5
-  - cmake . && make && sudo make install && cd ..
-  - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
-  - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cd mlpack && mkdir build && cd build && cmake .. && make -j2 && sudo make install
-  - mkdir build && cd build && cmake ..
+  - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev libmlpack-dev
+  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
+  - cmake . && make && ARMADILLO_INCLUDE_DIR=$(pwd)/include
+  - cd $APPVEYOR_BUILD_FOLDER && git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DARMADILLO_INCLUDE_DIR=$ARMADILLO_INCLUDE_DIR -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
 
 test_script:
-  - cd $APPVEYOR_BUILD_FOLDER && mkdir build && cd build && cmake ..
+  - cd $APPVEYOR_BUILD_FOLDER && mkdir build && cd build && cmake -DARMADILLO_INCLUDE_DIR=$ARMADILLO_INCLUDE_DIR ..
   - make -j2
 
 build: off
