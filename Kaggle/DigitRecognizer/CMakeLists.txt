@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1...3.16)
+
 project(kaggle-digit-recognizer)
 
 option(DEBUG "DEBUG" OFF)
 
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 set(SOURCES ${MODEL_SOURCE_DIR}/DigitRecognizer.cpp)
 
@@ -17,8 +17,9 @@ endif()
 
 add_executable(DigitRecognizer ${SOURCES})
 target_link_libraries(DigitRecognizer
-  ${MLPACK_LIBRARIES}
-  ${ARMADILLO_LIBRARIES})
+   PRIVATE ${MLPACK_LIBRARIES}
+   PRIVATE ${ARMADILLO_LIBRARIES})
+target_include_directories(DigitRecognizer PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
   add_custom_command(TARGET DigitRecognizer POST_BUILD

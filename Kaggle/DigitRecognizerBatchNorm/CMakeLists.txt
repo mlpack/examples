@@ -1,11 +1,10 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1...3.16)
+
 project(kaggle-digit-recognizer-batchnorm)
 
 option(DEBUG "DEBUG" OFF)
 
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
-
 set(SOURCES ${MODEL_SOURCE_DIR}/DigitRecognizerBatchNorm.cpp)
 
 if(DEBUG)
@@ -17,8 +16,9 @@ endif()
 
 add_executable(DigitRecognizerBatchNorm ${SOURCES})
 target_link_libraries(DigitRecognizerBatchNorm
-  ${MLPACK_LIBRARIES}
-  ${ARMADILLO_LIBRARIES})
+  PRIVATE ${MLPACK_LIBRARIES}
+  PRIVATE ${ARMADILLO_LIBRARIES})
+target_include_directories(DigitRecognizerBatchNorm PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
   add_custom_command(TARGET DigitRecognizerBatchNorm POST_BUILD

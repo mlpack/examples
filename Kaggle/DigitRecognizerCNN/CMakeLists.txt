@@ -4,8 +4,6 @@ project(kaggle-digit-recognizer-cnn)
 option(DEBUG "DEBUG" OFF)
 
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
-
 set(SOURCES ${MODEL_SOURCE_DIR}/DigitRecognizerCNN.cpp)
 
 if(DEBUG)
@@ -17,11 +15,12 @@ endif()
 
 add_executable(DigitRecognizerCNN ${SOURCES})
 target_link_libraries(DigitRecognizerCNN
-  ${MLPACK_LIBRARIES}
-  ${ARMADILLO_LIBRARIES})
+    PRIVATE ${MLPACK_LIBRARIES}
+    PRIVATE ${ARMADILLO_LIBRARIES})
+target_include_directories(DigitRecognizerCNN PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
-  add_custom_command(TARGET DigitRecognizerCNN POST_BUILD
+    add_custom_command(TARGET DigitRecognizerCNN POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E tar xvzf ${CMAKE_CURRENT_SOURCE_DIR}/../kaggle_train_test_dataset.zip
     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/../)
 endif()

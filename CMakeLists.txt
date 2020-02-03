@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.1...3.16)
-project(models LANGUAGES C CXX)
+
+project(models
+        DESCRIPTION "model examples mlpack"
+        LANGUAGES C CXX)
 
 # First, define all the compilation options.
 # We default to debugging mode for developers.
@@ -51,9 +54,9 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
       # We are on a 64-bit system.  Does Armadillo have ARMA_64BIT_WORD enabled?
       file(READ "${ARMADILLO_INCLUDE_DIR}/armadillo_bits/config.hpp" ARMA_CONFIG)
       string(REGEX MATCH
-          "[\r\n][ ]*#define ARMA_64BIT_WORD"
-          ARMA_HAS_64BIT_WORD_PRE
-          "${ARMA_CONFIG}")
+                   "[\r\n][ ]*#define ARMA_64BIT_WORD"
+             ARMA_HAS_64BIT_WORD_PRE
+                    "${ARMA_CONFIG}")
 
       string(LENGTH "${ARMA_HAS_64BIT_WORD_PRE}" ARMA_HAS_64BIT_WORD)
     endif()
@@ -318,22 +321,29 @@ endif ()
 
 # Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
-set(Boost_ADDITIONAL_VERSIONS
-  "1.49.0" "1.50.0" "1.51.0"
-  "1.52.0" "1.53.0" "1.54.0"
-  "1.55.0" "1.56.0" "1.57.0"
-  "1.58.0" "1.59.0" "1.60.0"
-  "1.61.0" "1.62.0" "1.63.0"
-  "1.64.0" "1.65.0" "1.66.0" 
-  "1.67.0" "1.68.0" "1.69.0"
-  "1.70.0" "1.71.0" "1.72.0")
-find_package(Boost 1.49
-    COMPONENTS
-      program_options
-      unit_test_framework
-      serialization
-    REQUIRED
-)
+set( BOOST_VERSION 1.72.0 )
+# Settings for finding correct Boost libraries.
+set( Boost_USE_STATIC_LIBS FALSE )
+set( Boost_USE_MULTITHREADED TRUE )
+set( Boost_USE_STATIC_RUNTIME FALSE )
+set( Boost_COMPILER "-gcc8" )
+set( Boost_ADDITIONAL_VERSIONS "${BOOST_VERSION}" )
+
+find_package(Boost ${BOOST_VERSION}
+      MODULE
+      REQUIRED COMPONENTS program_options
+                          unit_test_framework
+                          serialization
+                          graph)
+# Make found targets globally available.
+if ( Boost_FOUND )
+  set_target_properties( Boost::boost
+  Boost::program_options
+  Boost::graph
+  PROPERTIES IMPORTED_GLOBAL TRUE )
+else()
+  message(FATAL_ERROR "Could not found boost version ${BOOST_VERSION}")
+endif ()
 
 if (USE_OPENMP)
   find_package(OpenMP)

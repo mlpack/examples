@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.1...3.16)
 project(vae-cnn-mnist)
 
 option(DEBUG "DEBUG" OFF)
 
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
-
 set(SOURCES ${MODEL_SOURCE_DIR}/vae_cnn.cpp)
 
 if(DEBUG)
@@ -17,9 +15,10 @@ endif()
 
 add_executable(vae_cnn ${SOURCES})
 target_link_libraries(vae_cnn
-  ${MLPACK_LIBRARIES}
-  ${ARMADILLO_LIBRARIES}
-  ${Boost_LIBRARIES})
+  PRIVATE ${MLPACK_LIBRARIES}
+  PRIVATE ${ARMADILLO_LIBRARIES}
+  PRIVATE ${Boost_LIBRARIES})
+target_include_directories(vae_cnn PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 if (NOT EXISTS ${PROJECT_BINARY_DIR}/../mnist_full.csv)
   add_custom_command(TARGET vae_cnn POST_BUILD

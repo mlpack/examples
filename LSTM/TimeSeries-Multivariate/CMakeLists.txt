@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 2.6)
-project(lstm-time-series)
+cmake_minimum_required(VERSION 3.1...3.16)
 
+project(lstm-time-series)
 option(DEBUG "DEBUG" OFF)
 
 set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
-
 set(SOURCES
   ${MODEL_SOURCE_DIR}/LSTMTimeSeriesMultivariate.cpp
   )
@@ -20,9 +18,10 @@ endif()
 
 add_executable(LSTMTimeSeriesMultivariate ${SOURCES})
 target_link_libraries(LSTMTimeSeriesMultivariate
-  ${MLPACK_LIBRARIES}
-  ${ARMADILLO_LIBRARIES}
-  ${Boost_LIBRARIES})
+  PRIVATE ${MLPACK_LIBRARIES}
+  PRIVATE ${ARMADILLO_LIBRARIES}
+  PRIVATE ${Boost_LIBRARIES})
+target_include_directories(LSTMTimeSeriesMultivariate PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 
 
