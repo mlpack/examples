@@ -8,6 +8,8 @@ env:
 
 before_install:
   - sudo apt-get update -qq
+  - sudo add-apt-repository ppa:boost-latest/ppa
+  - sudo apt-get update
   - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
   - if [ $ARMADILLO == "latest" ]; then
       curl https://ftp.fau.de/macports/distfiles/armadillo/`curl https://ftp.fau.de/macports/distfiles/armadillo/ -- | grep '.tar.xz' | sed 's/^.*<a href="\(armadillo-[0-9]*.[0-9]*.[0-9]*.tar.xz\)".*$/\1/' | tail -1` | tar xvJ && cd armadillo*;
