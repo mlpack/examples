@@ -8,7 +8,7 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo add-apt-repository ppa:boost-latest/ppa
+  - travis_wait 30 sudo add-apt-repository ppa:boost-latest/ppa
   - sudo apt-get update
   - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
   - if [ $ARMADILLO == "latest" ]; then
@@ -25,7 +25,6 @@ install:
   - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake ..
 script:
   - make -j2
-
 notifications:
   email:
     - mlpack-git@lists.mlpack.org
