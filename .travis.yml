@@ -1,18 +1,17 @@
 sudo: required
-dist: trusty
+dist: xenial
 language: cpp
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
-  - curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-6.500.5.tar.gz | tar xvz && cd armadillo*
-  - cmake . && make && sudo make install && cd ..
-  - sudo cp .travis/config.hpp /usr/include/armadillo_bits/config.hpp
-  - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cd mlpack && mkdir build && cd build && cmake .. && make -j2 && sudo make install
-  
+  - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
+  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
+  - cmake . && make && sudo make install
+  - cd $TRAVIS_BUILD_DIR && git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
+
 install:
-  - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake ..
+  - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
 script:
   - make -j2
 
