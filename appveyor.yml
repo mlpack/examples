@@ -52,15 +52,15 @@ build_script:
   - 7z x armadillo.tar.xz -so | 7z x -si -ttar > nul
   - cd armadillo-8.400.0 && mkdir build && cd build
   - cmake -G "%VSVER%" -DBLAS_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DLAPACK_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DCMAKE_PREFIX:FILEPATH="%APPVEYOR_BUILD_FOLDER%/armadillo" -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=Release ..
-  - "%MSBUILD%" "C:\projects\mlpack\armadillo-8.400.0\build\armadillo.sln" /m /verbosity:quiet /p:Configuration=Release;Platform=x64'
+  - "%MSBUILD%" "C:\projects\mlpack\armadillo-8.400.0\build\armadillo.sln" /m /verbosity:quiet /p:Configuration=Release;Platform=x64
   - cd C:\projects\mlpack && mkdir build && cd build
   - cmake -G "%VSVER%" -DBLAS_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DLAPACK_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DARMADILLO_INCLUDE_DIR="C:/projects/mlpack/armadillo-8.400.0/include" -DARMADILLO_LIBRARY:FILEPATH=%ARMADILLO_LIBRARY% -DBOOST_INCLUDEDIR:PATH=%BOOST_INCLUDE% -DBOOST_LIBRARYDIR:PATH="C:\projects\mlpack\boost_libs" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release ..
-  - "%MSBUILD%" "C:\projects\mlpack\build\mlpack.sln" /m /verbosity:minimal /nologo /p:BuildInParallel=true /p:Configuration=Release;Platform=x64'
+  - "%MSBUILD%" "C:\projects\mlpack\build\mlpack.sln" /m /verbosity:minimal /nologo /p:BuildInParallel=true /p:Configuration=Release;Platform=x64
   - 7z a mlpack-windows-no-libs.zip "C:\projects\mlpack\build\Release\*.exe"
   - 7z a mlpack-windows.zip "C:\projects\mlpack\build\Release\*.*" "C:/projects/mlpack/OpenBLAS.0.2.14.1/lib/native/lib/x64/*.*"
   - cd C:\projects\models && mkdir build && cd build
   - cmake -G "%VSVER%" -DBLAS_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DLAPACK_LIBRARY:FILEPATH=%BLAS_LIBRARY% -DARMADILLO_INCLUDE_DIR="C:/projects/mlpack/armadillo-8.400.0/include" -DARMADILLO_LIBRARY:FILEPATH="C:\projects\mlpack\armadillo-8.400.0\build\Debug\armadillo.lib" -DBOOST_INCLUDEDIR:PATH=%BOOST_INCLUDE% -DBOOST_LIBRARYDIR:PATH="C:\projects\mlpack\boost_libs" -DMLPACK_LIBRARY:FILEPATH="C:/projects/mlpack/build/Release/mlpack.lib" -DMLPACK_INCLUDE_DIR:PATH="C:/projects/mlpack/build/include" -DCMAKE_PREFIX:FILEPATH="C:/projects/models" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release ..
-  - "%MSBUILD%" "C:\projects\models\build\models.sln" /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64'
+  - "%MSBUILD%" "C:\projects\models\build\models.sln" /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
 
 artifacts:
   - path: '**\*.zip'
