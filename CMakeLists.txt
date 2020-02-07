@@ -6,6 +6,8 @@ project(models C CXX)
 option(FORCE_CXX11
     "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS."
     OFF)
+option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
+option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
 
 # If we are not forcing C++11 support, check that the compiler supports C++11
 # and enable it.
@@ -138,6 +140,48 @@ if (WIN32)
 endif ()
 
 find_package(MLPACK REQUIRED)
+find_package(Ensmallen 1.10.0)
+if (NOT ENSMALLEN_FOUND)
+  if (DOWNLOAD_ENSMALLEN)
+    file(DOWNLOAD http://www.ensmallen.org/files/ensmallen-latest.tar.gz
+        "${CMAKE_BINARY_DIR}/deps/ensmallen-latest.tar.gz"
+        STATUS ENS_DOWNLOAD_STATUS_LIST LOG ENS_DOWBLOAD_LOG
+        SHOW_PROGRESS)
+    list(GET ENS_DOWNLOAD_STATUS_LIST 0 ENS_DOWNLOAD_STATUS)
+    if (ENS_DOWNLOAD_STATUS EQUAL 0)
+      execute_process(COMMAND ${CMAKE_COMMAND} -E
+          tar xzf "${CMAKE_BINARY_DIR}/deps/ensmallen-latest.tar.gz"
+          WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/deps/")
+
+      # Get the name of the directory.
+      file (GLOB ENS_DIRECTORIES RELATIVE "${CMAKE_BINARY_DIR}/deps/"
+          "${CMAKE_BINARY_DIR}/deps/ensmallen-[0-9]*.[0-9]*.[0-9]*")
+      list(LENGTH ENS_DIRECTORIES ENS_DIRECTORIES_LEN)
+      if (ENS_DIRECTORIES_LEN EQUAL 1)
+        list(GET ENS_DIRECTORIES 0 ENSMALLEN_INCLUDE_DIR)
+        set(ENSMALLEN_INCLUDE_DIR
+             "${CMAKE_BINARY_DIR}/deps/${ENSMALLEN_INCLUDE_DIR}/include")
+        message(STATUS
+            "Successfully downloaded ensmallen into ${CMAKE_BINARY_DIR}/deps/${ENSMALLEN_INCLUDE_DIR}/")
+      else ()
+        message(FATAL_ERROR "Problem unpacking ensmallen!  Expected only one directory ensmallen-x.y.z/; found ${ENS_DIRECTORIES}. Try removing the directory ${CMAKE_BINARY_DIR}/deps and reconfiguring.")
+      endif ()
+    else ()
+      list(GET ENS_DOWNLOAD_STATUS_LIST 1 ENS_DOWNLOAD_ERROR)
+      message(FATAL_ERROR
+          "Could not download ensmallen! Error code ${ENS_DOWNLOAD_STATUS}: ${ENS_DOWNLOAD_ERROR}!  Error log: ${ENS_DOWBLOAD_LOG}")
+    endif ()
+  else ()
+    # Release versions will have ensmallen packaged with the release so we can
+    # just reference that.
+    if (EXISTS "${CMAKE_SOURCE_DIR}/src/mlpack/core/optimizers/ensmallen/ensmallen.hpp")
+      set(ENSMALLEN_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/src/mlpack/core/optimizers/ensmallen")
+    else ()
+      message(FATAL_ERROR
+          "Cannot find ensmallen headers!  Try setting ENSMALLEN_INCLUDE_DIR!")
+    endif ()
+  endif ()
+endif ()
 
 # Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
@@ -151,6 +195,16 @@ find_package(Boost 1.49
     REQUIRED
 )
 
+if (USE_OPENMP)
+  message(WARNING "Only use OpenMP if mlpack has been compiled with OpenMP.")
+  find_package(OpenMP)
+endif ()
+
+if (OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif ()
+
 # In Visual Studio, automatic linking is performed, so we don't need to worry
 # about it.  Clear the list of libraries to link against and let Visual Studio
 # handle it.
@@ -163,6 +217,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 # Include directories for the previous dependencies.
 set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
+                        ${ENSMALLEN_INCLUDE_DIR}
                         ${ARMADILLO_INCLUDE_DIR}
                         ${Boost_INCLUDE_DIRS})
 set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
@@ -182,8 +237,14 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
 # Recurse into each model.
 set(DIRS
-  # Model directory.
+  # Model directories.
   Kaggle/DigitRecognizer
+  Kaggle/DigitRecognizerCNN
+  Kaggle/DigitRecognizerBatchNorm
+  vae/vae_mnist
+  vae/vae_cnn_mnist
+  LSTM/TimeSeries-Univariate
+  LSTM/TimeSeries-Multivariate
 )
 
 foreach(dir ${DIRS})

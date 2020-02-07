@@ -1,0 +1,174 @@
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@author Zoltan Somogyi
+@brief Tutorial on Multivariate Time Series using RNN.
+
+@page rnntutorial LSTM Multivariate Time Series
+
+@section intro_lstmtut Introduction
+
+We will predict the Google stock price based on historical data by using an LSTM Recurrent Neural Network(RNN) in mlpack.
+The input data contains the Google stock prices for the past 3 years from https://www.nasdaq.com/symbol/goog/historical in csv format (Google2016-2019.csv)
+
+@section toc_lstmtut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_lstmtut
+ - \ref toc_lstmtut
+ - \ref data_lstmtut
+ - \ref model_lstmtut
+ - \ref training_lstmtut
+ - \ref results_lstmtut
+
+@section data_lstmtut Time Series data
+ As a first step we normalize the input data using MinMaxScaler in mlpack so that all input features are on the scale between 0 to 1.
+
+@code
+  template<typename DataType = arma::mat>
+  DataType MinMaxScaler(DataType& dataset)
+  {
+    arma::vec maxValues = arma::max(dataset, 1 /* for each dimension */);
+    arma::vec minValues = arma::min(dataset, 1 /* for each dimension */);
+
+    arma::vec rangeValues = maxValues - minValues;
+
+    // Add a very small value if there are any zeros.
+    rangeValues += 1e-25;
+
+    dataset -= arma::repmat(minValues , 1, dataset.n_cols);
+    dataset /= arma::repmat(rangeValues , 1, dataset.n_cols);
+    return dataset;
+  }
+  ...
+  // Scale data for increased numerical stability.
+  dataset = MinMaxScaler(dataset);
+@endcode
+
+ * If we want to predict the Google stock price correctly then we need to consider the volume of the stocks traded, the closing, opening, high and low values of the stock price from the previous days. This is a time series problem.
+ * We will create data for the training of the RNN model that will go back 25 business days in the past for each time step.
+ * We will convert the input data to the time series format the RNN LSTM requires it.
+ * We will take 30 % of the latest data as our test dataset.
+
+The time series data for each time step will contain the volume of the stocks traded, the closing, opening, high and low values of the stock price for the past 25 days and the target variable will be Google’s stock price (high, low) for the next day.
+As the stock price prediction is based on multiple input features, it is a multivariate regression problem.
+
+@code
+/*
+ * The time series data for training the model contains the Closing stock price, the Volume of stocks traded,
+ * Opening stock price, Highest stock price and Lowest stock price for 'rho' days in the past. 
+ * The two target variables (multivariate) we want to predict are the Highest stock price and Lowest stock price
+ * (high, low) for the next day! 
+ *
+ * NOTE: Please note that we do not use the last input data point in the training because there is no target 
+ *       (next day (high, low)) for that point!
+ */
+template<typename InputDataType = arma::mat,
+  typename DataType = arma::cube,
+  typename LabelType = arma::cube>
+  void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size_t rho)
+{
+  for (size_t i = 0; i < dataset.n_cols - rho; i++)
+  {
+    X.subcube(span(), span(i), span()) = dataset.submat(span(), span(i, i + rho - 1));
+    y.subcube(span(), span(i), span()) = dataset.submat(span(3, 4), span(i + 1, i + rho));
+  }
+}
+@endcode
+
+@section model_lstmtut LSTM Model
+
+We add 3 LSTM modules that will be stacked one after the other in the RNN, implementing an efficient stacked RNN. Finally, the output will have 2 units the (high, low) values of the stock price for the next day.
+
+@code
+  // No of timesteps to look in RNN.
+  const int rho = 25;
+  // LSTM cell size ('hidden layers')
+  const int H1 = 25;
+  size_t inputSize = 5, outputSize = 2;
+
+  // RNN model.
+  RNN<MeanSquaredError<>,HeInitialization> model(rho);
+    //Model building.
+    model.Add<IdentityLayer<> >();
+    model.Add<LSTM<> >(inputSize, H1, maxRho);
+    model.Add<Dropout<> >(0.5);
+    model.Add<LeakyReLU<> >();
+    model.Add<LSTM<> >(H1, H1, maxRho);
+    model.Add<Dropout<> >(0.5);
+    model.Add<LeakyReLU<> >();
+    model.Add<LSTM<> >(H1, H1, maxRho);
+    model.Add<LeakyReLU<> >();
+    model.Add<Linear<> >(H1, outputSize);
+
+@endcode
+
+Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
+  SGD<AdamUpdate> optimizer(
+    STEP_SIZE, // Step size of the optimizer.
+    BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
+    ITERATIONS_PER_EPOCH, // Max number of iterations.
+    1e-8,// Tolerance.
+    true,// Shuffle.
+    AdamUpdate(1e-8, 0.9, 0.999)// Adam update policy.
+  );
+
+@endcode
+
+@section training_lstmtut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Run EPOCH number of cycles for optimizing the solution.
+  for (int i = 0; i < EPOCH; i++)
+  {
+    // Train neural network. If this is the first iteration, weights are
+    // random, using current values as starting point otherwise.
+    model.Train(trainX, trainY, optimizer);
+
+    // Don't reset optimizer's parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    cube predOut;
+    // Getting predictions on test data points.
+    model.Predict(testX, predOut);
+
+    // Calculating mse on test data points.
+    double testMSE = MSE(predOut,testY);
+    cout << i+1 << " - Mean Squared Error := "<< testMSE <<   endl;
+  }
+@endcode
+
+As last we use the test data for predicting the stock price with the trained RNN model. Please note that we do not have the last data point in the test data because we did not use it for the training, therefore the prediction result will be for the day before! In your own application you may of course load any dataset. Please look at the code for more information about how the model is saved, loaded and then used for prediction!
+
+@section results_lstmtut Results
+
+Reading data ...
+Training ...
+1 - Mean Squared Error := 0.311178
+2 - Mean Squared Error := 0.30771
+3 - Mean Squared Error := 0.303961
+4 - Mean Squared Error := 0.299234
+5 - Mean Squared Error := 0.291367
+6 - Mean Squared Error := 0.276275
+7 - Mean Squared Error := 0.198768
+8 - Mean Squared Error := 0.112946
+9 - Mean Squared Error := 0.103283
+10 - Mean Squared Error := 0.0965188
+...
+100 - Mean Squared Error := 0.0309369
+...
+200 - Mean Squared Error := 0.0162842
+...
+300 - Mean Squared Error := 0.00906527
+...
+500 - Mean Squared Error := 0.00595312
+
+The predicted Google stock (high, low) for the last day is the following:
+1116.4, 1094.65
+
+*/
