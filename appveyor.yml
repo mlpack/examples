@@ -14,6 +14,7 @@ configuration: Release
 os: Visual Studio 2015
 
 install:
+  - vcpkg install openblas[core]:x64-windows
   - vcpkg install mlpack:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
@@ -37,3 +38,4 @@ notifications:
 cache:
   - packages -> **\packages.config
   - armadillo.tar.xz -> appveyor.yaml
+  - c:\tools\vcpkg\installed\
