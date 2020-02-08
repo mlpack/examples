@@ -264,7 +264,7 @@ int main()
     cout << "Training ..." << endl;
 
     // Run EPOCH number of cycles for optimizing the solution.
-    for (int i = 0; i < EPOCH; i++)
+    for (size_t i = 0; i < EPOCH; i++)
     {
       // Train neural network. If this is the first iteration, weights are
       // random, using current values as starting point otherwise.

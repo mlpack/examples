@@ -1,0 +1,15 @@
+image: Ubuntu1604
+
+install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq --no-install-recommends binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
+  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
+  - cmake . && make && sudo make install
+  - cd $APPVEYOR_BUILD_FOLDER && git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
+  - cd $APPVEYOR_BUILD_FOLDER && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
+  - make -j2
+test_script:
+  - exit 0
+
+build: off
