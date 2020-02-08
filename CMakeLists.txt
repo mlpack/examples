@@ -126,7 +126,7 @@ if (WIN32)
   endif ()
 
   find_library(BLAS_LIBRARY
-      NAMES blas libblas blas_win32_MT blas_win32
+      NAMES blas libblas blas_win32_MT blas_win32 OpenBLAS 
       PATHS "C:/Program Files/Armadillo"
       PATH_SUFFIXES "examples/lib_win32/")
 
