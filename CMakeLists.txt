@@ -1,38 +1,34 @@
+# specify the minimum version. 
 cmake_minimum_required(VERSION 3.1...3.16)
 
+# set cmake policy.
+if (${CMAKE_VERSION} VERSION_LESS 3.12 )
+      cmake_policy( VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} )
+endif()
+
+# set the standards
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# specify the languages like C, CXX, CUDA.
 project(models
         DESCRIPTION "model examples mlpack"
         LANGUAGES C CXX)
-
-# First, define all the compilation options.
-# We default to debugging mode for developers.
-option(DEBUG "Compile with debugging information." OFF)
-option(PROFILE "Compile with profiling information." OFF)
-option(BUILD_TESTS "Build tests." ON)
-option(BUILD_CLI_EXECUTABLES "Build command-line executables." ON)
-option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
-option(FORCE_CXX11
-    "Don't check that the compiler supports C++11, just assume it.  Make sure to specify any necessary flag to enable C++11 as part of CXXFLAGS." OFF)
-option(USE_OPENMP "If available, use OpenMP for parallelization." ON)
-
-enable_testing()
+        
 # Include modules in the CMake directory.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMake")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
-
-
-# Set required C++ standard to C++11.
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_MODULE_PATH
+   ${CMAKE_MODULE_PATH}
+   "${CMAKE_SOURCE_DIR}/CMake"
+   "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
 # Now, find the libraries we need to compile against.  Several variables can be
 # set to manually specify the directory in which each of these libraries
 # resides.
-#   ARMADILLO_LIBRARY - location of libarmadillo.so / armadillo.lib
-#   ARMADILLO_INCLUDE_DIR - directory containing <armadillo>
-#   ARMADILLO_INCLUDE_DIRS - directories necessary for Armadillo includes
-#   MLPACK_INCLUDE_DIR - include directory for mlpack
-#   MLPACK_LIBRARY - library directory for mlpack
+#  ARMADILLO_LIBRARY - location of libarmadillo.so / armadillo.lib
+#  ARMADILLO_INCLUDE_DIR - directory containing <armadillo>
+#  ARMADILLO_INCLUDE_DIRS - directories necessary for Armadillo includes
+#  MLPACK_INCLUDE_DIR - include directory for mlpack
+#  MLPACK_LIBRARY - library directory for mlpack
 
 find_package(Armadillo 8.400.0 REQUIRED)
 
@@ -91,7 +87,7 @@ else ()
 endif ()
 
 # This is as of yet unused.
-#option(PGO "Use profile-guided optimization if not a debug build" ON)
+option(PGO "Use profile-guided optimization if not a debug build" ON)
 
 # Set the CFLAGS and CXXFLAGS depending on the options the user specified.
 # Only GCC-like compilers support -Wextra, and other compilers give tons of
@@ -319,7 +315,6 @@ if (NOT ENSMALLEN_FOUND)
   endif ()
 endif ()
 
-# Unfortunately this configuration variable is necessary and will need to be
 # updated as time goes on and new versions are released.
 set( BOOST_VERSION 1.72.0 )
 # Settings for finding correct Boost libraries.
@@ -363,14 +358,13 @@ else ()
   set(OpenMP_CXX_FLAGS "")
 endif ()
 
-
-
 # In Visual Studio, automatic linking is performed, so we don't need to worry
 # about it.  Clear the list of libraries to link against and let Visual Studio
 # handle it.
 if (MSVC)
   link_directories(${Boost_LIBRARY_DIRS})
   set(Boost_LIBRARIES "")
+  set(MODELS_LIBRARIES "")
 endif ()
 
 link_directories(${Boost_LIBRARY_DIRS})
@@ -385,13 +379,6 @@ set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
                      ${Boost_LIBRARIES})
 
 include_directories(${MODELS_INCLUDE_DIRS})
-
-# In Visual Studio, automatic linking is performed, so we don't need to worry
-# about it.  Clear the list of libraries to link against and let Visual Studio
-# handle it.
-if (MSVC)
-  set(MODELS_LIBRARIES "")
-endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
