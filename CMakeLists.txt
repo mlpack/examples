@@ -128,13 +128,13 @@ if (WIN32)
   find_package(BLAS)
   find_package(LAPACK)
 
-  if (NOT BLAS_LIBRARY)
+  if (NOT BLAS_LIBRARIES)
     message(FATAL_ERROR "Cannot find BLAS library (.lib)!")
   endif ()
 
   # Piggyback LAPACK and BLAS linking into Armadillo link.
   set(ARMADILLO_LIBRARIES
-       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARY} ${LAPACK_LIBRARY} m)
+       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES} m)
 endif ()
 
 find_package(MLPACK REQUIRED)
