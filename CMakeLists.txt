@@ -125,10 +125,7 @@ if (WIN32)
     message(FATAL_ERROR "Cannot find LAPACK library (.lib)!")
   endif ()
 
-  find_library(BLAS_LIBRARY
-      NAMES blas libblas blas_win32_MT blas_win32 OpenBLAS 
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
+  find_package(LAPACK)
 
   if (NOT BLAS_LIBRARY)
     message(FATAL_ERROR "Cannot find BLAS library (.lib)!")
