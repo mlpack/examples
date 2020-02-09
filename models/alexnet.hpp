@@ -119,6 +119,39 @@ class AlexNet
   Sequential<>* GetModel() { return alexNet; };
 
  private:
+  /*
+   * Return the convolution output size.
+   *
+   * @param size The size of the input (row or column).
+   * @param k The size of the filter (width or height).
+   * @param s The stride size (x or y direction).
+   * @param pSideOne The size of the padding (width or height) on one side.
+   * @param pSideTwo The size of the padding (width or height) on another side.
+   * @return The convolution output size.
+   */
+  size_t ConvOutSize(const size_t size,
+                     const size_t k,
+                     const size_t s,
+                     const size_t pSideOne,
+                     const size_t pSideTwo)
+  {
+    return std::floor(size + pSideOne + pSideTwo - k) / s + 1;
+  }
+
+  /*
+   * Return the convolution output size.
+   *
+   * @param size The size of the input (row or column).
+   * @param k The size of the filter (width or height).
+   * @param s The stride size (x or y direction).
+   * @return The convolution output size.
+   */
+  size_t PoolOutSize(const size_t size,
+                     const size_t k,
+                     const size_t s)
+  {
+    return std::floor(size - 1) / s + 1;
+  }
   //! Locally stored AlexNet Model.
   Sequential<>* alexNet;
 
