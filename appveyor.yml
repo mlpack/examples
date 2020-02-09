@@ -47,7 +47,6 @@ install:
 
 build_script:
   - cd C:\projects\models
-  - vcvarsall amd64
   - b2 --clean-all
   - mkdir boost_libs
   - ps: cp ${env:BOOST_PROG_OPTION} C:\projects\models\boost_libs\
