@@ -41,13 +41,14 @@ install:
   - ps: >
       nuget install boost_math_c99-vc140
       -o "${env:APPVEYOR_BUILD_FOLDER}" -Version 1.60.0
-  - vcpkg install openblas[core]:x64-windows
   - vcpkg install mlpack:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
 build_script:
   - cd C:\projects\models
+  - vcvarsall amd64
+  - b2 --clean-all
   - mkdir boost_libs
   - ps: cp ${env:BOOST_PROG_OPTION} C:\projects\models\boost_libs\
   - ps: cp ${env:BOOST_MATH} C:\projects\models\boost_libs\
