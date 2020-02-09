@@ -15,6 +15,7 @@ os: Visual Studio 2015
 
 install:
   - vcpkg install openblas[core]:x64-windows
+  - vcpkg install boost-serialization boost-math boost-program-options boost-random boost --triplet x64-windows --recurse
   - vcpkg install mlpack:x64-windows
   - cd c:\tools\vcpkg
   - vcpkg integrate install
