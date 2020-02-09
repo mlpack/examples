@@ -2,9 +2,9 @@ clone_depth: 10
 
 environment:
   matrix:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-      VSVER: Visual Studio 14 2015 Win64
-      MSBUILD: C:\Program Files (x86)\MSBuild\14.0\bin\MSBuild.exe
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    #   VSVER: Visual Studio 14 2015 Win64
+    #   MSBUILD: C:\Program Files (x86)\MSBuild\14.0\bin\MSBuild.exe
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       VSVER: Visual Studio 15 2017 Win64
       MSBUILD: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
