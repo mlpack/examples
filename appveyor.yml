@@ -55,7 +55,7 @@ build_script:
   - ps: cp ${env:BOOST_UNIT_TEST} C:\projects\models\boost_libs\
   - mkdir build && cd build
   - cmake -G "%VSVER%" -DCMAKE_PREFIX:FILEPATH="C:/projects/models" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DBOOST_INCLUDEDIR:PATH=%BOOST_INCLUDE% -DBOOST_LIBRARYDIR:PATH="C:/projects/models/boost_libs" ..
-  - msbuild "C:\projects\models\build\models.sln" /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
+  - cmake --build . -- /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
 
 artifacts:
   - path: '**\*.zip'
