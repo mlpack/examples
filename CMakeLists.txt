@@ -232,26 +232,6 @@ find_package(Boost 1.49
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-# In Visual Studio, automatic linking is performed, so we don't need to worry
-# about it.  Clear the list of libraries to link against and let Visual Studio
-# handle it.
-if (MSVC)
-  link_directories(${Boost_LIBRARY_DIRS})
-  set(CMAKE_MSVCIDE_RUN_PATH ${CMAKE_MSVCIDE_RUN_PATH} ${Boost_LIBRARY_DIRS})
-  message("boost lib dirs ${Boost_LIBRARY_DIRS}")
-  set(Boost_LIBRARIES "")
-endif ()
-
-# In Visual Studio, automatic linking is performed, so we don't need to worry
-# about it.  Clear the list of libraries to link against and let Visual Studio
-# handle it.
-if (MSVC)
-  link_directories(${Boost_LIBRARY_DIRS})
-  set(Boost_LIBRARIES "")
-endif ()
-
-link_directories(${Boost_LIBRARY_DIRS})
-
 # Include directories for the previous dependencies.
 set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
                         ${ENSMALLEN_INCLUDE_DIR}
