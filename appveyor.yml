@@ -33,4 +33,6 @@ notifications:
   on_build_failure: true
   on_build_status_changed: true
 
-cache: c:\tools\vcpkg\installed\
+cache:
+  - packages -> **\packages.config
+  - armadillo.tar.xz -> appveyor.yaml
