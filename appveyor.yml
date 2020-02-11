@@ -7,8 +7,6 @@ environment:
     #   MSBUILD: C:\Program Files (x86)\MSBuild\14.0\bin\MSBuild.exe
     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       VSVER: Visual Studio 15 2017 Win64
-      BOOST_ROOT: C:/Libraries/boost_1_69_0
-      BOOST_LIB: C:/Libraries/boost_1_69_0/lib64-msvc-15.0
       MSBUILD: C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\MSBuild.exe
 
 configuration: Release
@@ -17,13 +15,14 @@ os: Visual Studio 2015
 
 install:
   - vcpkg install mlpack:x64-windows
+  - vcpkg install boost --recurse
   - cd c:\tools\vcpkg
   - vcpkg integrate install
 
 build_script:
   - cd C:\projects\models
   - mkdir build && cd build
-  - cmake -G "%VSVER%" -DCMAKE_PREFIX:FILEPATH="C:/projects/models" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DBOOST_ROOT=%BOOST_ROOT% -DBOOST_LIBRARYDIR=%BOOST_LIB% -DBoost_USE_STATIC_LIBS="ON" ..
+  - cmake -G "%VSVER%" -DCMAKE_PREFIX:FILEPATH="C:/projects/models" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
   - cmake --build . -- /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
 
 artifacts:
