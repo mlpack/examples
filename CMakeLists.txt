@@ -116,6 +116,7 @@ endif()
 # and find LAPACK and BLAS ourselves, using a slightly modified variant of the
 # script Armadillo uses to find these.
 if (WIN32)
+  ADD_DEFINITIONS(/bigobj)
   find_library(LAPACK_LIBRARY
       NAMES lapack liblapack lapack_win32_MT lapack_win32
       PATHS "C:/Program Files/Armadillo"
@@ -124,19 +125,17 @@ if (WIN32)
   if (NOT LAPACK_LIBRARY)
     message(FATAL_ERROR "Cannot find LAPACK library (.lib)!")
   endif ()
+  
+  find_package(BLAS)
+  find_package(LAPACK)
 
-  find_library(BLAS_LIBRARY
-      NAMES blas libblas blas_win32_MT blas_win32
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
-
-  if (NOT BLAS_LIBRARY)
+  if (NOT BLAS_LIBRARIES)
     message(FATAL_ERROR "Cannot find BLAS library (.lib)!")
   endif ()
 
   # Piggyback LAPACK and BLAS linking into Armadillo link.
   set(ARMADILLO_LIBRARIES
-       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARY} ${LAPACK_LIBRARY})
+       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif ()
 
 find_package(MLPACK REQUIRED)
@@ -183,18 +182,6 @@ if (NOT ENSMALLEN_FOUND)
   endif ()
 endif ()
 
-# Unfortunately this configuration variable is necessary and will need to be
-# updated as time goes on and new versions are released.
-set(Boost_ADDITIONAL_VERSIONS
-  "1.49.0" "1.50.0" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55.0")
-find_package(Boost 1.49
-    COMPONENTS
-      program_options
-      unit_test_framework
-      serialization
-    REQUIRED
-)
-
 if (USE_OPENMP)
   message(WARNING "Only use OpenMP if mlpack has been compiled with OpenMP.")
   find_package(OpenMP)
@@ -205,13 +192,43 @@ if (OPENMP_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif ()
 
-# In Visual Studio, automatic linking is performed, so we don't need to worry
-# about it.  Clear the list of libraries to link against and let Visual Studio
-# handle it.
-if (MSVC)
-  link_directories(${Boost_LIBRARY_DIRS})
-  set(Boost_LIBRARIES "")
-endif ()
+# Unfortunately this configuration variable is necessary and will need to be
+# updated as time goes on and new versions are released.
+set(Boost_ADDITIONAL_VERSIONS
+  "1.69.0" "1.69"
+  "1.68.0" "1.68"
+  "1.67.0" "1.67"
+  "1.66.0" "1.66"
+  "1.65.1" "1.65.0" "1.65"
+  "1.64.1" "1.64.0" "1.64"
+  "1.63.1" "1.63.0" "1.63"
+  "1.62.1" "1.62.0" "1.62"
+  "1.61.1" "1.61.0" "1.61"
+  "1.60.1" "1.60.0" "1.60"
+  "1.59.1" "1.59.0" "1.59"
+  "1.58.1" "1.58.0" "1.58"
+  "1.57.1" "1.57.0" "1.57"
+  "1.56.1" "1.56.0" "1.56"
+  "1.55.1" "1.55.0" "1.55"
+  "1.54.1" "1.54.0" "1.54"
+  "1.53.1" "1.53.0" "1.53"
+  "1.52.1" "1.52.0" "1.52"
+  "1.51.1" "1.51.0" "1.51"
+  "1.50.1" "1.50.0" "1.50"
+  "1.49.1" "1.49.0" "1.49")
+# Disable forced config-mode CMake search for Boost, which only imports targets
+# and does not set the variables that we need.
+#
+# TODO for the brave: transition all mlpack's CMake to 'target-based modern
+# CMake'.  Good luck!  You'll need it.
+set(Boost_NO_BOOST_CMAKE 1)
+find_package(Boost 1.49
+    COMPONENTS
+      program_options
+      unit_test_framework
+      serialization
+    REQUIRED
+)
 
 link_directories(${Boost_LIBRARY_DIRS})
 
@@ -223,15 +240,9 @@ set(MODELS_INCLUDE_DIRS ${MLPACK_INCLUDE_DIR}
 set(MODELS_LIBRARIES ${MLPACK_LIBRARY}
                      ${ARMADILLO_LIBRARIES}
                      ${Boost_LIBRARIES})
+set(MODELS_LIBRARY_DIRS ${MODELS_LIBRARY_DIRS} ${Boost_LIBRARY_DIRS})
 
 include_directories(${MODELS_INCLUDE_DIRS})
-
-# In Visual Studio, automatic linking is performed, so we don't need to worry
-# about it.  Clear the list of libraries to link against and let Visual Studio
-# handle it.
-if (MSVC)
-  set(MODELS_LIBRARIES "")
-endif ()
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/)
 
