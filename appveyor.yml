@@ -1,15 +1,38 @@
-image: Ubuntu1604
+clone_depth: 10
+
+environment:
+  matrix:
+    # - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+    #   VSVER: Visual Studio 14 2015 Win64
+    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+      VSVER: Visual Studio 15 2017 Win64
+
+configuration: Release
+
+os: Visual Studio 2015
 
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq --no-install-recommends binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
-  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
-  - cmake . && make && sudo make install
-  - cd $APPVEYOR_BUILD_FOLDER && git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
-  - cd $APPVEYOR_BUILD_FOLDER && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
-  - make -j2
-test_script:
-  - exit 0
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+  - vcpkg install mlpack:x64-windows
+  - vcpkg integrate install
 
-build: off
+build_script:
+  - mkdir build && cd build
+  - cat c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmake -G "%VSVER%" -DCMAKE_PREFIX:FILEPATH="C:/projects/models" -DDEBUG=OFF -DPROFILE=OFF -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - cmake --build . -- /m /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
+
+artifacts:
+  - path: '**\*.zip'
+
+notifications:
+- provider: Email
+  to:
+  - mlpack-git@lists.mlpack.org
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
+
+cache:
+  - packages -> **\packages.config
+  - armadillo.tar.xz -> appveyor.yaml
