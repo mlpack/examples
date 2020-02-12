@@ -13,8 +13,9 @@ os: Visual Studio 2015
 
 install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
-  - curl -LfsS -o mlpack.zip https://ci.appveyor.com/api/buildjobs/n66607lew6gxntk4/artifacts/build%2Fmlpack-windows.zip
-  - 7z x mlpack.zip -o%APPVEYOR_BUILD_FOLDER%\dependencies -y > nul
+  - cd dependencies
+  - 7z x dependencies.7z.001 -y > nul
+  - cd ..
   - vcpkg install armadillo:x64-windows
   - vcpkg install boost:x64-windows
   - vcpkg integrate install
