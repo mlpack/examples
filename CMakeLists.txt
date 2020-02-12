@@ -116,6 +116,8 @@ endif()
 # and find LAPACK and BLAS ourselves, using a slightly modified variant of the
 # script Armadillo uses to find these.
 if (WIN32)
+  set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} "${PROJECT_SOURCE_DIR}/dependencies")
+  set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_PREFIX_PATH})
   ADD_DEFINITIONS(/bigobj)
   find_library(LAPACK_LIBRARY
       NAMES lapack liblapack lapack_win32_MT lapack_win32
