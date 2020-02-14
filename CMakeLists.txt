@@ -34,6 +34,10 @@ if(CMAKE_COMPILER_IS_GNUCC OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif()
 
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
+endif ()
+
 # If using clang, we have to link against libc++ depending on the
 # OS (at least on some systems). Further, gcc sometimes optimizes calls to
 # math.h functions, making -lm unnecessary with gcc, but it may still be
@@ -110,33 +114,13 @@ else()
   endif ()
 endif()
 
-# On Windows, Armadillo should be using LAPACK and BLAS but we still need to
-# link against it.  We don't want to use the FindLAPACK or FindBLAS modules
-# because then we are required to have a FORTRAN compiler (argh!) so we will try
-# and find LAPACK and BLAS ourselves, using a slightly modified variant of the
-# script Armadillo uses to find these.
 if (WIN32)
-  find_library(LAPACK_LIBRARY
-      NAMES lapack liblapack lapack_win32_MT lapack_win32
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
-
-  if (NOT LAPACK_LIBRARY)
-    message(FATAL_ERROR "Cannot find LAPACK library (.lib)!")
-  endif ()
-
-  find_library(BLAS_LIBRARY
-      NAMES blas libblas blas_win32_MT blas_win32
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
-
-  if (NOT BLAS_LIBRARY)
-    message(FATAL_ERROR "Cannot find BLAS library (.lib)!")
-  endif ()
+  find_package(LAPACK required)
+  find_package(BLAS required)
 
   # Piggyback LAPACK and BLAS linking into Armadillo link.
   set(ARMADILLO_LIBRARIES
-       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARY} ${LAPACK_LIBRARY})
+      ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif ()
 
 find_package(MLPACK REQUIRED)
