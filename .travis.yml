@@ -8,19 +8,12 @@ env:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo add-apt-repository -y ppa:boost-latest/ppa
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq libopenblas-dev liblapack-dev g++ libboost-all-dev
-  - if [ $ARMADILLO == "latest" ]; then
-      curl https://ftp.fau.de/macports/distfiles/armadillo/`curl https://ftp.fau.de/macports/distfiles/armadillo/ -- | grep '.tar.xz' | sed 's/^.*<a href="\(armadillo-[0-9]*.[0-9]*.[0-9]*.tar.xz\)".*$/\1/' | tail -1` | tar xvJ && cd armadillo*;
-    fi
-  - if [ $ARMADILLO == "minimum" ]; then
-      curl https://ftp.fau.de/macports/distfiles/armadillo/armadillo-8.400.0.tar.xz | tar -xvJ && cd armadillo*;
-    fi
-  - cmake . && make && sudo make install && cd ..
-  - cd $TRAVIS_BUILD_DIR && cd .. && git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cd mlpack && mkdir build && cd build && cmake .. && make -j2 && sudo make install
-  
+  - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
+  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
+  - cmake . && make && sudo make install
+  - cd $TRAVIS_BUILD_DIR && git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
+
 install:
   - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
 script:
