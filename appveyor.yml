@@ -49,8 +49,8 @@ build_script:
     cmake --build . --
     /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
   - cd %APPVEYOR_BUILD_FOLDER% && mkdir build && cd build
-  - set MLPACK_LIB = "mlpack/build/Release/mlpack.lib"
-  - set MLPACK_INCLUDE = "mlpack/build/include"
+  - ps: $env:MLPACK_LIB = "mlpack/build/Release/mlpack.lib"
+  - ps: $env:MLPACK_INCLUDE = "mlpack/build/include"
   - ps: $env:MLPACK_LIB = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_LIB"
   - ps: $env:MLPACK_INCLUDE = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_INCLUDE"
   - >
