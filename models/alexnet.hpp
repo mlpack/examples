@@ -41,22 +41,23 @@ class AlexNet
   /**
    * AlexNet constructor intializes input shape, number of classes
    * and width multiplier.
-   *  
+   *
+   * @param inputChannels Number of input channels of the input image.
    * @param inputWidth Width of the input image.
    * @param inputHeight Height of the input image.
-   * @param inputChannels Number of input channels of the input image.
    * @param numClasses Optional number of classes to classify images into,
    *                   only to be specified if includeTop is  true.
    * @param includeTop whether to include the fully-connected layer at 
    *        the top of the network.
    * @param weights One of 'none', 'imagenet'(pre-training on ImageNet) or path to weights.
    */
-  AlexNet(const size_t inputWidth,
+  AlexNet(const size_t inputChannel,
+          const size_t inputWidth,
           const size_t inputHeight,
-          const size_t inputChannel,
           const size_t numClasses = 1000,
           const bool includeTop = true,
-          const std::string &weights = "None");
+          const std::string &weights = "None",
+          const std::string &activationFunction = "relu");
 
   /**
    * AlexNet constructor intializes input shape, number of classes
@@ -75,7 +76,8 @@ class AlexNet
   AlexNet(const std::tuple<size_t, size_t, size_t> inputShape,
           const size_t numClasses = 1000,
           const bool includeTop = true,
-          const std::string &weights = "None");
+          const std::string &weights = "None",
+          const std::string &activationFunction = "relu");
 
   // Custom Destructor.
   ~AlexNet();
@@ -119,7 +121,73 @@ class AlexNet
   Sequential<>* GetModel() { return alexNet; };
 
  private:
-  /*
+  /**
+   * Returns Convolution Block.
+   * 
+   * @param inSize Number of input maps.
+   * @param outSize Number of output maps.
+   * @param kernelWidth Width of the filter/kernel.
+   * @param kernelHeight Height of the filter/kernel.
+   * @param strideWidth Stride of filter application in the x direction.
+   * @param strideHeight Stride of filter application in the y direction.
+   * @param padW Padding width of the input.
+   * @param padH Padding height of the input.
+   */
+  Sequential<>* ConvolutionBlock(const size_t inSize,
+                                 const size_t outSize,
+                                 const size_t kernelWidth,
+                                 const size_t kernelHeight,
+                                 const size_t strideWidth = 1,
+                                 const size_t strideHeight = 1,
+                                 const size_t padW = 0,
+                                 const size_t padH = 0)
+  {
+    Sequential<>* convolutionBlock;
+    convolutionBlock->Add<Convolution<>>(inSize, outSize, kernelWidth,
+        kernelHeight, strideWidth, strideHeight, padW, padH, inputWidth,
+        inputHeight);
+    if (activationFunction == "mish")
+    {
+      convolutionBlock->Add<MishLayer<>>();
+    }
+    else
+    {
+      convolutionBlock->Add<ReLULayer<>>();
+    }
+
+    // Update inputWidth and input Height.
+    inputWidth = ConvOutSize(inputWidth, kernelWidth, strideWidth, padW);
+    inputHeight = ConvOutSize(inputHeight, kernelHeight, strideHeight, padH);
+    return convolutionBlock;
+  }
+
+  /**
+   * Returns Pooling Block.
+   * 
+   * @param inSize Number of input maps.
+   * @param outSize Number of output maps.
+   * @param kernelWidth Width of the filter/kernel.
+   * @param kernelHeight Height of the filter/kernel.
+   * @param strideWidth Stride of filter application in the x direction.
+   * @param strideHeight Stride of filter application in the y direction.
+   * @param padW Padding width of the input.
+   * @param padH Padding height of the input.
+   */
+  Sequential<>* PoolingBlock(const size_t kernelWidth,
+                             const size_t kernelHeight,
+                             const size_t strideWidth = 1,
+                             const size_t srtideHeight = 1)
+  {
+    Sequential<>* poolingBlock;
+    poolingBlock->Add<MaxPooling<>>(kernelWidth, kernelHeight,
+        strideWidth, strideHeight);
+    // Update inputWidth and inputHeight.
+    inputWidth = PoolOutSize(inputWidth, kernelWidth, strideWidth);
+    inputHeight = PoolOutSize(inputHeight, kernelHeight, strideHeight);
+    return poolingBlock;
+  }
+
+      /**
    * Return the convolution output size.
    *
    * @param size The size of the input (row or column).
@@ -129,13 +197,12 @@ class AlexNet
    * @param pSideTwo The size of the padding (width or height) on another side.
    * @return The convolution output size.
    */
-  size_t ConvOutSize(const size_t size,
-                     const size_t k,
-                     const size_t s,
-                     const size_t pSideOne,
-                     const size_t pSideTwo)
+      size_t ConvOutSize(const size_t size,
+                         const size_t k,
+                         const size_t s,
+                         const size_t padding)
   {
-    return std::floor(size + pSideOne + pSideTwo - k) / s + 1;
+    return std::floor(size + 2 * padding - k) / s + 1;
   }
 
   /*
@@ -175,6 +242,9 @@ class AlexNet
 
   //! Locally stored output shape of the VGG19
   size_t outputShape;
+
+  //! Locally stored type of activation-function to be used.
+  const std::string activationFunction;
 };
 
 #include "alexnet_impl.hpp"
