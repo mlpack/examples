@@ -23,6 +23,7 @@
 #include "kaggle_utils.hpp"
 
 #include <ensmallen.hpp>
+#include <ensmallen_bits/callbacks/callbacks.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -46,9 +47,6 @@ int main()
   // uses previous results as a starting point and has different optimizer
   // options (here the step size is different).
 
-  // Number of cycles.
-  constexpr int CYCLES = 20;
-
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 5e-3;
 
@@ -62,7 +60,7 @@ int main()
   mat tempDataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/train.csv", tempDataset, true);
+  data::Load("../Kaggle/data/train.csv", tempDataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -132,41 +130,47 @@ int main()
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999));
 
-  // Cycles for monitoring the process of a solution.
-  for (int i = 1; i <= CYCLES; i++)
-  {
+  // Relay on Early Stopping as stopping criterion
+  optimizer.Tolerance() = -1;
+  // Go with unlimited epoch number, early stop is going to stop the training
+  optimizer.MaxIterations() = 0;
     // Train neural network. If this is the first iteration, weights are
     // random, using current values as starting point otherwise.
-    model.Train(trainX, trainY, optimizer);
+  model.Train(trainX, 
+              trainY,
+              optimizer,
+              ens::PrintLoss(),
+              ens::ProgressBar(),
+              ens::EarlyStopAtMinLoss(),
+              ens::StoreBestCoordinates<arma::mat>());
 
-    // Don't reset optimizer's parameters between cycles.
-    optimizer.ResetPolicy() = false;
+  // don't reset optimizer's parameters between cycles.
+  optimizer.ResetPolicy() = false;
 
-    mat predOut;
-    // Getting predictions on training data points.
-    model.Predict(trainX, predOut);
-    // Calculating accuracy on training data points.
-    Row<size_t> predLabels = getLabels(predOut);
-    double trainAccuracy = accuracy(predLabels, trainY);
-    // Getting predictions on validating data points.
-    model.Predict(validX, predOut);
-    // Calculating accuracy on validating data points.
-    predLabels = getLabels(predOut);
-    double validAccuracy = accuracy(predLabels, validY);
+  mat predout;
+  // getting predictions on training data points.
+  model.Predict(trainX, predout);
+  // calculating accuracy on training data points.
+  Row<size_t> predlabels = getLabels(predout);
+  double trainaccuracy = accuracy(predlabels, trainY);
+  // getting predictions on validating data points.
+  model.Predict(validX, predout);
+  // calculating accuracy on validating data points.
+  predlabels = getLabels(predout);
+  double validaccuracy = accuracy(predlabels, validY);
 
-    cout << i << " - accuracy: train = "<< trainAccuracy << "%," <<
-      " valid = "<< validAccuracy << "%" <<  endl;
-  }
+  cout << " - accuracy: train = "<< trainaccuracy << "%," <<
+  " valid = "<< validaccuracy << "%" << endl;
+  
+  cout << "predicting ..." << endl;
 
-  cout << "Predicting ..." << endl;
-
-  // Loading test dataset (the one whose predicted labels
-  // should be sent to Kaggle website).
+  // loading test dataset (the one whose predicted labels
+  // should be sent to kaggle website).
   // As before, it's necessary to get rid of header.
 
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/test.csv", tempDataset, true);
+  data::Load("../Kaggle/data/test.csv", tempDataset, true);
   mat testX = tempDataset.submat(0, 1,
     tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
@@ -180,7 +184,7 @@ int main()
   // Saving results into Kaggle compatibe CSV file.
   save("Kaggle/results.csv", "ImageId,Label", testPred);
   cout << "Results were saved to \"results.csv\" and could be uploaded to "
-    << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition"
-    << endl;
+       << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition"
+       << endl;
   cout << "Finished" << endl;
 }
