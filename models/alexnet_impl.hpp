@@ -20,39 +20,31 @@ AlexNet::AlexNet(const size_t inputChannel,
                  const size_t inputHeight,
                  const size_t numClasses,
                  const bool includeTop,
-                 const std::string &weights,
-                 const std::string &activationFunction):
+                 const std::string &weights):
                  inputWidth(inputWidth),
                  inputHeight(inputHeight),
                  inputChannel(inputChannel),
                  numClasses(numClasses),
                  includeTop(includeTop),
                  weights(weights),
-                 outputShape(512),
-                 activationFunction(activationFunction)
+                 outputShape(512)
 {
   alexNet = new Sequential<>();
-  std::transform(activationFunction.begin(), activationFunction.end(),
-      activationFunction.begin(), [](unsigned char c){ return std::tolower(c); });
 }
 
 AlexNet::AlexNet(const std::tuple<size_t, size_t, size_t> inputShape,
                  const size_t numClasses,
                  const bool includeTop,
-                 const std::string &weights,
-                 const std::string &activationFunction):
-                 inputWidth(std::get<1> inputShape),
-                 inputHeight(std::get<2> inputShape),
-                 inputChannel(std::get<0> inputShape),
+                 const std::string &weights):
+                 inputWidth(std::get<1>(inputShape)),
+                 inputHeight(std::get<2>(inputShape)),
+                 inputChannel(std::get<0>(inputShape)),
                  numClasses(numClasses),
                  includeTop(includeTop),
                  weights(weights),
-                 outputShape(512),
-                 activationFunction(activationFunction)
+                 outputShape(512)
 {
   alexNet = new Sequential<>();
-  std::transform(activationFunction.begin(), activationFunction.end(),
-      activationFunction.begin(), [](unsigned char c){ return std::tolower(c); });
 }
 
 AlexNet::~AlexNet()
@@ -100,7 +92,21 @@ Sequential<>* AlexNet::CompileModel()
 
   if(includeTop)
   {
-    // Add Adaptive Pooling Layer Here. 
+    alexNet->Add(AdaptivePoolingBlock(6, 6));
+    alexNet->Add<Dropout<> >(0.2);
+    alexNet->Add<Linear<> >(256 * 6 * 6, 4096);
+    alexNet->Add<ReLULayer<> >();
+    alexNet->Add<Dropout<> >(0.2);
+    alexNet->Add<Linear<> >(4096, 4096);
+    alexNet->Add<ReLULayer<> >();
+    alexNet->Add<Linear<> >(4096, numClasses);
   }
+  else
+  {
+    alexNet->Add<MaxPooling<> >(inputWidth, inputHeight, 1, 1, true);
+    outputShape = 512;
+  }
+
+  return alexNet;
 }
 #endif
