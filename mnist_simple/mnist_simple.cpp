@@ -144,18 +144,18 @@ int main()
               ens::EarlyStopAtMinLoss(),
               ens::StoreBestCoordinates<arma::mat>());
 
-  // don't reset optimizer's parameters between cycles.
+  // Don't reset optimizer's parameters between cycles.
   optimizer.ResetPolicy() = false;
 
   mat predout;
-  // getting predictions on training data points.
+  // Getting predictions on training data points.
   model.Predict(trainX, predout);
-  // calculating accuracy on training data points.
+  // Calculating accuracy on training data points.
   Row<size_t> predlabels = getLabels(predout);
   double trainaccuracy = accuracy(predlabels, trainY);
-  // getting predictions on validating data points.
+  // Getting predictions on validating data points.
   model.Predict(validX, predout);
-  // calculating accuracy on validating data points.
+  // Calculating accuracy on validating data points.
   predlabels = getLabels(predout);
   double validaccuracy = accuracy(predlabels, validY);
 
@@ -164,7 +164,7 @@ int main()
   
   cout << "predicting ..." << endl;
 
-  // loading test dataset (the one whose predicted labels
+  // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
   // As before, it's necessary to get rid of header.
 
