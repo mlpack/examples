@@ -77,8 +77,9 @@ int main()
       train.n_cols - 1) / 255.0;
   const mat validX = valid.submat(1, 0, valid.n_rows - 1,
       valid.n_cols - 1) / 255.0;
-  
-  const int ITERATIONS_PER_CYCLE = trainX.n_cols;
+
+  // Allow infinite number of iterations utill we stopped by EarlyStopAtMinLoss.
+  const int ITERATIONS_PER_CYCLE = 0;
   // According to NegativeLogLikelihood output layer of NN, labels should
   // specify class of a data point and be in the interval from 1 to
   // number of classes (in this case from 1 to 10).
@@ -120,22 +121,21 @@ int main()
     BATCH_SIZE,
     // Max number of iterations
     ITERATIONS_PER_CYCLE,
-    // Tolerance, used as a stopping condition. This small number
-    // means we never stop by this condition and continue to optimize
-    // up to reaching maximum of iterations.
-    1e-8,
+    // Tolerance, used as a stopping condition is set to -1.
+    // This value means we never stop by this condition and continue to optimize
+    // until we stopped by EarlyStopAtMinLoss.
+    -1,
     // Shuffle. If optimizer should take random data points from the dataset at
     // each iteration.
     true,
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999));
 
-  // Relay on Early Stopping as stopping criterion
-  optimizer.Tolerance() = -1;
-  // Go with unlimited epoch number, early stop is going to stop the training
-  optimizer.MaxIterations() = 0;
-    // Train neural network. If this is the first iteration, weights are
-    // random, using current values as starting point otherwise.
+  // Don't reset optimizer's parameters between cycles.
+  optimizer.ResetPolicy() = false;
+
+  // Train neural network. If this is the first iteration, weights are
+  // random, using current values as starting point otherwise.
   model.Train(trainX, 
               trainY,
               optimizer,
@@ -143,9 +143,6 @@ int main()
               ens::ProgressBar(),
               ens::EarlyStopAtMinLoss(),
               ens::StoreBestCoordinates<arma::mat>());
-
-  // Don't reset optimizer's parameters between cycles.
-  optimizer.ResetPolicy() = false;
 
   mat predout;
   // Getting predictions on training data points.
@@ -175,7 +172,7 @@ int main()
     tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   mat testPredOut;
-  // Getting predictions on test data points .
+  // Getting predictions on test data points.
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
