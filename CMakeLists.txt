@@ -217,6 +217,7 @@ set(DIRS
   vae/vae_cnn_mnist
   LSTM/TimeSeries-Univariate
   LSTM/TimeSeries-Multivariate
+  models/
 )
 
 foreach(dir ${DIRS})
