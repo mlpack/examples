@@ -23,4 +23,3 @@ endforeach()
 
 # Append sources (with directory name) to list of all models sources (used at
 # the parent scope).
-set(MLPACK_SRCS ${MLPACK_SRCS} ${DIR_SRCS} PARENT_SCOPE)
