@@ -23,3 +23,4 @@ endforeach()
 
 # Append sources (with directory name) to list of all models sources (used at
 # the parent scope).
+set(DIRS ${DIRS} ${DIR_SRCS} PARENT_SCOPE)

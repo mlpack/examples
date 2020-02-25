@@ -3,15 +3,28 @@ project(model-zoo-samples)
 
 option(DEBUG "DEBUG" OFF)
 
-set(DIR_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/)
+set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../")
 
-add_executable(model_zoo_samples
-   object_classification.cpp
-)
+set(SOURCES
+  ${MODEL_SOURCE_DIR}/object_classification.cpp
+  )
 
+if(DEBUG)
+  message("Compilation with debug info (with ggdb3 flag)")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ggdb3")
+else()
+  message("Compilation without debug info (without ggdb3 flag)")
+endif()
+
+add_executable(ModelZooSamples ${SOURCES})
 target_link_libraries(ModelZooSamples
-  models
-  PRIVATE ${MLPACK_LIBRARIES}
-  PRIVATE ${ARMADILLO_LIBRARIES})
+  ${MLPACK_LIBRARIES}
+  ${ARMADILLO_LIBRARIES}
+  ${Boost_LIBRARIES})
 
-target_include_directories(ModelZooSamples PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../")
+if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
+  add_custom_command(TARGET ModelZooSamples POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+      ${PROJECT_BINARY_DIR}/../data)
+endif()
