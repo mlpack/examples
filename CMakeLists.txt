@@ -218,6 +218,7 @@ set(DIRS
   LSTM/TimeSeries-Univariate
   LSTM/TimeSeries-Multivariate
   models/
+  samples/
 )
 
 foreach(dir ${DIRS})
