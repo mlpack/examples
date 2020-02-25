@@ -22,9 +22,3 @@ target_link_libraries(ModelZooSamples
   ${MLPACK_LIBRARIES}
   ${ARMADILLO_LIBRARIES}
   ${Boost_LIBRARIES})
-
-if (NOT EXISTS ${PROJECT_BINARY_DIR}/../data)
-  add_custom_command(TARGET ModelZooSamples POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-      ${PROJECT_BINARY_DIR}/../data)
-endif()
