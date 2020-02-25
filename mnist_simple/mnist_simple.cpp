@@ -13,8 +13,11 @@
  * @author Eugene Freyman
  */
 
+#include <mlpack/prereqs.hpp>
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
+#include <mlpack/core/util/cli.hpp>
+#include <mlpack/core/util/mlpack_main.hpp>
 
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
@@ -30,14 +33,65 @@ using namespace mlpack::ann;
 
 using namespace arma;
 using namespace std;
-
+using namespace mlpack::util;
 using namespace ens;
 
-int main()
+PROGRAM_INFO(
+  "DigitRecognizer",
+  "This software is part of mlpack model zoo, it implements digits recognizer "
+  "which classify hand written images based on the MNIST data set.",
+  "This software can be used in Kaggle DigitRecognizer competition, to obtain "
+  "the training and testing set, You can visit this website: "
+  "https://www.kaggle.com/c/digit-recognizer/data",
+  SEE_ALSO("DigitRecognizer competition website",
+           "https://www.kaggle.com/c/digit-recognizer"),
+  SEE_ALSO("MNIST Dataset website", "http://yann.lecun.com/exdb/mnist/"));
+
+// // Training dataset parameters.
+PARAM_STRING_IN("training_dataset",
+                "Full path to the file containing the training set.",
+                "t",
+                "../Kaggle/data/train.csv");
+
+// Testing/classification parameters.
+PARAM_STRING_IN("testing_datatest",
+                "Full path to the file containing the test set.",
+                "l",
+                "../Kaggle/data/test.csv");
+
+// Prediction results parameters.
+PARAM_STRING_IN("prediction_result",
+                "File name in which prediction will be saved.",
+                "P",
+                "../Kaggle/results.csv");
+
+// // Model loading/saving.
+// PARAM_MODEL_IN("input_model", "Full path to the file which has input model.",
+// "m"); PARAM_MODEL_OUT("output_model", "Full path to the file in which output
+// model will be saved.", "M");
+
+// Division ration between Train set and validation set, default 10%.
+PARAM_DOUBLE_IN("Ratio",
+                "Percentage of validation set from the training set.",
+                "r",
+                0.1);
+
+PARAM_INT_IN(
+  "Batch_size",
+  "Number of data points to be trained in each iteration of the optimizer.",
+  "b",
+  64);
+
+static void mlpackMain()
 {
   // Dataset is randomly split into validation
   // and training parts in the following ratio.
-  constexpr double RATIO = 0.1;
+  double RATIO = 0.1;  
+  if (CLI::HasParam("Ratio")) 
+  {
+    RATIO = CLI::GetParam<double>("Ratio");
+  }
+  
   // The number of neurons in the first layer.
   constexpr int H1 = 200;
   // The number of neurons in the second layer.
@@ -51,16 +105,29 @@ int main()
   constexpr double STEP_SIZE = 5e-3;
 
   // Number of data points in each iteration of SGD
-  constexpr int BATCH_SIZE = 64;
-
-  cout << "Reading data ..." << endl;
+  size_t BATCH_SIZE = 64;
+  if (CLI::HasParam("Batch_size")) 
+  {
+    BATCH_SIZE = (size_t) CLI::GetParam<int>("Batch_size");
+  }
 
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   mat tempDataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../Kaggle/data/train.csv", tempDataset, true);
+
+  if (CLI::HasParam("training_dataset"))
+  {
+    Log::Info << "Reading dataset from:"
+    << CLI::GetPrintableParam<std::string>("training_dataset");
+    data::Load(std::move(CLI::GetParam<std::string>("training_dataset")), 
+    tempDataset, true);
+  }
+  else
+  {
+    data::Load("../Kaggle/data/train.csv", tempDataset, true);
+  }
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -111,7 +178,7 @@ int main()
   // output values to log of probabilities of being a specific class.
   model.Add<LogSoftMax<> >();
 
-  cout << "Training ..." << endl;
+  Log::Info << "Training ...";
 
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
@@ -156,10 +223,10 @@ int main()
   predlabels = getLabels(predout);
   double validaccuracy = accuracy(predlabels, validY);
 
-  cout << " - accuracy: train = "<< trainaccuracy << "%," <<
+  Log::Info << "Accuracy: train = "<< trainaccuracy << "%," <<
   " valid = "<< validaccuracy << "%" << endl;
   
-  cout << "predicting ..." << endl;
+  Log::Info << "predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
@@ -176,12 +243,20 @@ int main()
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
+  Log::Info << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("Kaggle/results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to \"results.csv\" and could be uploaded to "
-       << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition"
-       << endl;
-  cout << "Finished" << endl;
+  if (CLI::HasParam("prediction_result"))
+  {
+    save(std::move(CLI::GetParam<std::string>("prediction_result")),
+    "ImageId,Label", testPred);
+  }
+  else 
+  {
+   save("Kaggle/results.csv", "ImageId,Label", testPred);
+  }
+
+  Log::Info << "Results were saved to \"results.csv\" and could be uploaded to "
+       << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition";
+  Log::Info << "Finished";
 }
