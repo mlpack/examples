@@ -47,11 +47,6 @@ AlexNet::AlexNet(const std::tuple<size_t, size_t, size_t> inputShape,
   alexNet = new Sequential<>();
 }
 
-AlexNet::~AlexNet()
-{
-  delete alexNet;
-}
-
 Sequential<>* AlexNet::CompileModel()
 {
   // Add Convlution Block with inputChannels as input maps,

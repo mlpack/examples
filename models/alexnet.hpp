@@ -78,7 +78,10 @@ class AlexNet
           const std::string &weights = "None");
 
   // Custom Destructor.
-  ~AlexNet();
+  ~AlexNet()
+  {
+    delete alexNet;
+  }
 
   /** 
    * Defines Model Architecture.
