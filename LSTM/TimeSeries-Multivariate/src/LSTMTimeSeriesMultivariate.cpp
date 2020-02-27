@@ -39,6 +39,7 @@ date  close  volume  open  high  low
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <ensmallen.hpp>
+#include <ensmallen_bits/callbacks/callbacks.hpp>
 
 using namespace std;
 using namespace mlpack;
@@ -142,7 +143,7 @@ int main()
   // Change the names of these files as necessary. They should be correct
   // already, if your program's working directory contains the data and/or
   // model.
-  const string dataFile = "Google2016-2019.csv";
+  const string dataFile = "./../data/Google2016-2019.csv";
   // example: const string dataFile =
   //              "C:/mlpack-model-app/Google2016-2019.csv";
   // example: const string dataFile =
@@ -168,9 +169,6 @@ int main()
 
   // Testing data is taken from the dataset in this ratio.
   const double RATIO = 0.1;
-
-  // Number of optimization epochs.
-  const int EPOCH = 500;
 
   // Number of iterations per cycle.
   const int ITERATIONS_PER_EPOCH = 1000;
@@ -273,29 +271,23 @@ int main()
         true, // Shuffle.
         AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
 
+    // Use Early Stopping criteria to stop training.
+    optimizer.Tolerance() = -1;
+    optimizer.MaxIterations() = 0;
+
     cout << "Training ..." << endl;
 
-    // Run EPOCH number of cycles for optimizing the solution.
-    for (int i = 0; i < EPOCH; i++)
-    {
-      // Train neural network. If this is the first iteration, weights are
-      // random, using current values as starting point otherwise.
-      model.Train(trainX, trainY, optimizer);
+    model.Train(trainX,
+                trainY,
+                optimizer,
+                ens::PrintLoss(),
+                ens::ProgressBar(),
+                ens::EarlyStopAtMinLoss(),
+                ens::StoreBestCoordinates<arma::mat>());
 
-      // Don't reset optimizer's parameters between cycles.
-      optimizer.ResetPolicy() = false;
+    optimizer.ResetPolicy() = false;
 
-      arma::cube predOut;
-      // Getting predictions on test data points.
-      model.Predict(testX, predOut);
-
-      // Calculating mse on test data points.
-      double testMSE = MSE(predOut, testY);
-      cout << i + 1 << " - Mean Squared Error := " << testMSE << endl;
-    }
-
-    cout << "Finished training." << endl;
-    cout << "Saving Model" << endl;
+    cout << "Finished training. \n Saving Model" << endl;
     data::Save(modelFile, "LSTMMulti", model);
     cout << "Model saved in " << modelFile << endl;
   }

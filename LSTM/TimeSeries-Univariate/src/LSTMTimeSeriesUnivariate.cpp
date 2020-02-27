@@ -133,7 +133,7 @@ int main()
   // Change the names of these files as necessary. They should be correct
   // already, if your program's working directory contains the data and/or
   // model.
-  const string dataFile = "electricity-usage.csv";
+  const string dataFile = "./../data/electricity-usage.csv";
   // example: const string dataFile =
   //                  "C:/mlpack-model-app/electricity-usage.csv";
   // example: const string dataFile =
@@ -159,9 +159,6 @@ int main()
 
   // Training data is randomly taken from the dataset in this ratio.
   const double RATIO = 0.1;
-
-  // Number of epochs for training.
-  const size_t EPOCH = 100;
 
   // Number of iterations per epoch.
   const size_t ITERATIONS_PER_EPOCH = 100000;
@@ -263,24 +260,21 @@ int main()
 
     cout << "Training ..." << endl;
 
-    // Run EPOCH number of cycles for optimizing the solution.
-    for (size_t i = 0; i < EPOCH; i++)
-    {
-      // Train neural network. If this is the first iteration, weights are
-      // random, using current values as starting point otherwise.
-      model.Train(trainX, trainY, optimizer);
+    // Use Early Stopping criteria to stop training.
+    optimizer.Tolerance() = -1;
+    optimizer.MaxIterations() = 0;
 
-      // Don't reset optimizer's parameters between cycles.
-      optimizer.ResetPolicy() = false;
+    cout << "Training ..." << endl;
 
-      arma::cube predOut;
-      // Getting predictions on test data points.
-      model.Predict(testX, predOut);
+    model.Train(trainX,
+                trainY,
+                optimizer,
+                ens::PrintLoss(),
+                ens::ProgressBar(),
+                ens::EarlyStopAtMinLoss(),
+                ens::StoreBestCoordinates<arma::mat>());
 
-      // Calculating mse on test data points.
-      double testMSE = MSE(predOut, testY);
-      cout << i + 1 << " - Mean Squared Error := " << testMSE << endl;
-    }
+    optimizer.ResetPolicy() = false;
 
     cout << "Finished training." << endl;
     cout << "Saving Model" << endl;
