@@ -253,27 +253,12 @@ endif()
 # and find LAPACK and BLAS ourselves, using a slightly modified variant of the
 # script Armadillo uses to find these.
 if (WIN32)
-  find_library(LAPACK_LIBRARY
-      NAMES lapack liblapack lapack_win32_MT lapack_win32
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
-
-  if (NOT LAPACK_LIBRARY)
-    message(FATAL_ERROR "Cannot find LAPACK library (.lib)!")
-  endif ()
-
-  find_library(BLAS_LIBRARY
-      NAMES blas libblas blas_win32_MT blas_win32
-      PATHS "C:/Program Files/Armadillo"
-      PATH_SUFFIXES "examples/lib_win32/")
-
-  if (NOT BLAS_LIBRARY)
-    message(FATAL_ERROR "Cannot find BLAS library (.lib)!")
-  endif ()
+  find_package(LAPACK required)
+  find_package(BLAS required)
 
   # Piggyback LAPACK and BLAS linking into Armadillo link.
   set(ARMADILLO_LIBRARIES
-       ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARY} ${LAPACK_LIBRARY})
+      ${ARMADILLO_LIBRARIES} ${BLAS_LIBRARIES} ${LAPACK_LIBRARIES})
 endif ()
 
 find_package(MLPACK REQUIRED)

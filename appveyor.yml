@@ -1,15 +1,81 @@
-image: Ubuntu1604
+clone_depth: 10
+
+environment:
+
+  matrix:
+     #- APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+     #  VSVER: Visual Studio 14 2015 Win64
+     #  Architecture: x86_amd64
+     #  VCPREFIX:'C:\Program Files (x86)\Microsoft Visual Studio 14.0'
+     #  VCVARS: 'VC\vcvarsall.bat'
+     #  BOOST_ROOT: C:\Libraries\boost_1_69_0
+     #  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.0
+     - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+       VSVER: Visual Studio 15 2017 Win64
+       VCPREFIX: 'C:/Program Files (x86)/Microsoft Visual Studio/2017/Community'
+       VCVARS: 'VC/Auxiliary/Build/vcvars64.bat'
+       BOOST_ROOT: C:\Libraries\boost_1_69_0
+       BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.0
+
+configuration: Release
+
+os: Visual Studio 2015
 
 install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq --no-install-recommends binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
-  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
-  - cmake . && make && sudo make install
-  - cd $APPVEYOR_BUILD_FOLDER && git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
-  - cd $APPVEYOR_BUILD_FOLDER && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
-  - make -j2
-test_script:
-  - exit 0
+  - ps: $env:VCVARSALL = "`"$env:VCPREFIX/$env:VCVARS`" $Architecture"
+  - call %VCVARSALL%
+  - vcpkg install armadillo:x64-windows
+  - vcpkg integrate install
 
-build: off
+build_script:
+  - cd %APPVEYOR_BUILD_FOLDER%
+  - git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cp -f mlpack-cmake.patch mlpack/
+  - cd mlpack
+  - patch < mlpack-cmake.patch
+  - mkdir build && cd build
+  - >
+    cmake -G "%VSVER%"
+    -DDEBUG=OFF -DPROFILE=OFF
+    -DUSE_OPENMP=OFF
+    -DBOOST_ROOT=%BOOST_ROOT%
+    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
+    -DBUILD_CLI_EXECUTABLES=OFF
+    -DBUILD_JULIA_BINDINGS=OFF
+    -DBUILD_PYTHON_BINDINGS=OFF
+    -DBUILD_TESTS=OFF
+    -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - >
+    cmake --build . --
+    /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
+  - cd %APPVEYOR_BUILD_FOLDER% && mkdir build && cd build
+  - ps: $env:MLPACK_LIB = "mlpack/build/Release/mlpack.lib"
+  - ps: $env:MLPACK_INCLUDE = "mlpack/build/include"
+  - ps: $env:MLPACK_LIB = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_LIB"
+  - ps: $env:MLPACK_INCLUDE = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_INCLUDE"
+  - >
+    cmake -G "%VSVER%"
+    -DDEBUG=OFF -DPROFILE=OFF
+    -DBOOST_ROOT=%BOOST_ROOT%
+    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
+    -DMLPACK_LIBRARY:FILEPATH=%MLPACK_LIB%
+    -DMLPACK_INCLUDE_DIR:PATH=%MLPACK_INCLUDE%
+    -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+  - >
+    cmake --build . --
+    /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
+
+artifacts:
+  - path: '**\*.zip'
+
+notifications:
+- provider: Email
+  to:
+  - mlpack-git@lists.mlpack.org
+  on_build_success: false
+  on_build_failure: false
+  on_build_status_changed: true
+
+cache:
+  - c:\tools\vcpkg\installed\
