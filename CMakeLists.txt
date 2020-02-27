@@ -1,21 +1,29 @@
+ 
 # specify the minimum version. 
 cmake_minimum_required(VERSION 3.1...3.16)
 
-# set cmake policy.
+#The cmake_policy command is used to set policies to OLD or NEW behavior.
+# While setting policies individually is supported
 if (${CMAKE_VERSION} VERSION_LESS 3.12 )
       cmake_policy( VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} )
 endif()
 
-# set the standards
+# This property specifies the C++ standard whose features are requested to 
+# build this target. For some compilers, this results in adding a flag
+# such as -std=gnu++11 to the compile line.
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# specify the languages like C, CXX, CUDA.
+# specify the languages like C, CXX, CUDA.Here using c/c++ because that
+# what mlpack require
 project(models
         DESCRIPTION "model examples mlpack"
         LANGUAGES C CXX)
         
-# Include modules in the CMake directory.
+# List of directories specifying a search path for
+# CMake modules to be loaded by the include() or find_package() commands 
+# before checking the default modules that come with CMake. By default it is empty,
+# it is intended to be set by the project.
 set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
    "${CMAKE_SOURCE_DIR}/CMake"
@@ -50,9 +58,9 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
       # We are on a 64-bit system.  Does Armadillo have ARMA_64BIT_WORD enabled?
       file(READ "${ARMADILLO_INCLUDE_DIR}/armadillo_bits/config.hpp" ARMA_CONFIG)
       string(REGEX MATCH
-                   "[\r\n][ ]*#define ARMA_64BIT_WORD"
-             ARMA_HAS_64BIT_WORD_PRE
-                    "${ARMA_CONFIG}")
+          "[\r\n][ ]*#define ARMA_64BIT_WORD"
+          ARMA_HAS_64BIT_WORD_PRE
+          "${ARMA_CONFIG}")
 
       string(LENGTH "${ARMA_HAS_64BIT_WORD_PRE}" ARMA_HAS_64BIT_WORD)
     endif()
@@ -85,9 +93,6 @@ else ()
   set(CMAKE_INSTALL_DOCDIR ${CMAKE_INSTALL_PREFIX}/share/doc/mlpack)
   set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
 endif ()
-
-# This is as of yet unused.
-option(PGO "Use profile-guided optimization if not a debug build" ON)
 
 # Set the CFLAGS and CXXFLAGS depending on the options the user specified.
 # Only GCC-like compilers support -Wextra, and other compilers give tons of
@@ -314,14 +319,17 @@ if (NOT ENSMALLEN_FOUND)
     endif ()
   endif ()
 endif ()
+set(Boost_ADDITIONAL_VERSIONS
+  "1.49.0" "1.50.0" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55.0")
+set(BOOST_VERSION 1.49.0)
 
-# updated as time goes on and new versions are released.
-set( BOOST_VERSION 1.58.0 )
-# Settings for finding correct Boost libraries.
-set( Boost_USE_STATIC_LIBS FALSE )
-set( Boost_USE_MULTITHREADED TRUE )
-set( Boost_USE_STATIC_RUNTIME FALSE )
-set( Boost_ADDITIONAL_VERSIONS "${BOOST_VERSION}" )
+function(add_library)
+    set(_args ${ARGN})
+    if ("${_args}" MATCHES ";IMPORTED")
+        list(APPEND _args GLOBAL)
+    endif()
+    _add_library(${_args})
+endfunction()
 
 find_package(Boost ${BOOST_VERSION}
       MODULE
@@ -330,17 +338,12 @@ find_package(Boost ${BOOST_VERSION}
                           serialization
                           graph)
 # Make found targets globally available.
-if ( Boost_FOUND )
-  set_target_properties( Boost::boost
-  Boost::program_options
-  Boost::graph
-  PROPERTIES IMPORTED_GLOBAL TRUE )
-else()
+if ( NOT Boost_FOUND )
   message(FATAL_ERROR "Could not found boost version ${BOOST_VERSION}")
 endif ()
 
 if (USE_OPENMP)
-  find_package(OpenMP)
+  find_package(OpenMP)  
 endif ()
 
 if (OPENMP_FOUND)
@@ -396,5 +399,3 @@ set(DIRS
 foreach(dir ${DIRS})
   add_subdirectory(${dir})
 endforeach()
-
-enable_testing()
