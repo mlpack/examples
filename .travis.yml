@@ -2,10 +2,6 @@ sudo: required
 dist: xenial
 language: cpp
 
-env:
-  - ARMADILLO=latest
-  - ARMADILLO=minimum
-
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
