@@ -199,32 +199,31 @@ int main()
   // removing it also (first row in in arma::mat).
   dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
 
+  arma::mat trainData = dataset.submat(arma::span(),arma::span(0, (1 - RATIO) *
+      dataset.n_cols));
+  arma::mat testData = dataset.submat(arma::span(), arma::span((1 - RATIO) * dataset.n_cols,
+      dataset.n_cols - 1));
+
   // Scale all data into the range (0, 1) for increased numerical stability.
   data::MinMaxScaler scale;
-  scale.Fit(dataset);
-  scale.Transform(dataset, dataset);
+  // Fit scaler only on training data.
+  scale.Fit(trainData);
+  scale.Transform(trainData, trainData);
+  scale.Transform(testData, testData);
 
   // We need to represent the input data for RNN in an arma::cube (3D matrix).
   // The 3rd dimension is the rho number of past data records the RNN uses for
   // learning.
-  arma::cube X, y;
-  X.set_size(inputSize, dataset.n_cols - rho + 1, rho);
-  y.set_size(outputSize, dataset.n_cols - rho + 1, rho);
-
-  // Create testing and training sets for one-step-ahead regression.
-  CreateTimeSeriesData(dataset, X, y, rho);
-
-  // Split the data into training and testing sets.
   arma::cube trainX, trainY, testX, testY;
-  size_t trainingSize = (1 - RATIO) * X.n_cols;
-  trainX = X.subcube(arma::span(), arma::span(0, trainingSize - 1),
-      arma::span());
-  trainY = y.subcube(arma::span(), arma::span(0, trainingSize - 1),
-        arma::span());
-  testX = X.subcube(arma::span(), arma::span(trainingSize, X.n_cols - 1),
-        arma::span());
-  testY = y.subcube(arma::span(), arma::span(trainingSize, X.n_cols - 1),
-        arma::span());
+  trainX.set_size(inputSize, trainData.n_cols - rho + 1, rho);
+  trainY.set_size(outputSize, trainData.n_cols - rho + 1, rho);
+  testX.set_size(inputSize, testData.n_cols - rho + 1, rho);
+  testY.set_size(outputSize, testData.n_cols - rho + 1, rho);
+
+  // Create training sets for one-step-ahead regression.
+  CreateTimeSeriesData(trainData, trainX, trainY, rho);
+  // Create test sets for one-step-ahead regression.
+  CreateTimeSeriesData(testData, testX, testY, rho);
 
   // Only train the model if required.
   if (bTrain || bLoadAndTrain)
@@ -257,8 +256,6 @@ int main()
         1e-8, // Tolerance.
         true, // Shuffle.
         AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
-
-    cout << "Training ..." << endl;
 
     // Use Early Stopping criteria to stop training.
     optimizer.Tolerance() = -1;
