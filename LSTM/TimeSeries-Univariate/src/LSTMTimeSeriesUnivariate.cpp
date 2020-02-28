@@ -40,6 +40,7 @@ DateTime,Consumption kWh,Off-peak,Mid-peak,On-peak
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
+#include <mlpack/core/data/split_data.hpp>
 #include <ensmallen.hpp>
 
 using namespace std;
@@ -52,14 +53,7 @@ using namespace ens;
  */
 double MSE(arma::cube& pred, arma::cube& Y)
 {
-  double err_sum = 0.0;
-  arma::cube diff = pred-Y;
-  for(size_t i = 0; i < diff.n_slices; i++)
-  {
-    arma::mat temp = diff.slice(i);
-    err_sum += accu(temp%temp);
-  }
-  return (err_sum) / (diff.n_elem + 1e-50);
+  return metric::SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
 
 /**
@@ -100,16 +94,13 @@ void SaveResults(const string& filename,
                  const arma::cube& testX)
 {
   arma::mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
-  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
 
   // The prediction result is the energy consumption for the next hour and comes
   // from the last slice of the prediction.
-  arma::mat temp = predictions.slice(predictions.n_slices - 1);
-  scale.InverseTransform(temp, temp);
+  flatDataAndPreds.rows(flatDataAndPreds.n_rows - 1,
+      flatDataAndPreds.n_rows - 1) = predictions.slice(predictions.n_slices - 1);
 
-  // We add the prediction as the last column.
-  flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows, temp.rows(temp.n_rows - 1, temp.n_rows - 1));
-
+  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
   // We need to remove the last column because it was not used for training
   // (there is no next hour to predict).
   flatDataAndPreds.shed_col(flatDataAndPreds.n_cols - 1);
@@ -125,7 +116,7 @@ void SaveResults(const string& filename,
   // any dataset for prediction.
   cout << "The predicted energy consumption for the next hour is : " << endl;
   cout << " " << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
-                                  flatDataAndPreds.n_cols - 1) << endl;
+      flatDataAndPreds.n_cols - 1) << endl;
 }
 
 int main()
@@ -133,7 +124,7 @@ int main()
   // Change the names of these files as necessary. They should be correct
   // already, if your program's working directory contains the data and/or
   // model.
-  const string dataFile = "./../data/electricity-usage.csv";
+  const string dataFile = "electricity-usage.csv";
   // example: const string dataFile =
   //                  "C:/mlpack-model-app/electricity-usage.csv";
   // example: const string dataFile =
@@ -159,9 +150,6 @@ int main()
 
   // Training data is randomly taken from the dataset in this ratio.
   const double RATIO = 0.1;
-
-  // Number of iterations per epoch.
-  const size_t ITERATIONS_PER_EPOCH = 100000;
 
   // Step size of an optimizer.
   const double STEP_SIZE = 5e-5;
@@ -199,10 +187,12 @@ int main()
   // removing it also (first row in in arma::mat).
   dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
 
-  arma::mat trainData = dataset.submat(arma::span(),arma::span(0, (1 - RATIO) *
-      dataset.n_cols));
-  arma::mat testData = dataset.submat(arma::span(), arma::span((1 - RATIO) * dataset.n_cols,
-      dataset.n_cols - 1));
+  // Split the dataset into training and validation sets.
+  arma::mat trainData, testData;
+  data::Split(dataset, trainData, testData, RATIO);
+
+  // Number of iterations per cycle.
+  const int EPOCHS = 150;
 
   // Scale all data into the range (0, 1) for increased numerical stability.
   data::MinMaxScaler scale;
@@ -252,26 +242,29 @@ int main()
     SGD<AdamUpdate> optimizer(
         STEP_SIZE, // Step size of the optimizer.
         BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
-        ITERATIONS_PER_EPOCH, // Max number of iterations.
+        trainData.n_cols * EPOCHS, // Max number of iterations.
         1e-8, // Tolerance.
         true, // Shuffle.
         AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
 
-    // Use Early Stopping criteria to stop training.
+    // Instead of terminating based on the tolerance of the objective function,
+    // we'll depend on the maximum number of iterations, and terminate early using
+    // the EarlyStopAtMinLoss callback.
     optimizer.Tolerance() = -1;
-    optimizer.MaxIterations() = 0;
 
     cout << "Training ..." << endl;
 
     model.Train(trainX,
                 trainY,
                 optimizer,
+                // PrintLoss Callback prints loss for each epoch.
                 ens::PrintLoss(),
+                // Progressbar Callback prints progress bar for each epoch.
                 ens::ProgressBar(),
-                ens::EarlyStopAtMinLoss(),
-                ens::StoreBestCoordinates<arma::mat>());
-
-    optimizer.ResetPolicy() = false;
+                // Stops the optimization process if the loss stops decreasing
+                // or no improvement has been made. This will terminate the
+                // optimization once we obtain a minima on training set.
+                ens::EarlyStopAtMinLoss());
 
     cout << "Finished training." << endl;
     cout << "Saving Model" << endl;
