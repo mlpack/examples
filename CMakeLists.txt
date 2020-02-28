@@ -8,6 +8,11 @@ if (${CMAKE_VERSION} VERSION_LESS 3.12 )
       cmake_policy( VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} )
 endif()
 
+# First, define all the compilation options.
+# We default to debugging mode for developers.
+option(DOWNLOAD_ENSMALLEN "If ensmallen is not found, download it." ON)
+option(USE_OPENMP "If available, use OpenMP for parallelization." OFF)
+
 # This property specifies the C++ standard whose features are requested to 
 # build this target. For some compilers, this results in adding a flag
 # such as -std=gnu++11 to the compile line.
