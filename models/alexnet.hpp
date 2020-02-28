@@ -88,16 +88,15 @@ class AlexNet
    * 
    * @return Sequential Pointer to the sequential AlexNet model.
    */
-  Sequential<>* CompileModel();
+  Sequential<> *CompileModel();
 
   /**
    * Load model from a path.
    * 
-   *
    * @param filePath Path to load the model from.
    * @return Sequential Pointer to a sequential model.
    */
-  Sequential<>* LoadModel(const std::string &filePath);
+  Sequential<> *LoadModel(const std::string &filePath);
 
   /**
    * Save model to a location.
@@ -119,7 +118,7 @@ class AlexNet
    * 
    * @return Sequential Pointer to a sequential model.
    */
-  Sequential<>* GetModel() { return alexNet; };
+  Sequential<> *GetModel() { return alexNet; };
 
  private:
   /**
@@ -128,21 +127,22 @@ class AlexNet
    * @param outputlWidth Width of the output.
    * @param outputHeight Height of the output.
    */
-  Sequential<>* AdaptivePoolingBlock(const size_t outputWidth,
-                                     const size_t outputHeight)
+  void AdaptivePoolingBlock(const size_t outputWidth,
+                            const size_t outputHeight)
   {
-    Sequential<>* poolingBlock;
+    Sequential<> *poolingBlock = new Sequential<>();
     const size_t strideWidth = std::floor(inputWidth / outputWidth);
     const size_t strideHeight = std::floor(inputHeight / outputHeight);
 
     const size_t kernelWidth = inputWidth - (outputWidth - 1) * strideWidth;
     const size_t kernelHeight = inputHeight - (outputHeight - 1) * strideHeight;
     poolingBlock->Add<MaxPooling<>>(kernelWidth, kernelHeight,
-        strideWidth, strideHeight);
+      strideWidth, strideHeight);
     // Update inputWidth and inputHeight.
     inputWidth = outputWidth;
     inputHeight = outputHeight;
-    return poolingBlock;
+    alexNet->Add(poolingBlock);
+    return;
   }
 
   /**
@@ -157,26 +157,26 @@ class AlexNet
    * @param padW Padding width of the input.
    * @param padH Padding height of the input.
    */
-  Sequential<>* ConvolutionBlock(const size_t inSize,
-                                 const size_t outSize,
-                                 const size_t kernelWidth,
-                                 const size_t kernelHeight,
-                                 const size_t strideWidth = 1,
-                                 const size_t strideHeight = 1,
-                                 const size_t padW = 0,
-                                 const size_t padH = 0)
+  void ConvolutionBlock(const size_t inSize,
+                        const size_t outSize,
+                        const size_t kernelWidth,
+                        const size_t kernelHeight,
+                        const size_t strideWidth = 1,
+                        const size_t strideHeight = 1,
+                        const size_t padW = 0,
+                        const size_t padH = 0)
   {
-    Sequential<>* convolutionBlock;
-    convolutionBlock->Add<Convolution<> >(inSize, outSize, kernelWidth,
-        kernelHeight, strideWidth, strideHeight, padW, padH, inputWidth,
-        inputHeight);
-      convolutionBlock->Add<ReLULayer<> >();
-    
+    Sequential<> *convolutionBlock = new Sequential<>();
+    convolutionBlock->Add<Convolution<>>(inSize, outSize, kernelWidth,
+      kernelHeight, strideWidth, strideHeight, padW, padH, inputWidth,
+      inputHeight);
+    convolutionBlock->Add<ReLULayer<>>();
 
     // Update inputWidth and input Height.
     inputWidth = ConvOutSize(inputWidth, kernelWidth, strideWidth, padW);
     inputHeight = ConvOutSize(inputHeight, kernelHeight, strideHeight, padH);
-    return convolutionBlock;
+    alexNet->Add(convolutionBlock);
+    return;
   }
 
   /**
@@ -189,18 +189,19 @@ class AlexNet
    * @param strideWidth Stride of filter application in the x direction.
    * @param strideHeight Stride of filter application in the y direction.
    */
-  Sequential<>* PoolingBlock(const size_t kernelWidth,
-                             const size_t kernelHeight,
-                             const size_t strideWidth = 1,
-                             const size_t strideHeight = 1)
+  void PoolingBlock(const size_t kernelWidth,
+                    const size_t kernelHeight,
+                    const size_t strideWidth = 1,
+                    const size_t strideHeight = 1)
   {
-    Sequential<>* poolingBlock;
+    Sequential<> *poolingBlock = new Sequential<>();
     poolingBlock->Add<MaxPooling<>>(kernelWidth, kernelHeight,
-        strideWidth, strideHeight);
+      strideWidth, strideHeight);
     // Update inputWidth and inputHeight.
     inputWidth = PoolOutSize(inputWidth, kernelWidth, strideWidth);
     inputHeight = PoolOutSize(inputHeight, kernelHeight, strideHeight);
-    return poolingBlock;
+    alexNet->Add(poolingBlock);
+    return;
   }
 
   /**
@@ -213,10 +214,10 @@ class AlexNet
    * @param pSideTwo The size of the padding (width or height) on another side.
    * @return The convolution output size.
    */
-      size_t ConvOutSize(const size_t size,
-                         const size_t k,
-                         const size_t s,
-                         const size_t padding)
+  size_t ConvOutSize(const size_t size,
+                     const size_t k,
+                     const size_t s,
+                     const size_t padding)
   {
     return std::floor(size + 2 * padding - k) / s + 1;
   }
@@ -236,7 +237,7 @@ class AlexNet
     return std::floor(size - 1) / s + 1;
   }
   //! Locally stored AlexNet Model.
-  Sequential<>* alexNet;
+  Sequential<> *alexNet;
 
   //! Locally stored width of the image.
   size_t inputWidth;
@@ -251,7 +252,7 @@ class AlexNet
   size_t numClasses;
 
   //! Locally stored include the final dense layer.
-   bool includeTop;
+  bool includeTop;
 
   //! Locally stored type of pre-trained weights.
   std::string weights;

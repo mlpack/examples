@@ -6,6 +6,7 @@
 #include <mlpack/methods/ann/ffn.hpp>
 #include <Kaggle/kaggle_utils.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
+#include<models/alexnet.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -17,6 +18,6 @@ using namespace ens;
 int main()
 {
   AlexNet alexnet(1, 28, 28, 10, true);
-  //Sequential<>* layer = alexnet.CompileModel();
+  Sequential<>* layer = alexnet.CompileModel();
   return 0;
 }
