@@ -145,7 +145,7 @@ static void mlpackMain()
   const mat validX = valid.submat(1, 0, valid.n_rows - 1,
       valid.n_cols - 1) / 255.0;
 
-  // Allow infinite number of iterations utill we stopped by EarlyStopAtMinLoss.
+  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss.
   const int ITERATIONS_PER_CYCLE = 0;
   // According to NegativeLogLikelihood output layer of NN, labels should
   // specify class of a data point and be in the interval from 1 to
