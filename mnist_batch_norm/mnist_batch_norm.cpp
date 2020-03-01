@@ -3,7 +3,8 @@
  * solving Digit Recognizer problem from Kaggle website.
  *
  * The full description of a problem as well as datasets for training
- * and testing are available here https://www.kaggle.com/c/digit-recognizer using BatchNorm
+ * and testing are available here https://www.kaggle.com/c/digit-recognizer
+ * using BatchNorm
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
@@ -14,8 +15,11 @@
  * @author Manthan-R-Sheth
  */
 
+#include <mlpack/prereqs.hpp>
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
+#include <mlpack/core/util/cli.hpp>
+#include <mlpack/core/util/mlpack_main.hpp>
 
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
@@ -23,6 +27,7 @@
 #include "kaggle_utils.hpp"
 
 #include <ensmallen.hpp>
+#include <ensmallen_bits/callbacks/callbacks.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -32,10 +37,65 @@ using namespace std;
 
 using namespace ens;
 
-int main() {
+PROGRAM_INFO("DigitRecognizer",
+             "This software is part of mlpack model zoo, it implements digits "
+             "recognizer "
+             "which classify hand written images based on the MNIST data set.",
+             "This software can be used in Kaggle DigitRecognizer competition, "
+             "to obtain "
+             "the training and testing set, You can visit this website: "
+             "https://www.kaggle.com/c/digit-recognizer/data",
+             SEE_ALSO("DigitRecognizer competition website",
+                      "https://www.kaggle.com/c/digit-recognizer"),
+             SEE_ALSO("MNIST Dataset website",
+                      "http://yann.lecun.com/exdb/mnist/"));
+
+// // Training dataset parameters.
+PARAM_STRING_IN("training_dataset",
+                "Full path to the file containing the training set.",
+                "t",
+                "../Kaggle/data/train.csv");
+
+// Testing/classification parameters.
+PARAM_STRING_IN("testing_datatest",
+                "Full path to the file containing the test set.",
+                "l",
+                "../Kaggle/data/test.csv");
+
+// Prediction results parameters.
+PARAM_STRING_IN("prediction_result",
+                "File name in which prediction will be saved.",
+                "P",
+                "../Kaggle/results.csv");
+
+// // Model loading/saving.
+// PARAM_MODEL_IN("input_model", "Full path to the file which has input model.",
+// "m"); PARAM_MODEL_OUT("output_model", "Full path to the file in which output
+// model will be saved.", "M");
+
+// Division ration between Train set and validation set, default 10%.
+PARAM_DOUBLE_IN("Ratio",
+                "Percentage of validation set from the training set.",
+                "r",
+                0.1);
+
+PARAM_INT_IN(
+    "Batch_size",
+    "Number of data points to be trained in each iteration of the optimizer.",
+    "b",
+    64);
+
+static void mlpackMain()
+{
   // Dataset is randomly split into training
   // and validation parts with following ratio.
-  constexpr double RATIO = 0.1;
+  double RATIO = 0.1;
+
+  if (CLI::HasParam("Ratio"))
+  {
+    RATIO = CLI::GetParam<double>("Ratio");
+  }
+
   // The number of neurons in the first layer.
   constexpr int H1 = 100;
   // The number of neurons in the second layer.
@@ -46,19 +106,18 @@ int main() {
   // options (here the step size is different).
 
   // Number of iteration per cycle.
-  constexpr int ITERATIONS_PER_CYCLE = 10000;
-
-  // Number of cycles.
-  constexpr int CYCLES = 20;
+  constexpr int ITERATIONS_PER_CYCLE = 0;
 
   // Step size of an optimizer.
   constexpr double STEP_SIZE = 5e-4;
 
   // Number of data points in each iteration of SGD
   // Power of 2 is better for data parallelism
-  constexpr int BATCH_SIZE = 64;
-
-  cout << "Reading data ..." << endl;
+  size_t BATCH_SIZE = 64;
+  if (CLI::HasParam("Batch_size"))
+  {
+    BATCH_SIZE = ( size_t )CLI::GetParam<int>("Batch_size");
+  }
 
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
@@ -69,8 +128,8 @@ int main() {
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
-  mat dataset = tempDataset.submat(0, 1,
-    tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  mat dataset =
+      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   // Splitting the dataset on training and validation parts.
   mat train, valid;
@@ -92,75 +151,78 @@ int main() {
   // is used for classification problem. RandomInitialization means that
   // initial weights in neurons are generated randomly in the interval
   // from -1 to 1.
-  FFN <NegativeLogLikelihood<>, RandomInitialization> model;
+  FFN<NegativeLogLikelihood<>, RandomInitialization> model;
   // This is intermediate layer that is needed for connection between input
   // data and PRelU layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
-  model.Add<Linear<> >(trainX.n_rows, H1);
-  // The first PReLU activation layer. parameter can be set as constructor argument.
-  model.Add<PReLU<> >();
-  // BatchNorm layer applied after PReLU activation as it gives better results practically.
-  model.Add<BatchNorm<> >(H1);
+  model.Add<Linear<>>(trainX.n_rows, H1);
+  // The first PReLU activation layer. parameter can be set as constructor
+  // argument.
+  model.Add<PReLU<>>();
+  // BatchNorm layer applied after PReLU activation as it gives
+  // better results practically.
+  model.Add<BatchNorm<>>(H1);
   // Intermediate layer between PReLU activation layers.
-  model.Add<Linear<> >(H1, H2);
+  model.Add<Linear<>>(H1, H2);
   // The second PReLU layer.
-  model.Add<PReLU<> >();
-  //Second BatchNorm layer
-  model.Add<BatchNorm<> >(H2);
+  model.Add<PReLU<>>();
+  // Second BatchNorm layer
+  model.Add<BatchNorm<>>(H2);
   // Intermediate layer.
-  model.Add<Linear<> >(H2, 10);
+  model.Add<Linear<>>(H2, 10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
   // output values to log of probabilities of being a specific class.
-  model.Add<LogSoftMax<> >();
+  model.Add<LogSoftMax<>>();
 
-  cout << "Training ..." << endl;
+  Log::Info << "Training ..." << endl;
 
   // Setting parameters Stochastic Gradient Descent (SGD) optimizer.
-  SGD <AdamUpdate> optimizer(
-    // Step size of the optimizer.
-    STEP_SIZE,
-    // Batch size. Number of data points that are used in each iteration.
-    BATCH_SIZE,
-    // Max number of iterations
-    ITERATIONS_PER_CYCLE,
-    // Tolerance, used as a stopping condition. This small number
-    // means we never stop by this condition and continue to optimize
-    // up to reaching maximum of iterations.
-    1e-8,
-    // Shuffle. If optimizer should take random data points from the dataset at
-    // each iteration.
-    true,
-    // Adam update policy.
-    AdamUpdate(1e-8, 0.9, 0.999));
+  SGD<AdamUpdate> optimizer(
+      // Step size of the optimizer.
+      STEP_SIZE,
+      // Batch size. Number of data points that are used in each iteration.
+      BATCH_SIZE,
+      // Max number of iterations
+      ITERATIONS_PER_CYCLE,
+      // Tolerance, used as a stopping condition. This small number
+      // means we never stop by this condition and continue to optimize
+      // up to reaching maximum of iterations.
+      1e-8,
+      // Shuffle. If optimizer should take random data points from the dataset
+      // at each iteration.
+      true,
+      // Adam update policy.
+      AdamUpdate(1e-8, 0.9, 0.999));
 
-  // Cycles for monitoring the process of a solution.
-  for (int i = 0; i <= CYCLES; i++)
-  {
+  // Don't reset optimizer's parameters between cycles.
+  optimizer.ResetPolicy() = false;
 
-    // Train neural network. If this is the first iteration, weights are
-    // random, using current values as starting point otherwise.
-    model.Train(trainX, trainY, optimizer);
+  // Train neural network. If this is the first iteration, weights are
+  // random, using current values as starting point otherwise.
+  model.Train(trainX,
+              trainY,
+              optimizer,
+              ens::PrintLoss(),
+              ens::ProgressBar(),
+              ens::EarlyStopAtMinLoss(),
+              ens::StoreBestCoordinates<arma::mat>());
 
-    // Don't reset optimizer's parameters between cycles.
-    optimizer.ResetPolicy() = false;
+  mat predOut;
+  // Getting predictions on training data points.
+  model.Predict(trainX, predOut);
+  // Calculating accuracy on training data points.
+  Row<size_t> predLabels = getLabels(predOut);
+  double trainAccuracy = accuracy(predLabels, trainY);
+  // Getting predictions on validating data points.
+  model.Predict(validX, predOut);
+  // Calculating accuracy on validating data points.
+  predLabels = getLabels(predOut);
+  double validAccuracy = accuracy(predLabels, validY);
 
-    mat predOut;
-    // Getting predictions on training data points.
-    model.Predict(trainX, predOut);
-    // Calculating accuracy on training data points.
-    Row <size_t> predLabels = getLabels(predOut);
-    double trainAccuracy = accuracy(predLabels, trainY);
-    // Getting predictions on validating data points.
-    model.Predict(validX, predOut);
-    // Calculating accuracy on validating data points.
-    predLabels = getLabels(predOut);
-    double validAccuracy = accuracy(predLabels, validY);
+  Log::Info << "Accuracy: train = " << trainAccuracy << "%,"
+            << " valid = " << validAccuracy << "%" << endl;
 
-    cout << i << " - accuracy: train = " << trainAccuracy << "%," <<
-      " valid = " << validAccuracy << "%" << endl;
-  }
-
-  cout << "Predicting ..." << endl;
+  Log::Info << "Predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to Kaggle website).
@@ -168,21 +230,44 @@ int main() {
 
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/test.csv", tempDataset, true);
-  mat testX = tempDataset.submat(0, 1,
-    tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  if (CLI::HasParam("testing_dataset"))
+  {
+    Log::Info << "Reading testing dataset from:"
+              << CLI::GetPrintableParam<std::string>("testing_dataset");
+    data::Load(std::move(CLI::GetParam<std::string>("testing_dataset")),
+               tempDataset,
+               true);
+  }
+  else
+  {
+    data::Load("../Kaggle/data/test.csv", tempDataset, true);
+  }
+
+  mat testX =
+      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   mat testPredOut;
   // Getting predictions on test data points .
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
-  Row <size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
+  Row<size_t> testPred = getLabels(testPredOut);
+  Log::Info << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("Kaggle/results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to \"results.csv\" and could be uploaded to "
-    << "https://www.kaggle.com/c/digit-recognizer/submissions for a competition"
-    << endl;
-  cout << "Finished" << endl;
+  if (CLI::HasParam("prediction_result"))
+  {
+    save(std::move(CLI::GetParam<std::string>("prediction_result")),
+         "ImageId,Label",
+         testPred);
+  }
+  else
+  { // Saving results into Kaggle compatibe CSV file.
+    save("Kaggle/results.csv", "ImageId,Label", testPred);
+  }
+
+  Log::Info << "Results were saved to \"results.csv\" and could be uploaded to "
+            << "https://www.kaggle.com/c/digit-recognizer/submissions for a "
+               "competition"
+            << endl;
+  Log::Info << "Finished" << endl;
 }
