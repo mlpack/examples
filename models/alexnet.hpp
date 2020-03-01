@@ -130,18 +130,16 @@ class AlexNet
   void AdaptivePoolingBlock(const size_t outputWidth,
                             const size_t outputHeight)
   {
-    Sequential<> *poolingBlock = new Sequential<>();
     const size_t strideWidth = std::floor(inputWidth / outputWidth);
     const size_t strideHeight = std::floor(inputHeight / outputHeight);
 
     const size_t kernelWidth = inputWidth - (outputWidth - 1) * strideWidth;
     const size_t kernelHeight = inputHeight - (outputHeight - 1) * strideHeight;
-    poolingBlock->Add<MaxPooling<>>(kernelWidth, kernelHeight,
+    alexNet->Add<MaxPooling<>>(kernelWidth, kernelHeight,
       strideWidth, strideHeight);
     // Update inputWidth and inputHeight.
     inputWidth = outputWidth;
     inputHeight = outputHeight;
-    alexNet->Add(poolingBlock);
     return;
   }
 
@@ -166,16 +164,15 @@ class AlexNet
                         const size_t padW = 0,
                         const size_t padH = 0)
   {
-    Sequential<> *convolutionBlock = new Sequential<>();
-    convolutionBlock->Add<Convolution<>>(inSize, outSize, kernelWidth,
+    
+    alexNet->Add<Convolution<>>(inSize, outSize, kernelWidth,
       kernelHeight, strideWidth, strideHeight, padW, padH, inputWidth,
       inputHeight);
-    convolutionBlock->Add<ReLULayer<>>();
+    alexNet->Add<ReLULayer<>>();
 
     // Update inputWidth and input Height.
     inputWidth = ConvOutSize(inputWidth, kernelWidth, strideWidth, padW);
     inputHeight = ConvOutSize(inputHeight, kernelHeight, strideHeight, padH);
-    alexNet->Add(convolutionBlock);
     return;
   }
 
@@ -194,13 +191,11 @@ class AlexNet
                     const size_t strideWidth = 1,
                     const size_t strideHeight = 1)
   {
-    Sequential<> *poolingBlock = new Sequential<>();
-    poolingBlock->Add<MaxPooling<>>(kernelWidth, kernelHeight,
+    alexNet->Add<MaxPooling<>>(kernelWidth, kernelHeight,
       strideWidth, strideHeight);
     // Update inputWidth and inputHeight.
     inputWidth = PoolOutSize(inputWidth, kernelWidth, strideWidth);
     inputHeight = PoolOutSize(inputHeight, kernelHeight, strideHeight);
-    alexNet->Add(poolingBlock);
     return;
   }
 
