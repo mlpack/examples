@@ -30,9 +30,7 @@ install:
 build_script:
   - cd %APPVEYOR_BUILD_FOLDER%
   - git clone https://github.com/mlpack/mlpack.git --depth 1
-  - cp -f mlpack-cmake.patch mlpack/
   - cd mlpack
-  - patch < mlpack-cmake.patch
   - mkdir build && cd build
   - >
     cmake -G "%VSVER%"
