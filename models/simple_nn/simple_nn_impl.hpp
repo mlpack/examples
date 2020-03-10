@@ -19,37 +19,31 @@
 namespace mlpack {
 namespace ann {
 
-template<
-  typename OutputLayerType,
-  typename InitializationRuleType
->
-SimpleNN<
-  OutputLayerType,
-  InitializationRuleType
->::SimpleNN(const size_t inputLength,
-            const size_t numClasses,
-            const std::tuple<int, int> hiddenOutSize,
-            const bool useBatchNorm,
-            const std::string &weights) :
-            inputLength(inputLength),
-            numClasses(numClasses),
-            H1(std::get<0>(hiddenOutSize)),
-            H2(std::get<1>(hiddenOutSize)),
-            useBatchNorm(useBatchNorm),
-            weights(weights)
+SimpleNN::SimpleNN(const size_t inputLength,
+                   const size_t numClasses,
+                   const std::tuple<int, int> hiddenOutSize,
+                   const bool useBatchNorm,
+                   const std::string &weights) :
+                   inputLength(inputLength),
+                   numClasses(numClasses),
+                   H1(std::get<0>(hiddenOutSize)),
+                   H2(std::get<1>(hiddenOutSize)),
+                   useBatchNorm(useBatchNorm),
+                   weights(weights)
 {
-  model.Add<Linear<>>(inputLength, H1);
-  model.Add<LeakyReLU<>>();
+  model = new Sequential<>();
+  model->Add<Linear<>>(inputLength, H1);
+  model->Add<LeakyReLU<>>();
   if (useBatchNorm)
-    model.Add<BatchNorm<>>(H1);
+    model->Add<BatchNorm<>>(H1);
 
-  model.Add<Linear<>>(H1, H2);
-  model.Add<LeakyReLU<>>();
+  model->Add<Linear<>>(H1, H2);
+  model->Add<LeakyReLU<>>();
   if (useBatchNorm)
-    model.Add<BatchNorm<>>(H2);
+    model->Add<BatchNorm<>>(H2);
 
-  model.Add<Linear<>>(H2, numClasses);
-  model.Add<LogSoftMax<>>();
+  model->Add<Linear<>>(H2, numClasses);
+  model->Add<LogSoftMax<>>();
 
   if (weights == "mnist")
   {
@@ -60,24 +54,16 @@ SimpleNN<
     LoadModel(weights);
   }
 }
-template<
-  typename OutputLayerType, typename InitializationRuleType
->
-FFN<OutputLayerType, InitializationRuleType> SimpleNN<
-  OutputLayerType,
-  InitializationRuleType
->::LoadModel(const std::string &filePath)
+
+Sequential<>* SimpleNN::LoadModel(const std::string &filePath)
 {
   std::cout << "Loading model" << std::endl;
   data::Load(filePath, "SimpleNN", model);
   return model;
 }
-template<typename OutputLayerType, typename InitializationRuleType
->
-void SimpleNN<
-  OutputLayerType,
-  InitializationRuleType
->::SaveModel(const std::string &filePath)
+
+
+void SimpleNN::SaveModel(const std::string &filePath)
 {
   std::cout << "Saving model" << std::endl;
   data::Save(filePath, "SimpleNN", model);

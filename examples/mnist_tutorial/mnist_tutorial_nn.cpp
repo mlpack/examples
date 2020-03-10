@@ -25,16 +25,17 @@ int main()
   const double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  const int BATCH_SIZE = 50;
+  const int BATCH_SIZE = 32;
 
   // Ratio for train-validation split.
   const double RATIO = 0.2;
 
-  DataLoader<arma::mat, arma::mat> dataloader("mnist", RATIO);
+  DataLoader<arma::mat, arma::mat> dataloader("mnist", true, RATIO);
 
-  SimpleNN<> module1(dataloader.TrainX().n_rows, 10);
-
-  FFN<> model = module1.GetModel();
+  SimpleNN module1(dataloader.TrainX().n_rows, 10);
+  Sequential<>* layers = module1.GetModel();
+  FFN<> model;
+  model.Add(layers);
 
   cout << "Training." << endl;
 
@@ -65,12 +66,12 @@ int main()
   cout << "Training Complete." << endl;
 
   mat predOut;
-  mat valX = dataloader.ValidationX();
+  mat valX = dataloader.ValidX();
   model.Predict(valX, predOut);
   // Calculating accuracy on validating data points.
   Row<size_t> predLabels = GetLabels(predOut);
-  mat valY = dataloader.ValidationY();
-  double validAccuracy = accuracy(predLabels, valY);
+  mat valY = dataloader.ValidY();
+  double validAccuracy = Accuracy(predLabels, valY);
 
   cout << "Validation Accuracy: " << validAccuracy << endl;
 

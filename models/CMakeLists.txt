@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
  
 add_subdirectory(lenet)
 add_subdirectory(simple_nn)
+add_subdirectory(lstm)
 
 # Add directory name to sources.
 set(DIR_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/)

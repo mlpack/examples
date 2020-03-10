@@ -1,6 +1,8 @@
 /**
  * @file utils.hpp
  * @author Eugene Freyman
+ * @author Mehul Kumar Nirala
+ * @author Zoltan Somogyi
  * @author Kartik Dutt
  * 
  * Utitlity functions that are useful in deep-learning.
@@ -11,14 +13,56 @@
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
 
-#ifndef MODELS_KAGGLE_UTILS_HPP
-#define MODELS_KAGGLE_UTILS_HPP
+#ifndef MODELS_UTILS_HPP
+#define MODELS_UTILS_HPP
 
 #include <mlpack/prereqs.hpp>
+
+using namespace mlpack;
+
+/**
+ * Returns MSE metric (average).
+ * 
+ * @param predictions predicted values.
+ * @param groundTruth groung truth values.
+ * @return MSE between ground truth and predictions.
+ */
+template<
+typename PredType = arma::cube,
+typename GroundTruthType = arma::cube
+>
+double MSE(const PredType predictions, const GroundTruthType groundTruth)
+{
+  return metric::SquaredEuclideanDistance::Evaluate(predictions, groundTruth) /
+      (groundTruth.n_elem);
+}
+
+/**
+ * Returns the accuracy (percentage of correct answers).
+ * 
+ * @param predictions predicted values.
+ * @param groundTruth groung truth values.
+ * @return percentage of correct answers.
+ */
+template<
+typename PredType = arma::Row<size_t>,
+typename GroundTruthType = arma::Row<size_t>
+>
+double Accuracy(const PredType predictions, const GroundTruthType groundTruth)
+{
+  // Calculating how many predicted classes are coincide with real labels.
+  size_t success = 0;
+  for (size_t j = 0; j < groundTruth.n_cols; j++)
+      success += (predictions(j) == std::round(groundTruth(j)));
+
+  // Calculating percentage of correctly classified data points.
+  return (double)success / (double)groundTruth.n_cols * 100.0;
+}
 
 /**
  * Returns labels bases on predicted probability (or log of probability)
  * of classes.
+ * 
  * @param predOut matrix contains probabilities (or log of probability) of
  * classes. Each row corresponds to a certain class, each column corresponds
  * to a data point.
@@ -34,61 +78,46 @@ arma::Row<size_t> GetLabels(const arma::mat &predOut)
   for (size_t j = 0; j < predOut.n_cols; ++j)
   {
     pred(j) = arma::as_scalar(arma::find(
-         arma::max(predOut.col(j)) == predOut.col(j), 1)) + 1;
+        arma::max(predOut.col(j)) == predOut.col(j), 1)) + 1;
   }
 
   return pred;
 }
 
 /**
- * Returns the accuracy (percentage of correct answers).
- * @param predLabels predicted labels of data points.
- * @param realY real labels (they are double because we usually read them from
- * CSV file that contain many other double values).
- * @return percentage of correct answers.
+ * Creates Time-Series Dataset for Time-Series Prediction.
+ * 
+ * @param dataset Time-Series Dataset.
+ * @param X Input features will be stored in this variable.
+ * @param Y Output will be stored in this variable.
+ * @param rho Maximum rho used in LSTMs / RNNs.
+ * @param inputFeatureColumnStart Starting column number for input features
+ *         in dataset.
+ * @param inputFeatureColumnEnd Last column number for input features in dataset.
  */
-double accuracy(arma::Row<size_t> predLabels, const arma::mat &realY)
+template <typename InputDataType = arma::mat,
+          typename DataType = arma::cube,
+          typename LabelType = arma::cube>
+void CreateTimeSeriesData(InputDataType dataset,
+                          DataType &X,
+                          LabelType &y,
+                          const size_t rho,
+                          const size_t inputFeatureColumnStart = 0,
+                          const size_t inputFeatureColumnEnd = 0,
+                          const size_t inputSize = 0,
+                          const size_t outputSize = 0)
 {
-  // Calculating how many predicted classes are coincide with real labels.
-  size_t success = 0;
-  for (size_t j = 0; j < realY.n_cols; j++)
-  {
-    if (predLabels(j) == std::round(realY(j)))
-    {
-      ++success;
-    }
-  }
+  X.set_size(inputSize, dataset.n_cols - rho + 1, rho);
+  y.set_size(outputSize, dataset.n_cols - rho + 1, rho);
 
-  // Calculating percentage of correctly classified data points.
-  return (double)success / (double)realY.n_cols * 100.0;
-}
-
-/**
- * Saves prediction into specifically formated CSV file, suitable for
- * most Kaggle competitions.
- * @param filename the name of a file.
- * @param header the header in a CSV file.
- * @param predLabels predicted labels of data points. Classes of data points
- * are expected to start from 1. At the same time classes of data points in
- * the file are going to start from 0 (as Kaggle usually expects)
- */
-void save(const std::string filename, std::string header,
-          const arma::Row<size_t> &predLabels)
-{
-  std::ofstream out(filename);
-  out << header << std::endl;
-  for (size_t j = 0; j < predLabels.n_cols; ++j)
+  for (size_t i = 0; i < dataset.n_cols - rho; i++)
   {
-    // j + 1 because Kaggle indexes start from 1
-    // pred - 1 because 1st class is 0, 2nd class is 1 and etc.
-    out << j + 1 << "," << std::round(predLabels(j)) - 1;
-    // to avoid an empty line in the end of the file
-    if (j < predLabels.n_cols - 1)
-    {
-      out << std::endl;
-    }
+    X.subcube(arma::span(), arma::span(i), arma::span()) =
+        dataset.submat(arma::span(), arma::span(i, i + rho - 1));
+    y.subcube(arma::span(), arma::span(i), arma::span()) =
+        dataset.submat(arma::span(inputFeatureColumnStart,
+        inputFeatureColumnEnd), arma::span(i + 1, i + rho));
   }
-  out.close();
 }
 
 #endif

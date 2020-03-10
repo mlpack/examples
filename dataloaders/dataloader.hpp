@@ -2,7 +2,7 @@
  * @file dataloader.hpp
  * @author Kartik Dutt
  * 
- * Definition of Dataloader to for popular datasets.
+ * Definition of Dataloader for popular datasets.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
@@ -26,21 +26,38 @@ class DataLoader
   DataLoader();
 
   /**
-   * Constructor for DataLoader.
+   * Constructor for DataLoader. This is used for loading popular Datasets such as
+   * MNIST, ImageNet, Pascal VOC and many more.
    * 
-   * @param dataset Path or name of dataset.
+   * @param datasetPath Path or name of dataset.
+   * @param shuffle whether or not to shuffle the data.
    * @param ratio Ratio for train-test split.
-   * @param shuffle Boolean to shuffle dataset, if true.
+   * @param dropHeader Drops first row if true.
    * @param augmentation Adds augmentation to training data only.
    * @param augmentationProbability Probability of applying augmentation on dataset.
    */
-  DataLoader(std::string dataset,
-             double ratio = 0.75,
-             std::vector<std::string> augmentation = std::vector<std::string>(),
-             double augmentationProbability = 0.2);
+  DataLoader(const std::string &dataset,
+             const bool shuffle,
+             const double ratio = 0.75,
+             const std::vector<std::string> augmentation =
+                 std::vector<std::string>(),
+             const double augmentationProbability = 0.2);
+
+  /**
+   * Constructor for DataLoader. This is used for loading popular Datasets such as
+   * Google Stock Prices Dataset and many more.
+   * 
+   * @param datasetPath Path or name of dataset.
+   * @param ratio Ratio for train-test split.
+   * @param rho Lookback for dataset.
+   */
+  DataLoader(const std::string &dataset,
+             const double ratio = 0.75,
+             const size_t rho = 10);
 
   //! Get the Training Dataset.
   DataSetX TrainX() const { return trainX; }
+
   //! Modify the Training Dataset.
   DataSetX &TrainX() { return trainX; }
 
@@ -60,16 +77,27 @@ class DataLoader
   DataSetY &TestY() { return testY; }
 
   //! Get the Validation Dataset.
-  DataSetX ValidationX() const { return validX; }
+  DataSetX ValidX() const { return validX; }
   //! Modify the Validation Dataset.
-  DataSetX &ValidationX() { return validX; }
+  DataSetX &ValidX() { return validX; }
 
   //! Get the Validation Dataset.
-  DataSetY ValidationY() const { return validY; }
+  DataSetY ValidY() const { return validY; }
   //! Modify the Validation Dataset.
-  DataSetY &ValidationY() { return validY; }
+  DataSetY &ValidY() { return validY; }
+
+  //! Get the Training Dataset.
+  arma::mat TrainCSVData() const { return trainCSVData; }
+  //! Modify the Training Dataset.
+  arma::mat &TrainCSVData() { return trainCSVData; }
+
+  //! Get the Test CSV Dataset.
+  arma::mat TestCSVData() const { return testCSVData; }
+  //! Modify the Training Dataset.
+  arma::mat &TestCSVData() { return testCSVData; }
 
 private:
+  
   //! Locally stored input for training.
   DataSetX trainX;
   //! Locally stored input for testing.
@@ -84,16 +112,34 @@ private:
   //! Locally stored labels for validation.
   DataSetY validY;
 
+  //! Locally stored Train CSV.
+  arma::mat trainCSVData;
+
+  //! Locally stored Valid CSV.
+  arma::mat testCSVData;
+
   // MNIST Dataset Dataloader.
   void MNISTDataLoader();
 
-  //! Locally stored path of dataset.
-  std::string datasetPath;
+  // Google Stock Prices Dataloader.
+  void GoogleStockPricesDataloader();
 
-  //! Locally stored value of ratio for train-test split.
+  // Electricity Consumption DataLoader.
+  void ElectricityConsumptionDataLoader();
+
+  //! Locally stored path of dataset.
+  std::string trainDatasetPath;
+
+  //! Locally stored path of dataset.
+  std::string testDatasetPath;
+
+  //! Locally stored value of rho.
+  size_t rho;
+
+  //! Locally stored ratio for train-test split.
   double ratio;
 
-  //! Locally stored augmentations.
+  //! Locally stored augmentation.
   std::vector<std::string> augmentation;
 
   //! Locally stored augmented probability.

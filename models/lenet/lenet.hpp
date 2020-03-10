@@ -47,8 +47,7 @@ class LeNet
   LeNet();
 
   /**
-   * LeNet constructor intializes input shape, number of classes
-   * and width multiplier.
+   * LeNet constructor intializes input shape and number of classes.
    *
    * @param inputChannels Number of input channels of the input image.
    * @param inputWidth Width of the input image.
@@ -66,8 +65,7 @@ class LeNet
         const int leNetVer = 1);
 
   /**
-   * LeNet constructor intializes input shape, number of classes
-   * and width multiplier.
+   * LeNet constructor intializes input shape and number of classes.
    *  
    * @param inputShape A three-valued tuple indicating input shape.
    *                   First value is number of Channels (Channels-First).
@@ -127,9 +125,7 @@ class LeNet
 
   /**
    * Adds Pooling Block.
-   * 
-   * @param inSize Number of input maps.
-   * @param outSize Number of output maps.
+   *
    * @param kernelWidth Width of the filter/kernel.
    * @param kernelHeight Height of the filter/kernel.
    * @param strideWidth Stride of filter application in the x direction.
@@ -154,8 +150,7 @@ class LeNet
    * @param size The size of the input (row or column).
    * @param k The size of the filter (width or height).
    * @param s The stride size (x or y direction).
-   * @param pSideOne The size of the padding (width or height) on one side.
-   * @param pSideTwo The size of the padding (width or height) on another side.
+   * @param padding The size of the padding (width or height) on one side.
    * @return The convolution output size.
    */
   size_t ConvOutSize(const size_t size,

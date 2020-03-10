@@ -1,6 +1,8 @@
 /**
  * @file dataloader_impl.hpp
  * @author Eugene Freyman
+ * @author Mehul Kumar Nirala.
+ * @author Zoltan Somogyi
  * @author Kartik Dutt
  * 
  * Implementation of DataLoader.
@@ -17,6 +19,7 @@
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/core/math/shuffle_data.hpp>
 #include <mlpack/prereqs.hpp>
+#include <utils/utils.hpp>
 #include "dataloader.hpp"
 
 using namespace mlpack;
@@ -26,19 +29,45 @@ template<
 >
 DataLoader<
   DataSetX, DataSetY
->::DataLoader(std::string dataset,
-              double ratio,
-              std::vector<std::string> augmentation,
-              double augmentationProbability) :
-              datasetPath(dataset),
+>::DataLoader(const std::string& dataset,
+              const bool shuffle,
+              const double ratio,
+              const std::vector<std::string> augmentation,
+              const double augmentationProbability) :
+              trainDatasetPath(dataset),
               ratio(ratio),
               augmentation(augmentation),
               augmentationProbability(augmentationProbability)
 {
-  if (datasetPath == "mnist")
+  if (trainDatasetPath == "mnist")
   {
     MNISTDataLoader();
   }
+
+  std::cout << "Dataset Loaded." << std::endl;
+}
+
+template<
+  typename DataSetX, typename DataSetY
+>
+DataLoader<
+  DataSetX, DataSetY
+>::DataLoader(const std::string& dataset,
+              const double ratio,
+              const size_t rho) :
+              trainDatasetPath(dataset),
+              ratio(ratio),
+              rho(rho)
+{
+  if (trainDatasetPath == "google-stock-prices")
+  {
+    GoogleStockPricesDataloader();
+  }
+  else if (trainDatasetPath == "electricity-consumption")
+  {
+    ElectricityConsumptionDataLoader();
+  }
+
   std::cout << "Dataset Loaded." << std::endl;
 }
 
@@ -73,6 +102,39 @@ void DataLoader<
 
   testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1) / 255.0;
   testY = dataset.row(0) + 1;
+}
+
+template<
+  typename DataSetX,typename DataSetY
+>
+void DataLoader<
+  DataSetX, DataSetY
+>::GoogleStockPricesDataloader()
+{
+  arma::mat dataset;
+  data::Load("./../data/Google2016-2019.csv", dataset, true);
+  dataset = dataset.submat(1, 1, dataset.n_rows - 1, dataset.n_cols - 1);
+
+  trainCSVData = dataset.submat(arma::span(),arma::span(0, (1 - ratio) *
+       dataset.n_cols));
+  testCSVData = dataset.submat(arma::span(), arma::span((1 - ratio) * dataset.n_cols,
+       dataset.n_cols - 1));
+}
+
+template<
+  typename DataSetX,typename DataSetY
+>
+void DataLoader<
+  DataSetX, DataSetY
+>::ElectricityConsumptionDataLoader()
+{
+  arma::mat dataset;
+  data::Load("./../data/electricity-usage.csv", dataset, true);
+  dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
+  trainCSVData = dataset.submat(arma::span(),arma::span(0, (1 - ratio) *
+      dataset.n_cols));
+  testCSVData = dataset.submat(arma::span(), arma::span((1 - ratio) * dataset.n_cols,
+      dataset.n_cols - 1));
 }
 
 #endif

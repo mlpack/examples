@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
-project(mnist_tutorial)
+project(time_series_tutorial)
 
 option(DEBUG "DEBUG" OFF)
-option(DOWNLOAD_MNIST "DOWNLOAD_MNIST" OFF)
+# Download Google Stock Prices Dataset.
+option(DOWNLOAD_GOOGLE_STOCK_DATA "DOWNLOAD_GOOGLE_STOCK_DATA" OFF)
+# Download Electricity Consumption Dataset.
+option(DOWNLOAD_ELECTRICITY_DATA "DOWNLOAD_ELECTRICITY_DATA" OFF)
 # Download all datasets used in examples.
 option(DOWNLOAD_DATASETS "DOWNLOAD_DATASETS" OFF)
 
@@ -10,8 +13,8 @@ set(MODEL_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/)
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../")
 
 set(SOURCES
-  mnist_tutorial_cnn.cpp
-  mnist_tutorial_nn.cpp
+  google_stock_price_tutorial.cpp
+  electricity_consumption_tutorial.cpp
 )
 
 if(DEBUG)
@@ -28,6 +31,7 @@ foreach(file ${SOURCES})
       ${MLPACK_LIBRARIES}
       ${ARMADILLO_LIBRARIES}
       ${Boost_LIBRARIES})
+
 endforeach()
 
 function(download_file url filename)
@@ -38,15 +42,16 @@ function(download_file url filename)
          SHOW_PROGRESS
          TIMEOUT 60)  # seconds
   endif()
-
 endfunction(download_file)
 
-if(DOWNLOAD_MNIST OR DOWNLOAD_DATASETS)
-download_file(
-    https://raw.githubusercontent.com/kartikdutt18/mlpack-models-weights-and-datasets/master/mnist-dataset/mnist_train.csv
-    ./../data/mnist_train.csv)
+if(DOWNLOAD_GOOGLE_STOCK_DATA OR DOWNLOAD_DATASETS)
+  download_file(
+    https://raw.githubusercontent.com/kartikdutt18/mlpack-models-weights-and-datasets/master/Google2016-2019.csv
+    ./../data/Google2016-2019.csv)
+endif()
 
-download_file(
-    https://raw.githubusercontent.com/kartikdutt18/mlpack-models-weights-and-datasets/master/mnist-dataset/mnist_test.csv
-    ./../data/mnist_test.csv)
+if(DOWNLOAD_ELECTRICITY_DATA OR DOWNLOAD_DATASETS)
+  download_file(
+    https://raw.githubusercontent.com/kartikdutt18/mlpack-models-weights-and-datasets/master/electricity-usage.csv
+    ./../data/electricity-usage.csv)
 endif()
