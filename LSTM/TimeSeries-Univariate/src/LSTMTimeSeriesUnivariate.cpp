@@ -188,8 +188,10 @@ int main()
   dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
 
   // Split the dataset into training and validation sets.
-  arma::mat trainData, testData;
-  data::Split(dataset, trainData, testData, RATIO);
+  arma::mat trainData = dataset.submat(arma::span(),arma::span(0, (1 - RATIO) *
+      dataset.n_cols));
+  arma::mat testData = dataset.submat(arma::span(), arma::span((1 - RATIO) * dataset.n_cols,
+      dataset.n_cols - 1));
 
   // Number of iterations per cycle.
   const int EPOCHS = 150;
