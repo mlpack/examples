@@ -46,7 +46,7 @@ Use the optional command `-D DEBUG=ON ` to enable debugging.
 Run the make file. Use -jN with the following command where N is the number of cores to be used for the build. 
 For instance,
   
-  `make -j2`
+  `make -j4`
 
 ### 4. Running Models
 
