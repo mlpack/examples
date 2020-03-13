@@ -47,6 +47,7 @@ int main()
   RNN<MeanSquaredError<>, HeInitialization> model(rho);
   SimpleLSTM module1(inputSize, outputSize, H1);
   Sequential<>* layers = module1.GetModel();
+  model.Add<IdentityLayer<>>();
   model.Add(layers);
 
   const double STEP_SIZE = 5e-5;

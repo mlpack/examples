@@ -101,7 +101,6 @@ void DataLoader<
   data::Load("./../data/mnist_test.csv", dataset, true);
 
   testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1) / 255.0;
-  testY = dataset.row(0) + 1;
 }
 
 template<

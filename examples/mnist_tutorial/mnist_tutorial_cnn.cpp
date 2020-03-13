@@ -39,6 +39,7 @@ int main()
     FFN<NegativeLogLikelihood<>, RandomInitialization> model;
     LeNet module1(1, 28, 28, 10);
     Sequential<>* layer = module1.GetModel();
+    model.Add<IdentityLayer<>>();
     model.Add(layer);
 
     cout << "Training." << endl;

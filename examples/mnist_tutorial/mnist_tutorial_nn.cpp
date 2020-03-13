@@ -35,6 +35,7 @@ int main()
   SimpleNN module1(dataloader.TrainX().n_rows, 10);
   Sequential<>* layers = module1.GetModel();
   FFN<> model;
+  model.Add<IdentityLayer<>>();
   model.Add(layers);
 
   cout << "Training." << endl;
