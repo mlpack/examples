@@ -40,9 +40,9 @@ int main()
   scaler.Transform(dataloader.TrainCSVData(), dataloader.TestCSVData());
 
   CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TrainX(),
-      dataloader.TrainY(), rho, 0, 0, 1, 1);
+      dataloader.TrainY(), rho, 0, dataloader.TrainCSVData().n_rows - 1, 1, 1);
   CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TestX(),
-      dataloader.TestY(), rho, 0, 0, 1, 1);
+      dataloader.TestY(), rho, 0, dataloader.TestCSVData().n_rows - 1, 1, 1);
 
   RNN<MeanSquaredError<>, HeInitialization> model(rho);
   SimpleLSTM module1(inputSize, outputSize, H1);
