@@ -3,7 +3,7 @@
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
-#include "VGG16_impl.hpp"
+#include <vgg/VGG16.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -40,7 +40,7 @@ int main()
 
     // The original file can be downloaded from
     // https://www.kaggle.com/c/digit-recognizer/data
-    data::Load("Kaggle/data/train.csv", tempDataset, true);
+    data::Load("../build/Kaggle/data/train.csv", tempDataset, true);
 
     // The original Kaggle dataset CSV file has headings for each column,
     // so it's necessary to get rid of the first row. In Armadillo representation,
