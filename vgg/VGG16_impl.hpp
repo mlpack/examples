@@ -74,28 +74,4 @@ Sequential<>* VGG16::CompileModel()
     return vgg16;
 }
 
-// size_t VGG16::GetOutputShape()
-// {
-//     return outputShape;
-// }
-
-// Sequential<>* VGG16::LoadModel(const std::string& filePath)
-// {
-//     std::cout << "Loading Model..." << std::endl;
-//     data::Load(filePath, "VGG16", vgg16);
-//     return vgg16;
-// }
-
-// void VGG16::SaveModel(const std::string& filePath)
-// {
-//     std::cout << "Saving Model..." << std::endl;
-//     data::Save(filePath, "VGG16", vgg16);
-//     std::cout << "Model saved in " << filePath << std::endl;
-// }
-
-// Sequential<>* VGG16::GetModel()
-// {
-//     return vgg16;
-// }
-
 #endif
