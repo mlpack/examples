@@ -57,7 +57,6 @@ Sequential<>* VGG16::CompileModel()
 
     if(includeTop)
     {   
-        std::cout << inputWidth << inputHeight << std::endl;
         vgg16->Add<Linear<>>(inputWidth * inputHeight * 512, 4096);
         vgg16->Add<Linear<>>(4096, 4096);
         vgg16->Add<Linear<>>(4096, numClasses);

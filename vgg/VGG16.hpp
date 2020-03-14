@@ -157,11 +157,11 @@ class VGG16
                           const size_t padWidth = 0,
                           const size_t padHeight = 0)
             {
-                std::vector<size_t> filters = {numInFilters, numOutFilters};
+                vector<size_t> filters = {numInFilters, numOutFilters};
                 filters = getFiltersForBlock(numConv, numOutFilters, filters);
                 
-                std::vector<size_t> inputWidths = {inputWidth};
-                std::vector<size_t> inputHeights = {inputHeight};
+                vector<size_t> inputWidths = {inputWidth};
+                vector<size_t> inputHeights = {inputHeight};
 
                 inputWidths = VGGOutSize(numConv, inputWidths, inputWidth, convKernelWidth, 
                                          poolKernelWidth, convStrideWidth, poolStrideWidth,
@@ -189,7 +189,7 @@ class VGG16
                 return;        
             }
 
-            std::vector<size_t> getFiltersForBlock(size_t numConv, size_t numFilters, std::vector<size_t> &filters) {
+            vector<size_t> getFiltersForBlock(size_t numConv, size_t numFilters, vector<size_t> &filters) {
                 for(size_t i = 0; i < numConv - 1; i++) {
                     filters.push_back(numFilters);
                     filters.push_back(numFilters);
@@ -198,8 +198,8 @@ class VGG16
             }
 
             // Find output dimensions for a VGG Block.
-            std::vector<size_t> VGGOutSize(const size_t numConv,
-                              std::vector<size_t> inpVec,
+            vector<size_t> VGGOutSize(const size_t numConv,
+                              vector<size_t> inpVec,
                               const size_t inputSize,
                               const size_t convKernelSize,
                               const size_t poolKernelSize,
