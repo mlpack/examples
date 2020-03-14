@@ -2,6 +2,7 @@
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/init_rules/glorot_init.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 #include <vgg/VGG16.hpp>
 
@@ -21,16 +22,13 @@ int main()
     constexpr double RATIO = 0.1;
 
     // Number of iterations per cycle.
-    constexpr int ITERATIONS_PER_CYCLE = 10000;
-
-    // Number of cycles.
-    constexpr int CYCLES = 40;
+    constexpr int MAX_ITERATIONS = 1000;
 
     // Step size of the optimizer.
-    constexpr double STEP_SIZE = 1.2e-3;
+    constexpr double STEP_SIZE = 1.0e-4;
 
-    // Number of data points in each iteration of SGD.
-    constexpr int BATCH_SIZE = 50;
+    // Number of data points in each iteration.
+    constexpr int BATCH_SIZE = 128;
 
     cout << "Reading data ..." << endl;
 
@@ -62,29 +60,14 @@ int main()
     const mat validY = valid.row(0) + 1;
 
     // Specify the NN model. NegativeLogLikelihood is the output layer that
-    // is used for classification problem. RandomInitialization means that
-    // initial weights are generated randomly in the interval from -1 to 1.
-    FFN<NegativeLogLikelihood<>, RandomInitialization> model;
+    // is used for classification problem. 
+    FFN<NegativeLogLikelihood<>, GlorotInitialization> model;
     model.Add<IdentityLayer<>>();
     model.Add(vgg16_net);
     model.Add<LogSoftMax<>>();
     cout << "Training ..." << endl;
 
-    // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
-    SGD<AdamUpdate> optimizer(
-    // Step size of the optimizer.
-    STEP_SIZE,
-    // Batch size
-    BATCH_SIZE,
-    // Max number of iterations.
-    ITERATIONS_PER_CYCLE,
-    // Tolerance, used as stopping condtiion.
-    1e-8,
-    // Shuffle. If optimizer should take random data points from the dataset at
-    // each iteration.
-    true,
-    // Adam update policy.
-    AdamUpdate(1e-8, 0.9, 0.999));
+    Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-8, MAX_ITERATIONS, 1e-5, true);
     
     model.Train(trainX,
                 trainY,
