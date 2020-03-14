@@ -157,30 +157,46 @@ class VGG16
                           const size_t padWidth = 0,
                           const size_t padHeight = 0)
             {
+                vector<size_t> filters = {numInFilters, numOutFilters};
+                filters = getFiltersForBlock(numConv, numOutFilters, filters);
+                
+                vector<size_t> inputWidths = {inputWidth};
+                vector<size_t> inputHeights = {inputHeight};
+
+                inputWidths = VGGOutSize(numConv, inputWidths, inputWidth, convKernelWidth, 
+                                         poolKernelWidth, convStrideWidth, poolStrideWidth,
+                                         padWidth);
+                inputHeights = VGGOutSize(numConv, inputHeights, inputHeight, convKernelHeight, 
+                                         poolKernelHeight, convStrideHeight, poolStrideHeight,
+                                         padHeight);
+
                 // Add numConv number of "Convolutional and Relu" blocks.
                 for(size_t i = 0; i < numConv; i++) {
-                    vgg16->Add<Convolution<>>(numInFilters, numOutFilters, 
+                    vgg16->Add<Convolution<>>(filters[2 * i], filters[2 * i + 1], 
                         convKernelWidth, convKernelHeight, convStrideWidth, 
-                        convStrideHeight, padWidth, padHeight);
+                        convStrideHeight, padWidth, padHeight, inputWidths[i], 
+                        inputHeights[i]);
                     vgg16->Add<ReLULayer<>>();
                 }
                 
                 // Add Pooling layer.
                 vgg16->Add<MaxPooling<>>(poolKernelWidth, poolKernelHeight,
                     poolStrideWidth, poolStrideHeight);
-                
-                // Update dimensions.
-                inputWidth = VGGOutSize(numConv, inputWidth, convKernelWidth, poolKernelWidth,
-                                        convStrideWidth, poolStrideWidth, padWidth);
-                inputHeight = VGGOutSize(numConv, inputHeight, convKernelHeight, poolKernelHeight,
-                                        convStrideHeight, poolStrideHeight, padHeight);
-                
-                std::cout << inputWidth << inputHeight << std::endl;
+
                 return;        
             }
 
+            vector<size_t> getFiltersForBlock(size_t numConv, size_t numFilters, vector<size_t> &filters) {
+                for(size_t i = 0; i < numConv - 1; i++) {
+                    filters.push_back(numFilters);
+                    filters.push_back(numFilters);
+                }
+                return filters;
+            }
+
             // Find output dimensions for a VGG Block.
-            size_t VGGOutSize(const size_t numConv,
+            vector<size_t> VGGOutSize(const size_t numConv,
+                              vector<size_t> inpVec,
                               const size_t inputSize,
                               const size_t convKernelSize,
                               const size_t poolKernelSize,
@@ -191,12 +207,14 @@ class VGG16
                 size_t ConvOutSize;
                 size_t inputSizeTemp = inputSize;
                 // Output dimension after convolutions.
-                for(size_t i = 0; i < numConv; i++) {
-                    ConvOutSize = std::floor(inputSizeTemp + 2 * padding - convKernelSize) / convStride + 1; 
+                for(size_t i = 0; i < numConv - 1; i++) {
+                    ConvOutSize = std::floor(inputSizeTemp + 2 * padding - convKernelSize) / convStride + 1;
+                    inpVec.push_back(ConvOutSize);
                     inputSizeTemp = ConvOutSize;
                 }
                 // Return VGG block output dimension.
-                return std::floor(ConvOutSize - poolKernelSize) / poolStride + 1;
+                inpVec.push_back(std::floor(ConvOutSize - poolKernelSize) / poolStride + 1);
+                return inpVec;
             }
             
             //! Locally stored vgg16 Model.
