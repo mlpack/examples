@@ -31,7 +31,7 @@ int main()
     // Ratio for train-validation split.
     const double RATIO = 0.2;
 
-    DataLoader<arma::mat, arma::mat> dataloader("mnist", true, RATIO);
+    DataLoader<> dataloader("mnist", true, RATIO);
 
     // NegativeLogLikelihood is the output layer that
     // is used for classification problem. RandomInitialization means that

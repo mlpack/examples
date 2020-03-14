@@ -33,17 +33,6 @@ int main()
 
   DataLoader<arma::cube, arma::cube> dataloader("google-stock-prices", 0.8, rho);
 
-  // Scale the training and testing data.
-  data::MinMaxScaler scaler;
-  scaler.Fit(dataloader.TrainCSVData());
-  scaler.Transform(dataloader.TestCSVData(), dataloader.TestCSVData());
-  scaler.Transform(dataloader.TrainCSVData(), dataloader.TestCSVData());
-
-  CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TrainX(),
-      dataloader.TrainY(), rho, 3, 4, 5, 2);
-  CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TestX(),
-      dataloader.TestY(), rho, 3, 4, 5, 2);
-
   RNN<MeanSquaredError<>, HeInitialization> model(rho);
   SimpleLSTM module1(inputSize, outputSize, H1);
   Sequential<>* layers = module1.GetModel();

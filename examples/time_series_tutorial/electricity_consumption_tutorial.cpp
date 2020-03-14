@@ -31,18 +31,7 @@ int main()
   // Max rho for LSTM.
   const size_t maxRho = rho;
 
-  DataLoader<arma::cube, arma::cube> dataloader("electricity-consumption", 0.8, rho);
-
-  // Scale the training and testing data.
-  data::MinMaxScaler scaler;
-  scaler.Fit(dataloader.TrainCSVData());
-  scaler.Transform(dataloader.TestCSVData(), dataloader.TestCSVData());
-  scaler.Transform(dataloader.TrainCSVData(), dataloader.TestCSVData());
-
-  CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TrainX(),
-      dataloader.TrainY(), rho, 0, dataloader.TrainCSVData().n_rows - 1, 1, 1);
-  CreateTimeSeriesData(dataloader.TestCSVData(), dataloader.TestX(),
-      dataloader.TestY(), rho, 0, dataloader.TestCSVData().n_rows - 1, 1, 1);
+  DataLoader<arma::cube, arma::cube> dataloader("electricity-consumption", 0.8, rho, true);
 
   RNN<MeanSquaredError<>, HeInitialization> model(rho);
   SimpleLSTM module1(inputSize, outputSize, H1);

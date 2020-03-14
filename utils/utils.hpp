@@ -56,7 +56,7 @@ double Accuracy(const PredType predictions, const GroundTruthType groundTruth)
       success += (predictions(j) == std::round(groundTruth(j)));
 
   // Calculating percentage of correctly classified data points.
-  return (double)success / (double)groundTruth.n_cols * 100.0;
+  return ((double)success / (double)groundTruth.n_cols) * 100.0;
 }
 
 /**
@@ -102,8 +102,8 @@ void CreateTimeSeriesData(InputDataType dataset,
                           DataType &X,
                           LabelType &y,
                           const size_t rho,
-                          const size_t inputFeatureColumnStart = 0,
-                          const size_t inputFeatureColumnEnd = 0,
+                          const size_t inputFeatureStart = 0,
+                          const size_t inputFeatureEnd = 0,
                           const size_t inputSize = 0,
                           const size_t outputSize = 0)
 {
@@ -113,10 +113,11 @@ void CreateTimeSeriesData(InputDataType dataset,
   for (size_t i = 0; i < dataset.n_cols - rho; i++)
   {
     X.subcube(arma::span(), arma::span(i), arma::span()) =
-        dataset.submat(arma::span(), arma::span(i, i + rho - 1));
+        dataset.submat(arma::span(inputFeatureStart, inputFeatureEnd),
+        arma::span(i, i + rho - 1));
     y.subcube(arma::span(), arma::span(i), arma::span()) =
-        dataset.submat(arma::span(inputFeatureColumnStart,
-        inputFeatureColumnEnd), arma::span(i + 1, i + rho));
+        dataset.submat(arma::span(inputFeatureStart,
+        inputFeatureEnd), arma::span(i + 1, i + rho));
   }
 }
 

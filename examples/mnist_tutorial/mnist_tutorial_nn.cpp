@@ -30,7 +30,7 @@ int main()
   // Ratio for train-validation split.
   const double RATIO = 0.2;
 
-  DataLoader<arma::mat, arma::mat> dataloader("mnist", true, RATIO);
+  DataLoader<arma::mat, arma::mat> dataloader("mnist", true, RATIO, true);
 
   SimpleNN module1(dataloader.TrainX().n_rows, 10);
   Sequential<>* layers = module1.GetModel();
