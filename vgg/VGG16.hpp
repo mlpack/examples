@@ -27,6 +27,7 @@
 #include <mlpack/prereqs.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
+#include <vector>
 
 using namespace mlpack;
 using namespace mlpack::ann;
