@@ -183,6 +183,9 @@ class VGG16
                 vgg16->Add<MaxPooling<>>(poolKernelWidth, poolKernelHeight,
                     poolStrideWidth, poolStrideHeight);
 
+                inputWidth = inputWidths[inputWidths.size() - 1];
+                inputHeight = inputHeights[inputHeights.size() - 1];
+                
                 return;        
             }
 
