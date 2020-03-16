@@ -37,11 +37,8 @@ int main()
   // and training parts with following ratio.
   constexpr double RATIO = 0.1;
 
-  // Number of iteration per cycle.
-  constexpr int ITERATIONS_PER_CYCLE = 10000;
-
-  // Number of cycles.
-  constexpr int CYCLES = 40;
+  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss
+  constexpr int ITERATIONS_PER_CYCLE = 0;
 
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 1.2e-3;
@@ -62,8 +59,8 @@ int main()
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
   // this corresponds to the first column of our data matrix.
-  mat dataset = tempDataset.submat(0, 1,
-      tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  mat dataset =
+      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   // Split the dataset into training and validation sets.
   mat train, valid;
@@ -106,101 +103,96 @@ int main()
   // 4x4x16  ------------------- Dense ----------------------> 10
 
   // Add the first convolution layer.
-  model.Add<Convolution<> >(
-      1,  // Number of input activation maps.
-      6,  // Number of output activation maps.
-      5,  // Filter width.
-      5,  // Filter height.
-      1,  // Stride along width.
-      1,  // Stride along height.
-      0,  // Padding width.
-      0,  // Padding height.
-      28, // Input width.
-      28  // Input height.
-      );
+  model.Add<Convolution<>>(1,  // Number of input activation maps.
+                           6,  // Number of output activation maps.
+                           5,  // Filter width.
+                           5,  // Filter height.
+                           1,  // Stride along width.
+                           1,  // Stride along height.
+                           0,  // Padding width.
+                           0,  // Padding height.
+                           28, // Input width.
+                           28  // Input height.
+  );
 
   // Add first ReLU.
-  model.Add<LeakyReLU<> >();
+  model.Add<LeakyReLU<>>();
 
   // Add first pooling layer. Pools over 2x2 fields in the input.
-  model.Add<MaxPooling<> >(
-      2,  // Width of field.
-      2,  // Height of field.
-      2,  // Stride along width.
-      2,  // Stride along height.
-      true
-      );
+  model.Add<MaxPooling<>>(2, // Width of field.
+                          2, // Height of field.
+                          2, // Stride along width.
+                          2, // Stride along height.
+                          true);
 
   // Add the second convolution layer.
-  model.Add<Convolution<> >(
-      6,  // Number of input activation maps.
-      16, // Number of output activation maps.
-      5,  // Filter width.
-      5,  // Filter height.
-      1,  // Stride along width.
-      1,  // Stride along height.
-      0,  // Padding width.
-      0,  // Padding height.
-      12, // Input width.
-      12  // Input height.
-      );
+  model.Add<Convolution<>>(6,  // Number of input activation maps.
+                           16, // Number of output activation maps.
+                           5,  // Filter width.
+                           5,  // Filter height.
+                           1,  // Stride along width.
+                           1,  // Stride along height.
+                           0,  // Padding width.
+                           0,  // Padding height.
+                           12, // Input width.
+                           12  // Input height.
+  );
 
   // Add the second ReLU.
-  model.Add<LeakyReLU<> >();
+  model.Add<LeakyReLU<>>();
 
   // Add the second pooling layer.
-  model.Add<MaxPooling<> >(2, 2, 2, 2, true);
+  model.Add<MaxPooling<>>(2, 2, 2, 2, true);
 
   // Add the final dense layer.
-  model.Add<Linear<> >(16*4*4, 10);
-  model.Add<LogSoftMax<> >();
+  model.Add<Linear<>>(16 * 4 * 4, 10);
+  model.Add<LogSoftMax<>>();
 
-  cout << "Training ..." << endl;
+  cout << "Start training ..." << endl;
 
   // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
-    // Step size of the optimizer.
-    STEP_SIZE,
-    // Batch size. Number of data points that are used in each iteration.
-    BATCH_SIZE,
-    // Max number of iterations.
-    ITERATIONS_PER_CYCLE,
-    // Tolerance, used as a stopping condition. Such a small value
-    // means we almost never stop by this condition, and continue gradient
-    // descent until the maximum number of iterations is reached.
-    1e-8,
-    // Shuffle. If optimizer should take random data points from the dataset at
-    // each iteration.
-    true,
-    // Adam update policy.
-    AdamUpdate(1e-8, 0.9, 0.999));
+      // Step size of the optimizer.
+      STEP_SIZE,
+      // Batch size. Number of data points that are used in each iteration.
+      BATCH_SIZE,
+      // Max number of iterations.
+      ITERATIONS_PER_CYCLE,
+      // Tolerance, used as a stopping condition. Such a small value
+      // means we almost never stop by this condition, and continue gradient
+      // descent until the maximum number of iterations is reached.
+      -1,
+      // Shuffle. If optimizer should take random data points from the dataset
+      // at each iteration.
+      true,
+      // Adam update policy.
+      AdamUpdate(1e-8, 0.9, 0.999));
 
-  for (int i = 0; i <= CYCLES; i++)
-  {
-    // Train the CNN model. If this is the first iteration, weights are
-    // randomly initialized between -1 and 1. Otherwise, the values of weights
-    // from the previous iteration are used.
-    model.Train(trainX, trainY, optimizer);
+  // Train the CNN model. If this is the first iteration, weights are
+  // randomly initialized between -1 and 1. Otherwise, the values of weights
+  // from the previous iteration are used.
+  model.Train(trainX,
+              trainY,
+              optimizer,
+              ens::PrintLoss(),
+              ens::ProgressBar(),
+              ens::EarlyStopAtMinLoss());
 
-    // Don't reset optimizers parameters between cycles.
-    optimizer.ResetPolicy() = false;
+  // Matrix to store the predictions on train and validation datasets.
+  mat predOut;
+  // Get predictions on training data points.
+  model.Predict(trainX, predOut);
+  // Calculate accuracy on training data points.
+  Row<size_t> predLabels = getLabels(predOut);
+  double trainAccuracy = accuracy(predLabels, trainY);
+  // Get predictions on validating data points.
+  model.Predict(validX, predOut);
+  // Calculate accuracy on validating data points.
+  predLabels = getLabels(predOut);
+  double validAccuracy = accuracy(predLabels, validY);
 
-    // Matrix to store the predictions on train and validation datasets.
-    mat predOut;
-    // Get predictions on training data points.
-    model.Predict(trainX, predOut);
-    // Calculate accuracy on training data points.
-    Row<size_t> predLabels = getLabels(predOut);
-    double trainAccuracy = accuracy(predLabels, trainY);
-    // Get predictions on validating data points.
-    model.Predict(validX, predOut);
-    // Calculate accuracy on validating data points.
-    predLabels = getLabels(predOut);
-    double validAccuracy = accuracy(predLabels, validY);
-
-    cout << "Epoch " << i << ":\tTraining Accuracy = "<< trainAccuracy<< "%,"
-        <<"\tValidation Accuracy = "<< validAccuracy << "%" <<  endl;
-  }
+  cout << "Training Accuracy = " << trainAccuracy << "%,"
+       << "\tValidation Accuracy = " << validAccuracy << "%" << endl;
 
   cout << "Predicting ..." << endl;
 
@@ -210,8 +202,8 @@ int main()
   data::Load("Kaggle/data/test.csv", tempDataset, true);
 
   // As before, it's necessary to get rid of column headings.
-  mat testX = tempDataset.submat(0, 1,
-      tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  mat testX =
+      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   // Matrix to store the predictions on test dataset.
   mat testPredOut;
@@ -219,10 +211,11 @@ int main()
   model.Predict(testX, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to results.csv."<< endl;
+  cout << "Saving predicted labels to results.csv." << endl;
 
   // Saving results into Kaggle compatibe CSV file.
   save("Kaggle/results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to Kaggle/results.csv. This file can be uploaded to "
-      << "https://www.kaggle.com/c/digit-recognizer/submissions." << endl;
+  cout << "Results were saved to Kaggle/results.csv. This file can be uploaded "
+          "to "
+       << "https://www.kaggle.com/c/digit-recognizer/submissions." << endl;
 }
