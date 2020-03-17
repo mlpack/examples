@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
-  arma::mat HeaderLessDataset =
+  arma::mat headerLessDataset =
       dataset.submat(0, 1, dataset.n_rows - 1, dataset.n_cols - 1);
 
   // Splitting the training dataset on training and validation parts.
