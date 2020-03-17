@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
   // Number of data points in each iteration of SGD
   constexpr size_t BATCH_SIZE = 64;
   // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss.
-  const int ITERATIONS_PER_CYCLE = 0;
+  const int MAX_ITERATIONS = 0;
 
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
       // Batch size. Number of data points that are used in each iteration.
       BATCH_SIZE,
       // Max number of iterations
-      ITERATIONS_PER_CYCLE,
+      MAX_ITERATIONS,
       // Tolerance, used as a stopping condition is set to -1.
       // This value means we never stop by this condition and continue to
       // optimize until we stopped by EarlyStopAtMinLoss.

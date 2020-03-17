@@ -38,7 +38,7 @@ int main()
   constexpr double RATIO = 0.1;
 
   // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss
-  constexpr int ITERATIONS_PER_CYCLE = 0;
+  constexpr int MAX_ITERATIONS = 0;
 
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 1.2e-3;
@@ -157,7 +157,7 @@ int main()
       // Batch size. Number of data points that are used in each iteration.
       BATCH_SIZE,
       // Max number of iterations.
-      ITERATIONS_PER_CYCLE,
+      MAX_ITERATIONS,
       // Tolerance, used as a stopping condition. Such a small value
       // means we almost never stop by this condition, and continue gradient
       // descent until the maximum number of iterations is reached.
