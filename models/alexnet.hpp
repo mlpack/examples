@@ -83,13 +83,6 @@ class AlexNet
     delete alexNet;
   }
 
-  /** 
-   * Defines Model Architecture.
-   * 
-   * @return Sequential Pointer to the sequential AlexNet model.
-   */
-  Sequential<> *CompileModel();
-
   /**
    * Load model from a path.
    * 
@@ -168,7 +161,7 @@ class AlexNet
     alexNet->Add<Convolution<>>(inSize, outSize, kernelWidth,
       kernelHeight, strideWidth, strideHeight, padW, padH, inputWidth,
       inputHeight);
-    alexNet->Add<ReLULayer<>>();
+    alexNet->Add<LeakyReLU<>>();
 
     // Update inputWidth and input Height.
     inputWidth = ConvOutSize(inputWidth, kernelWidth, strideWidth, padW);

@@ -17,15 +17,12 @@ using namespace ens;
 
 int main()
 {
-  AlexNet alexnet(1, 28, 28, 10, true);
-  Sequential<>* layer = alexnet.CompileModel();
-
   // Dataset is randomly split into validation
   // and training parts with following ratio.
-  constexpr double RATIO = 0.1;
+  constexpr double RATIO = 0.7;
 
   // Number of iteration per cycle.
-  constexpr int ITERATIONS_PER_CYCLE = 10000;
+  constexpr int EPOCHS = 5;
 
   // Number of cycles.
   constexpr int CYCLES = 40;
@@ -34,9 +31,9 @@ int main()
   constexpr double STEP_SIZE = 1.2e-3;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 50;
+  constexpr int BATCH_SIZE = 32;
 
-  cout << "Reading data ..." << endl;
+  std::cout << "Reading data ..." << endl;
 
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
@@ -44,8 +41,12 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/train.csv", tempDataset, true);
+  data::Load("./../data/mnist_train.csv", tempDataset, true);
 
+  arma::mat paddings(49408, tempDataset.n_cols);
+  paddings.zeros();
+
+  tempDataset.insert_rows(tempDataset.n_rows - 1, paddings);
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
   // this corresponds to the first column of our data matrix.
@@ -73,10 +74,14 @@ int main()
   // is used for classification problem. RandomInitialization means that
   // initial weights are generated randomly in the interval from -1 to 1.
   FFN<NegativeLogLikelihood<>, RandomInitialization> model;
+
+  AlexNet alexnet(1, 224, 224, 10, true);
+  Sequential<> *layer = alexnet.GetModel();
+
   model.Add<IdentityLayer<>>();
   model.Add(layer);
-  model.Add<LogSoftMax<>>();
-  cout << "Training ..." << endl;
+
+  std::cout << "Training ..." << endl;
 
   // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
   SGD<AdamUpdate> optimizer(
@@ -85,7 +90,7 @@ int main()
     // Batch size. Number of data points that are used in each iteration.
     BATCH_SIZE,
     // Max number of iterations.
-    ITERATIONS_PER_CYCLE,
+    EPOCHS * trainY.n_cols,
     // Tolerance, used as a stopping condition. Such a small value
     // means we almost never stop by this condition, and continue gradient
     // descent until the maximum number of iterations is reached.
@@ -95,15 +100,48 @@ int main()
     true,
     // Adam update policy.
     AdamUpdate(1e-8, 0.9, 0.999));
-    model.Train(trainX,
-                 trainY,
-                 optimizer,
-                 ens::PrintLoss(),
-                 ens::ProgressBar(),
-                 ens::EarlyStopAtMinLoss(1),
-                 ens::StoreBestCoordinates<arma::mat>());
+  model.Train(trainX,
+              trainY,
+              optimizer,
+              ens::PrintLoss(),
+              ens::ProgressBar(),
+              ens::EarlyStopAtMinLoss(1),
+              ens::StoreBestCoordinates<arma::mat>());
 
-    // Don't reset optimizers parameters between cycles.
-    optimizer.ResetPolicy() = false;
+  // Don't reset optimizers parameters between cycles.
+  optimizer.ResetPolicy() = false;
+
+  mat predOut;
+  // Getting predictions on training data points.
+  model.Predict(trainX, predOut);
+  // Calculating accuracy on training data points.
+  Row<size_t> predLabels = getLabels(predOut);
+  double trainAccuracy = accuracy(predLabels, trainY);
+  // Getting predictions on validating data points.
+  model.Predict(validX, predOut);
+  // Calculating accuracy on validating data points.
+  predLabels = getLabels(predOut);
+  double validAccuracy = accuracy(predLabels, validY);
+  std::cout << "Valid Accuracy: " << validAccuracy << std::endl;
+
+  std::cout << "Predicting ..." << endl;
+
+  // Loading test dataset (the one whose predicted labels
+  // should be sent to Kaggle website).
+  // As before, it's necessary to get rid of header.
+
+  // The original file could be download from
+  // https://www.kaggle.com/c/digit-recognizer/data
+  data::Load("./../data/mnist_test.csv", tempDataset, true);
+  mat testX = tempDataset.submat(0, 1,
+    tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+
+  mat testPredOut;
+  // Getting predictions on test data points .
+  model.Predict(testX, testPredOut);
+  // Generating labels for the test dataset.
+  Row<size_t> testPred = getLabels(testPredOut);
+  std::cout << "Results Saved." << std::endl;
+
   return 0;
 }
