@@ -32,72 +32,8 @@ using namespace arma;
 using namespace mlpack::util;
 using namespace ens;
 
-void Usage()
+int main()
 {
-  std::cout
-      << "DigitRecognizer" << std::endl
-      << "This software is part of mlpack model zoo, it implements digits "
-         "recognizer "
-         "which classify hand written images based on the MNIST data set."
-      << std::endl
-      << "This software can be used in Kaggle DigitRecognizer competition, "
-         "to obtain "
-         "the training and testing set, You can visit this website: "
-         "https://www.kaggle.com/c/digit-recognizer/data"
-      << std::endl
-      << " For more information, please visit: DigitRecognizer competition "
-         "website"
-      << std::endl
-      << "https://www.kaggle.com/c/digit-recognizer" << std::endl
-      << "MNIST Dataset website: " << std::endl
-      << "http://yann.lecun.com/exdb/mnist/" << std::endl;
-
-  std::cout << "Usage options: " << std::endl
-            << "\t -h, --help \t Show this help message." << std::endl
-            << "\t -t, --training_dataset \t Full path to the file containing "
-               "the training set."
-            << std::endl
-            << "\t -l, --testing_datatest, \t Full path to the file containing "
-               "the test set."
-            << std::endl;
-}
-
-int main(int argc, char* argv[])
-{
-  std::string trainingPath, testingPath;
-  std::vector<std::string> args(argc);
-  for (int i = 1; i < argc; ++i)
-  {
-    args[i] = argv[i];
-  }
-  if ((argc == 2) and ((args[1] == "-h") or (args[1] == "--help")))
-  {
-    Usage();
-    return 0;
-  }
-  else
-  {
-    if (argc < 5)
-    {
-      std::cerr << "Option not recognized, please enter training and testing "
-                   "dataset path"
-                << std::endl;
-      return 1;
-    }
-    else if (((args[1] == "-t") or (args[1] == "--training_dataset"))
-             and ((args[3] == "-l") or (args[3] == "--testing_dataset")))
-    {
-      trainingPath = args[2];
-      testingPath = args[4];
-    }
-    else if (((args[3] == "-t") or (args[3] == "--training_dataset"))
-             and ((args[1] == "-l") or (args[1] == "--testing_dataset")))
-    {
-      trainingPath = args[4];
-      testingPath = args[2];
-    }
-  }
-
   // Dataset is randomly split into validation
   // and training parts in the following ratio.
   constexpr double RATIO = 0.1;
@@ -115,16 +51,8 @@ int main(int argc, char* argv[])
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  if (!trainingPath.empty())
-  {
-    std::cout << "Reading tiraining dataset from:" << trainingPath << std::endl;
-    mlpack::data::Load(std::move(trainingPath), dataset, true);
-  }
-  else
-  {
-    mlpack::data::Load("../Kaggle/data/train.csv", dataset, true);
-  }
-
+  mlpack::data::Load("../Kaggle/data/train.csv", dataset, true);
+  
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
   arma::mat headerLessDataset =
@@ -132,7 +60,7 @@ int main(int argc, char* argv[])
 
   // Splitting the training dataset on training and validation parts.
   arma::mat train, valid;
-  mlpack::data::Split(HeaderLessDataset, train, valid, RATIO);
+  mlpack::data::Split(headerLessDataset, train, valid, RATIO);
 
   // Getting training and validating dataset with features only and then
   // normalising
@@ -222,16 +150,8 @@ int main(int argc, char* argv[])
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
   arma::mat testingDataset;
-  if (!testingPath.empty())
-  {
-    std::cout << "Reading testing dataset from:" << testingPath << std::endl;
-    mlpack::data::Load(std::move(testingPath), testingDataset, true);
-  }
-  else
-  {
-    mlpack::data::Load("../Kaggle/data/test.csv", testingDataset, true);
-  }
-
+  mlpack::data::Load("../Kaggle/data/test.csv", testingDataset, true);
+ 
   // As before, it's necessary to get rid of header.
   arma::mat testX = testingDataset.submat(
       0, 1, testingDataset.n_rows - 1, testingDataset.n_cols - 1);
