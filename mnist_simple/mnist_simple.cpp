@@ -52,7 +52,7 @@ int main()
   // rows represent features, columns represent data points.
   arma::mat dataset;
   mlpack::data::Load("../Kaggle/data/train.csv", dataset, true);
-  
+
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
   arma::mat headerLessDataset =
@@ -135,15 +135,15 @@ int main()
   model.Predict(trainX, predOut);
   // Calculating accuracy on training data points.
   Row<size_t> predLabels = getLabels(predOut);
-  double trainaccuracy = accuracy(predLabels, trainY);
+  double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validaccuracy = accuracy(predLabels, validY);
+  double validAccuracy = arma::accu(predLabels == validY) / trainY.n_elem;
 
-  std::cout << "Accuracy: train = " << trainaccuracy << "%,"
-            << " Valid = " << validaccuracy << "%" << endl;
+  std::cout << "Accuracy: train = " << trainAccuracy << "%,"
+            << " Valid = " << validAccuracy << "%" << endl;
 
   mlpack::data::Save("model.txt", "model", model, false);
 
@@ -151,7 +151,7 @@ int main()
   // should be sent to kaggle website).
   arma::mat testingDataset;
   mlpack::data::Load("../Kaggle/data/test.csv", testingDataset, true);
- 
+
   // As before, it's necessary to get rid of header.
   arma::mat testX = testingDataset.submat(
       0, 1, testingDataset.n_rows - 1, testingDataset.n_cols - 1);
