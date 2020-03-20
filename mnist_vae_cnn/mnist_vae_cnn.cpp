@@ -46,10 +46,8 @@ int main()
   constexpr int batchSize = 64;
   // The step size of the optimizer.
   constexpr double stepSize = 0.001;
-  // The number of interations per cycle.
-  constexpr int iterPerCycle = 56000;
-  // Number of cycles.
-  constexpr int cycles = 10;
+  // The maximum number of possible iteration
+  constexpr int maxIteration = 0;
   // Whether to load a model to train.
   constexpr bool loadModel = false;
   // Whether to save the trained model.
@@ -62,7 +60,7 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("vae/mnist_full.csv", fullData, true, false);
+  data::Load("mnist_full.csv", fullData, true, false);
   fullData /= 255.0;
 
   if (isBinary)
@@ -189,11 +187,11 @@ int main()
     // Number of data points that are used in each iteration.
     batchSize,
     // Max number of iterations.
-    iterPerCycle,
+    maxIteration,
     // Tolerance, used as a stopping condition. This small number means we never
     // stop by this condition and continue to optimize up to reaching maximum of
     // iterations.
-    1e-8,
+    -1,
     // Shuffle, If optimizer should take random data points from the dataset at
     // each iteration.
     true,
@@ -205,21 +203,17 @@ int main()
 
   const clock_t begin_time = clock();
 
-  // Cycles for monitoring the progress.
-  for (int i = 0; i < cycles; i++)
-  {
     // Train neural network. If this is the first iteration, weights are
     // random, using current values as starting point otherwise.
-    vaeModel.Train(train, train, optimizer);
+  vaeModel.Train(train,
+                 train,
+                 optimizer,
+                 ens::PrintLoss(),
+                 ens::ProgressBar(),
+                 ens::EarlyStopAtMinLoss());
 
-    // Don't reset optimizer's parameters between cycles.
-    optimizer.ResetPolicy() = false;
-
-    std::cout << "Loss after cycle  " << i << " -> " <<
-        MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
-    std::cout << "Time taken for cycle -> " << float(clock() - begin_time) /
-        CLOCKS_PER_SEC << " seconds" << std::endl;
-  }
+  std::cout << "Trainin loss: -> " <<
+        MeanTestLoss<ReconModel>(vaeModel, train_test, 50) << std::endl;
 
   std::cout << "Time taken to train -> " << float(clock() - begin_time) /
       CLOCKS_PER_SEC << " seconds" << std::endl;
