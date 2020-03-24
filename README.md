@@ -38,6 +38,8 @@ Python examples in the `python/` directory, command-line examples in the
 
 ### 2. Building the examples and usage
 
+_(This section is still in the process of being implemented!)_
+
 In order to keep this repository as simple as possible, there is no build
 system, and all examples are minimal.  For the C++ examples, there is a Makefile
 in each example's directory; if you have mlpack installed on your system,
