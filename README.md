@@ -1,93 +1,57 @@
-In mlpack-model-zoo **project**, we provide state of the art **pre-built 
-models** and solutions to some standard datasets.
+The mlpack **examples** repository contains simple example usages of mlpack.
+You can take the code here and adapt it into your application, or compile it and
+see what it does and play with it.
+
+Each of the examples are meant to be as simple as possible, and they are
+extensively documented.
+
+_(This README is still a work in progress as this repository is transitioned.
+Any comments like this one indicate that something still needs to be done.  So,
+as we work on it, we can remove these comments, and once all the comments are
+removed, we are done. :))_
 
 ### 0. Contents
 
-  1. [Introduction](#1-introduction)
+  1. [Overview](#1-overview)
   2. [Dependencies](#2-dependencies)
   3. [Building-From-Source](#3-building-from-source)
   4. [Running Models](#4-running-models)
   5. [Current Models](#5-current-models)
   6. [Datasets](#6-datasets)
 
-###  1. Introduction
+###  1. Overview
 
-   This repository contains a number of different models implemented in C++ using
-   mlpack. To understand more about mlpack refer to the following links. The sample folder 
-   contains snippets and smaller models that demonstrate features of mlpack. 
-  - [mlpack homepage](https://www.mlpack.org/)
-  - [mlpack documentation](https://www.mlpack.org/docs.html)
-  - [Tutorials](https://www.mlpack.org/doc/mlpack-git/doxygen/tutorials.html)
+This repository contains examples of mlpack usage that can be easily adapted to
+various applications.  If you're looking to figure out how to get mlpack working
+for your machine learning task, this repository would definitely be a good place
+to look, along with the [mlpack
+documentation](https://www.mlpack.org/docs.html).
 
-### 2. Dependencies
+mlpack is a C++ library that provides machine learning support, but it also
+provides bindings to other languages, including Python and Julia, and it also
+provides command-line programs.
 
-To run this project you need:
+Therefore, this repository contains examples not just in C++ but also in other
+languages.  C++ mlpack usage examples are contained in the `c++/` directory;
+Python examples in the `python/` directory, command-line examples in the
+`command-line/` directory, and so forth.
 
-      mlpack
-      Armadillo     >= 8.400.0
-      Boost (program_options, math_c99, unit_test_framework, serialization,
-             spirit)
-      CMake         >= 3.3.2
-      ensmallen     >= 2.10.0
-To install mlpack refer to the [install guide.](https://www.mlpack.org/docs.html)
+### 2. Building the examples and usage
 
-All of those should be available in your distribution's package manager. If
-not, you will have to compile each of them by hand. See the documentation for
-each of those packages for more information.
+_(This section is still in the process of being implemented!)_
 
-### 3. Building from source
+In order to keep this repository as simple as possible, there is no build
+system, and all examples are minimal.  For the C++ examples, there is a Makefile
+in each example's directory; if you have mlpack installed on your system,
+running `make` should work fine.  Some other examples may also use other
+libraries, and the Makefile expects those dependencies to also be available.
+See the README in each directory for more information, and see the [main mlpack
+repository](https://github.com/mlpack/mlpack) and [mlpack
+website](https://www.mlpack.org/) for more information on how to install mlpack.
 
-To install this project run the following command.
-  
-  `mkdir build && cd build && cmake ../`
+For Python examples and other-language examples, it's expected that you have
+mlpack and its dependencies installed.
 
-Use the optional command `-D DEBUG=ON ` to enable debugging.
-
-Run the make file. Use -jN with the following command where N is the number of cores to be used for the build. 
-For instance,
-  
-  `make -j4`
-
-### 4. Running Models
-
-After building the projects all datasets will be unzipped and executables of the model will be made available in 
-bin. You can either execute the same file using:
-
-  `./bin/fileName`
-  
-### 5. Current Models
-
-Currently model-zoo project has the following models implemented:
-
-  - Simple Convolutional Neural Network on MNIST dataset.
-  - Multivariate Time Series prediction using LSTM on Google Stock Prices.
-  - Univariate Time Series prediction using LSTM on Electricity Consumption Dataset.
-  - Variational Auto-Encoder on MNIST dataset.
-  - Variational Convolutional Auto-Encoder on MNIST.
-  
-### 6. Datasets
-
-Model-Zoo project has the following datasets available:
-
-#### 1. MNIST
-
-[MNIST](http://yann.lecun.com/exdb/mnist/)("Modified National Institute of Standards and Technology") is the de facto “hello world” dataset of computer vision. 
-Since its release in 1999, this classic dataset of handwritten images has served as the basis for benchmarking classification 
-algorithms. As new machine learning techniques emerge, MNIST remains a reliable resource for researchers and learners alike.
-
-Each image is 28 pixels in height and 28 pixels in width, for a total of 784 pixels in total. Each pixel has a single pixel-
-value associated with it, indicating the lightness or darkness of that pixel, with higher numbers meaning darker. This pixel-
-value is an integer between 0 and 255, inclusive.
-The training data set, (train.csv), has 785 columns. The first column, called "label", is the digit that was drawn by the 
-user. The rest of the columns contain the pixel-values of the associated image. For more information refer to this [MNIST Database](http://yann.lecun.com/exdb/mnist/).
-
-#### 2. Google Stock-Prices Dataset
-
-Google Stock-Prices Dataset consists of stock prices for each day from 27th June, 2016 to 27th June, 2019. Each tuple is 
-seperated from its adjacent tuple by 1 day. It consists of following rows that indicate opening, closing, volume and high and 
-low of stocks associated with Google on that day.
-
-#### 3. Electricity Consumption Dataset
-
-Contains electricity consumption of a city for 2011 to 2012, where each tuple is seperated from its adjacent tuple by 1 day.  
-Each tuple has consumption in kWH and binary values for each Off-peak, Mid-peak, On-peak rows.
+Each example should be easily runnable and should perform a simple machine
+learning task on a dataset.  You might need to download the dataset first---so
+be sure to check any README for the example.
