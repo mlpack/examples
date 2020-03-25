@@ -127,8 +127,8 @@ int main()
               optimizer,
               ens::PrintLoss(),
               ens::ProgressBar(),
-              ens::EarlyStopAtMinLoss(),
-              ens::StoreBestCoordinates<arma::mat>());
+              // Stop the training using Early Stop at min loss.
+              ens::EarlyStopAtMinLoss());
 
   mat predOut;
   // Getting predictions on training data points.
@@ -140,12 +140,12 @@ int main()
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validAccuracy = arma::accu(predLabels == validY) / trainY.n_elem;
+  double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " Valid = " << validAccuracy << "%" << endl;
 
-  mlpack::data::Save("model.txt", "model", model, false);
+  mlpack::data::Save("model.bin", "model", model, false);
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).

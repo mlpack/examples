@@ -49,7 +49,7 @@ int main()
   // uses previous results as starting point and have a different optimizer
   // options (here the step size is different).
 
-  // Number of iteration per cycle.
+  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss
   constexpr int MAX_ITERATIONS = 0;
 
   // Step size of an optimizer.
@@ -141,6 +141,7 @@ int main()
               optimizer,
               ens::PrintLoss(),
               ens::ProgressBar(),
+              // Stop the training using Early Stop at min loss.
               ens::EarlyStopAtMinLoss());
 
   mat predOut;
@@ -148,16 +149,17 @@ int main()
   model.Predict(trainX, predOut);
   // Calculating accuracy on training data points.
   Row<size_t> predLabels = getLabels(predOut);
-  double trainAccuracy = accuracy(predLabels, trainY);
+  double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;  
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validAccuracy = accuracy(predLabels, validY);
-
+  double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
+  
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " valid = " << validAccuracy << "%" << endl;
 
+  mlpack::data::Save("model.bin", "model", model, false);  
   std::cout << "Predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels

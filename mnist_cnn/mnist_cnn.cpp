@@ -176,6 +176,7 @@ int main()
               optimizer,
               ens::PrintLoss(),
               ens::ProgressBar(),
+              // Stop the training using Early Stop at min loss.
               ens::EarlyStopAtMinLoss());
 
   // Matrix to store the predictions on train and validation datasets.
@@ -184,15 +185,17 @@ int main()
   model.Predict(trainX, predOut);
   // Calculate accuracy on training data points.
   Row<size_t> predLabels = getLabels(predOut);
-  double trainAccuracy = accuracy(predLabels, trainY);
+  double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;
   // Get predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculate accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validAccuracy = accuracy(predLabels, validY);
+  double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
 
   cout << "Training Accuracy = " << trainAccuracy << "%,"
        << "\tValidation Accuracy = " << validAccuracy << "%" << endl;
+
+  mlpack::data::Save("model.bin", "model", model, false);  
 
   cout << "Predicting ..." << endl;
 
