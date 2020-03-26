@@ -29,7 +29,7 @@ MNIST dataset contains images of handwritten digits. It is one of the most commo
 
 ##### 1. Loading The Dataset From The File To A Useable Format
 
-The Load Class is used to load a matrix from the file.The type of file is guessed automatically from the extension. For a list of supported file types please refer to [Load Class](https://github.com/mlpack/mlpack/blob/master/src/mlpack/core/data/load.hpp). Please note that since mlpack requires matrices to be in column major format and usually data is stored in a row major format, the matrix by default is transposed. In case the data is originally in column major format, consider setting the parameter to False. Refer to documentation of Load Class for further information.
+The Load Class is used to load a matrix from the file. The type of file is guessed automatically from the extension. For a list of supported file types please refer to [Load Class](https://github.com/mlpack/mlpack/blob/master/src/mlpack/core/data/load.hpp). Please note that since mlpack requires matrices to be in column major format and usually data is stored in a row major format, the matrix is transposed by default. In case the data is originally in column major format, consider setting `transpose` to false. Refer to documentation of Load Class for further information.
 
 After loading the dataset is stored in the _tempDataset_ Matrix.
 
