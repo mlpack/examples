@@ -8,13 +8,13 @@ MNIST dataset contains images of handwritten digits. It is one of the most commo
   <img alt="Sample Images From The MNIST Database" src="https://upload.wikimedia.org/wikipedia/commons/2/27/MnistExamples.png">
 </p>
 <br/>
-Sample Images From The MNIST Database
+*Sample Images From The MNIST Database*
 
 <p align="center">
   <img alt="A visualization of the sample image at index 7777" src="https://miro.medium.com/max/490/1*nlfLUgHUEj5vW7WVJpxY-g.png">
 </p> 
 <br/>
-A visualization of the sample image at index 7777
+*A visualization of the sample image at index 7777*
 
 ### Processing The Dataset
 
