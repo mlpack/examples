@@ -53,7 +53,7 @@ After splitting the training dataset is stored in the _train_ matrix and validat
 
 ##### 1. DigitRecognizer
 
-For More Details related to the Model, check out the **DigitRecognizer** Directory.
+For more details related to the model, check out the **DigitRecognizer** Directory.
 
 After running the model for 50 epochs, the model obtained a validation set accuracy of **97.2143%**.
 
