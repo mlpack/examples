@@ -42,7 +42,7 @@ data::Load("Kaggle/data/train.csv", tempDataset, true);
 
 The Split Class is used to split the Dataset into Train and Validation Datasets. The train dataset is used in the training procedure, the weights are updated and adjusted to fit this dataset. The validation dataset is used to constantly evaludate the model, which is used to adjust the model hyperparamters like the learning rate. The data is split randomly and RATIO defines the amount of data in Validation Set.
 
-After splitting the train dataset is stored in the _train_ matrix and validation in the _valid_ matrix.
+After splitting the training dataset is stored in the _train_ matrix and validation dataset in the _valid_ matrix.
 
 ```cpp
   mat train, valid;
