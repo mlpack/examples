@@ -55,7 +55,7 @@ After splitting the training dataset is stored in the _train_ matrix and validat
 
 For More Details related to the Model, check out the **DigitRecognizer** Directory.
 
-After running the model for 50 cycles, the model obtained the best validation set accuracy of **97.2143%**.
+After running the model for 50 epochs, the model obtained a validation set accuracy of **97.2143%**.
 
 ##### 2. DigitRecognizerBatchNorm
 
