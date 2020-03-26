@@ -38,6 +38,7 @@ date  close  volume  open  high  low
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
+#include <mlpack/core/data/split_data.hpp>
 #include <ensmallen.hpp>
 
 using namespace std;
@@ -48,16 +49,12 @@ using namespace ens;
 /**
  * Function to calcute MSE for arma::cube.
  */
-double MSE(arma::cube& pred, arma::cube& Y)
+/*
+ * Function to calcute MSE for arma::cube.
+ */
+double MSE(arma::cube &pred, arma::cube &Y)
 {
-  double err_sum = 0.0;
-  arma::cube diff = pred - Y;
-  for (size_t i = 0; i < diff.n_slices; i++)
-  {
-    arma::mat temp = diff.slice(i);
-    err_sum += accu(temp%temp);
-  }
-  return (err_sum) / (diff.n_elem + 1e-50);
+  return metric::SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
 
 /**
@@ -100,21 +97,13 @@ void SaveResults(const string filename,
                  const arma::cube& testX)
 {
   arma::mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
-  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
 
   // The prediction results are the (high, low) for the next day and come from
   // the last slice from the prediction.
-  arma::mat temp = predictions.slice(predictions.n_slices - 1);
+  flatDataAndPreds.rows(flatDataAndPreds.n_rows - 2,
+      flatDataAndPreds.n_rows - 1) = predictions.slice(predictions.n_slices - 1);
 
-  // We add 3 extra rows here in order to recreate the input data structure used
-  // to transform the data. This is needed in order to be able to use the right
-  // scaling parameters for the specific column stock high/low.
-  temp.insert_rows(0, 3, 0);
-  scale.InverseTransform(temp, temp);
-
-  // We add the prediction as the last two columns (stock high, low).
-  flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows,
-      temp.rows(temp.n_rows - 2, temp.n_rows - 1));
+  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
 
   // We need to remove the last column because it was not used for training
   // (there is no next day to predict).
@@ -169,12 +158,6 @@ int main()
   // Testing data is taken from the dataset in this ratio.
   const double RATIO = 0.1;
 
-  // Number of optimization epochs.
-  const int EPOCH = 500;
-
-  // Number of iterations per cycle.
-  const int ITERATIONS_PER_EPOCH = 1000;
-
   // Step size of an optimizer.
   const double STEP_SIZE = 5e-5;
 
@@ -203,38 +186,41 @@ int main()
   // representation it is the first column.
   // The first column in the CSV is the date which is not required, therefore
   // we remove it also (first row in in arma::mat).
-  dataset = dataset.submat(1, 1, dataset.n_rows - 1, dataset.n_cols - 1);
 
-  // Scale all data into the range (0, 1) for increased numerical stability.
-  data::MinMaxScaler scale;
-  scale.Fit(dataset);
-  scale.Transform(dataset, dataset);
+  dataset = dataset.submat(1, 1, dataset.n_rows - 1, dataset.n_cols - 1);
 
   // We have 5 input data columns and 2 output columns (target).
   size_t inputSize = 5, outputSize = 2;
 
+  // Split the dataset into training and validation sets.
+  arma::mat trainData = dataset.submat(arma::span(),arma::span(0, (1 - RATIO) *
+      dataset.n_cols));
+  arma::mat testData = dataset.submat(arma::span(), arma::span((1 - RATIO) * dataset.n_cols,
+      dataset.n_cols - 1));
+
+  // Number of epochs for training.
+  const int EPOCHS = 150;
+
+  // Scale all data into the range (0, 1) for increased numerical stability.
+  data::MinMaxScaler scale;
+  // Fit scaler only on training data.
+  scale.Fit(trainData);
+  scale.Transform(trainData, trainData);
+  scale.Transform(testData, testData);
+
   // We need to represent the input data for RNN in an arma::cube (3D matrix).
-  // The 3rd dimension is rho, the number of past data records the RNN uses for.
+  // The 3rd dimension is the rho number of past data records the RNN uses for
   // learning.
-  arma::cube X, y;
-  X.set_size(inputSize, dataset.n_cols - rho + 1, rho);
-  y.set_size(outputSize, dataset.n_cols - rho + 1, rho);
-
-  // Create testing and training sets (read the notes above in the function
-  // definition).
-  CreateTimeSeriesData(dataset, X, y, rho);
-
-  // Split the data into training and testing sets.
   arma::cube trainX, trainY, testX, testY;
-  size_t trainingSize = (1 - RATIO) * X.n_cols;
-  trainX = X.subcube(arma::span(), arma::span(0, trainingSize - 1),
-      arma::span());
-  trainY = y.subcube(arma::span(), arma::span(0, trainingSize - 1),
-      arma::span());
-  testX = X.subcube(arma::span(), arma::span(trainingSize, X.n_cols - 1),
-      arma::span());
-  testY = y.subcube(arma::span(), arma::span(trainingSize, X.n_cols - 1),
-      arma::span());
+  trainX.set_size(inputSize, trainData.n_cols - rho + 1, rho);
+  trainY.set_size(outputSize, trainData.n_cols - rho + 1, rho);
+  testX.set_size(inputSize, testData.n_cols - rho + 1, rho);
+  testY.set_size(outputSize, testData.n_cols - rho + 1, rho);
+
+  // Create training sets for one-step-ahead regression.
+  CreateTimeSeriesData(trainData, trainX, trainY, rho);
+  // Create test sets for one-step-ahead regression.
+  CreateTimeSeriesData(testData, testX, testY, rho);
 
   // Only train the model if required.
   if (bTrain || bLoadAndTrain)
@@ -268,34 +254,31 @@ int main()
         STEP_SIZE, // Step size of the optimizer.
         BATCH_SIZE, // Batch size. Number of data points that are used in each
                     // iteration.
-        ITERATIONS_PER_EPOCH, // Max number of iterations.
+        trainData.n_cols * EPOCHS, // Max number of iterations.
         1e-8,// Tolerance.
         true, // Shuffle.
         AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
 
+    // Instead of terminating based on the tolerance of the objective function,
+    // we'll depend on the maximum number of iterations, and terminate early using
+    // the EarlyStopAtMinLoss callback.
+    optimizer.Tolerance() = -1;
+
     cout << "Training ..." << endl;
 
-    // Run EPOCH number of cycles for optimizing the solution.
-    for (int i = 0; i < EPOCH; i++)
-    {
-      // Train neural network. If this is the first iteration, weights are
-      // random, using current values as starting point otherwise.
-      model.Train(trainX, trainY, optimizer);
+    model.Train(trainX,
+                trainY,
+                optimizer,
+                // PrintLoss Callback prints loss for each epoch.
+                ens::PrintLoss(),
+                // Progressbar Callback prints progress bar for each epoch.
+                ens::ProgressBar(),
+                // Stops the optimization process if the loss stops decreasing
+                // or no improvement has been made. This will terminate the
+                // optimization once we obtain a minima on training set.
+                ens::EarlyStopAtMinLoss());
 
-      // Don't reset optimizer's parameters between cycles.
-      optimizer.ResetPolicy() = false;
-
-      arma::cube predOut;
-      // Getting predictions on test data points.
-      model.Predict(testX, predOut);
-
-      // Calculating mse on test data points.
-      double testMSE = MSE(predOut, testY);
-      cout << i + 1 << " - Mean Squared Error := " << testMSE << endl;
-    }
-
-    cout << "Finished training." << endl;
-    cout << "Saving Model" << endl;
+    cout << "Finished training. \n Saving Model" << endl;
     data::Save(modelFile, "LSTMMulti", model);
     cout << "Model saved in " << modelFile << endl;
   }
