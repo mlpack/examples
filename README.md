@@ -75,10 +75,3 @@ description (just a little bit more than the title):
 
  - `mnist_simple`: use a very simple three-layer feedforward neural network with
    dropout to recognize the MNIST digits
-
- - `mnist_vae`: use a simple variational autoencoder to recognize the MNIST
-   digits
-
- - `mnist_vae_cnn`: use a variational autoencoder with convolutional neural
-   networks in the encoder and reparametrization networks to recognize the MNIST
-   digits
