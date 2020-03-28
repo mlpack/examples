@@ -51,21 +51,22 @@ build_script:
   - ps: $env:MLPACK_INCLUDE = "mlpack/build/include"
   - ps: $env:MLPACK_LIB = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_LIB"
   - ps: $env:MLPACK_INCLUDE = "$env:APPVEYOR_BUILD_FOLDER/$env:MLPACK_INCLUDE"
-  - >
-    cmake -G "%VSVER%"
-    -DDEBUG=OFF -DPROFILE=OFF
-    -DBOOST_ROOT=%BOOST_ROOT%
-    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
-    -DMLPACK_LIBRARY:FILEPATH=%MLPACK_LIB%
-    -DMLPACK_INCLUDE_DIR:PATH=%MLPACK_INCLUDE%
-    -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
-    -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
-  - >
-    cmake --build . --
-    /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
+# TODO: use AppVeyor to build examples from Makefiles (or similar)
+#  - >
+#    cmake -G "%VSVER%"
+#    -DDEBUG=OFF -DPROFILE=OFF
+#    -DBOOST_ROOT=%BOOST_ROOT%
+#    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
+#    -DMLPACK_LIBRARY:FILEPATH=%MLPACK_LIB%
+#    -DMLPACK_INCLUDE_DIR:PATH=%MLPACK_INCLUDE%
+#    -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
+#    -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+#  - >
+#    cmake --build . --
+#    /verbosity:minimal /nologo /p:Configuration=Release;Platform=x64
 
 artifacts:
-  - path: '**\*.zip'
+#  - path: '**\*.zip'
 
 notifications:
 - provider: Email

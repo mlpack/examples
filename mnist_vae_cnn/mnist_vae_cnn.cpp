@@ -19,7 +19,7 @@
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
 
-#include <vae/vae_utils.hpp>
+#include "vae_utils.hpp"
 
 #include <ensmallen.hpp>
 

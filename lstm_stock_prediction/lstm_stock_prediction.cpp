@@ -46,11 +46,8 @@ using namespace mlpack;
 using namespace mlpack::ann;
 using namespace ens;
 
-/**
- * Function to calcute MSE for arma::cube.
- */
 /*
- * Function to calcute MSE for arma::cube.
+ * Function to calculate MSE for arma::cube.
  */
 double MSE(arma::cube &pred, arma::cube &Y)
 {

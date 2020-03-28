@@ -55,3 +55,27 @@ mlpack and its dependencies installed.
 Each example should be easily runnable and should perform a simple machine
 learning task on a dataset.  You might need to download the dataset first---so
 be sure to check any README for the example.
+
+### 3. List of examples
+
+Below is a list of examples available in this repository along with a quick
+description (just a little bit more than the title):
+
+ - `lstm_electricity_consumption`: use an LSTM-based recurrent neural network to
+   predict electricity consumption
+
+ - `lstm_stock_prediction`: predict Google's historical stock price (daily high
+   _and_ low) using an LSTM-based recurrent neural network
+
+ - `mnist_batch_norm`: use batch normalization in a simple feedforward neural
+   network to recognize the MNIST digits
+
+ - `mnist_cnn`: use a convolutional neural network (CNN) similar to LeNet-5 to
+   recognize the MNIST digits
+
+ - `mnist_simple`: use a very simple three-layer feedforward neural network with
+   dropout to recognize the MNIST digits
+
+ - `mnist_vae_cnn`: use a variational autoencoder with convolutional neural
+   networks in the encoder and reparametrization networks to recognize the MNIST
+   digits

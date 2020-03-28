@@ -20,7 +20,7 @@
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/glorot_init.hpp>
 
-#include <Kaggle/kaggle_utils.hpp>
+#include "kaggle_utils.hpp"
 
 #include <ensmallen.hpp>
 
