@@ -21,8 +21,6 @@
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/glorot_init.hpp>
 
-#include "kaggle_utils.hpp"
-
 #include <ensmallen.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 
@@ -134,7 +132,7 @@ int main()
   // Getting predictions on training data points.
   model.Predict(trainX, predOut);
   // Calculating accuracy on training data points.
-  Row<size_t> predLabels = getLabels(predOut);
+  predOut = arma::round(predOut);
   double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
@@ -166,7 +164,7 @@ int main()
             << std::endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("../Kaggle/results.csv", "ImageId,Label", testPred);
+  testPred.save("../Kaggle/results.csv", arma::csv_ascii);
 
   std::cout << "Results were saved to \"../Kaggle/results.csv\" and could be "
                "uploaded to "
