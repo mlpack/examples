@@ -16,6 +16,7 @@ install:
 #  - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
 script:
 #  - make -j2
+  - echo "currently not doing anything for build!"
 
 notifications:
   email:
