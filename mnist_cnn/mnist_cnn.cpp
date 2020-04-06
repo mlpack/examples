@@ -190,17 +190,17 @@ int main()
   predLabels = getLabels(predOut);
   double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
 
-  cout << "Training Accuracy = " << trainAccuracy << "%,"
-       << "\tValidation Accuracy = " << validAccuracy << "%" << endl;
+  std::cout << "Accuracy: train = " << trainAccuracy << "%,"
+       << "\t valid = " << validAccuracy << "%" << std::endl;
 
   mlpack::data::Save("model.bin", "model", model, false);  
 
-  cout << "Predicting ..." << endl;
+  std::cout << "Predicting ..." << std::endl;
 
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/test.csv", tempDataset, true);
+  data::Load("../data/test.csv", tempDataset, true);
 
   // As before, it's necessary to get rid of column headings.
   mat testX =
@@ -212,11 +212,10 @@ int main()
   model.Predict(testX, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  cout << "Saving predicted labels to results.csv." << endl;
+  std::cout << "Saving predicted labels to \"results.csv.\"..."<< std::endl;
 
   // Saving results into Kaggle compatibe CSV file.
-  save("Kaggle/results.csv", "ImageId,Label", testPred);
-  cout << "Results were saved to Kaggle/results.csv. This file can be uploaded "
-          "to "
-       << "https://www.kaggle.com/c/digit-recognizer/submissions." << endl;
+  testPred.save("results.csv", arma::csv_ascii);
+  std::cout << "Neural network model is saved to \"model.bin\""<< std::endl;
+  std::cout << "Finished" << std::endl;
 }

@@ -167,7 +167,7 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
 
-  data::Load("../Kaggle/data/test.csv", tempDataset, true);
+  mlpack::data::Load("../data/test.csv", tempDataset, true);
 
   mat testX =
       tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
@@ -177,14 +177,8 @@ int main()
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  std::cout << "Saving predicted labels to \"Kaggle/results.csv\" ..." << endl;
-
-  // Saving results into Kaggle compatibe CSV file.
-  save("Kaggle/results.csv", "ImageId,Label", testPred);
-
-  std::cout << "Results were saved to \"results.csv\" and could be uploaded to "
-            << "https://www.kaggle.com/c/digit-recognizer/submissions for a "
-               "competition"
-            << endl;
+  std::cout << "Saving predicted labels to \"results.csv\"" << endl;
+  testPred.save("results.csv", arma::csv_ascii);
+  std::cout << "Neural network model is saved to \"model.bin\""<< std::endl;
   std::cout << "Finished" << endl;
 }

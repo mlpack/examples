@@ -141,14 +141,14 @@ int main()
   double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
-            << " Valid = " << validAccuracy << "%" << endl;
+            << "\t valid = " << validAccuracy << "%" << endl;
 
   mlpack::data::Save("model.bin", "model", model, false);
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
   arma::mat testingDataset;
-  mlpack::data::Load("../Kaggle/data/test.csv", testingDataset, true);
+  mlpack::data::Load("../data/test.csv", testingDataset, true);
 
   // As before, it's necessary to get rid of header.
   arma::mat testX = testingDataset.submat(
@@ -160,18 +160,10 @@ int main()
   model.Predict(testX, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  std::cout << "Saving predicted labels to \"Kaggle/results.csv\" ..."
+  std::cout << "Saving predicted labels to \"results.csv\" ..."
             << std::endl;
 
-  // Saving results into Kaggle compatibe CSV file.
-  testPred.save("../Kaggle/results.csv", arma::csv_ascii);
-
-  std::cout << "Results were saved to \"../Kaggle/results.csv\" and could be "
-               "uploaded to "
-            << "https://www.kaggle.com/c/digit-recognizer/submissions for a "
-               "competition"
-            << std::endl;
-  std::cout << "Neural network model is saved to \"../Kaggle/model.txt\""
-            << std::endl;
+  testPred.save("results.csv", arma::csv_ascii);
+  std::cout << "Neural network model is saved to \"model.bin\""<< std::endl;
   std::cout << "Finished" << std::endl;
 }
