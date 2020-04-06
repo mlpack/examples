@@ -52,7 +52,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("Kaggle/data/train.csv", tempDataset, true);
+  data::Load("../data/train.csv", tempDataset, true);
 
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
