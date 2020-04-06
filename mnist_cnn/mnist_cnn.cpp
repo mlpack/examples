@@ -29,6 +29,16 @@ using namespace std;
 
 using namespace ens;
 
+arma::Row<size_t> getLabels(arma::mat predOut)
+{
+  arma::Row<size_t> predLabels(predOut.n_cols);
+  for (arma::uword i = 0; i < predOut.n_cols; ++i)
+  {
+    predLabels(i) = predOut.col(i).index_max();
+  }
+  return predLabels;
+}
+
 int main()
 {
   // Dataset is randomly split into validation
@@ -182,7 +192,7 @@ int main()
   // Get predictions on training data points.
   model.Predict(trainX, predOut);
   // Calculate accuracy on training data points.
-  Row<size_t> predLabels = getLabels(predOut);
+  arma::Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;
   // Get predictions on validating data points.
   model.Predict(validX, predOut);
@@ -191,9 +201,9 @@ int main()
   double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
-       << "\t valid = " << validAccuracy << "%" << std::endl;
+            << "\t valid = " << validAccuracy << "%" << std::endl;
 
-  mlpack::data::Save("model.bin", "model", model, false);  
+  mlpack::data::Save("model.bin", "model", model, false);
 
   std::cout << "Predicting ..." << std::endl;
 
@@ -212,10 +222,10 @@ int main()
   model.Predict(testX, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  std::cout << "Saving predicted labels to \"results.csv.\"..."<< std::endl;
+  std::cout << "Saving predicted labels to \"results.csv.\"..." << std::endl;
 
   // Saving results into Kaggle compatibe CSV file.
   testPred.save("results.csv", arma::csv_ascii);
-  std::cout << "Neural network model is saved to \"model.bin\""<< std::endl;
+  std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
   std::cout << "Finished" << std::endl;
 }
