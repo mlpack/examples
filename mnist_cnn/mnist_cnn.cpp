@@ -193,12 +193,12 @@ int main()
   model.Predict(trainX, predOut);
   // Calculate accuracy on training data points.
   arma::Row<size_t> predLabels = getLabels(predOut);
-  double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem;
+  double trainAccuracy = arma::accu(predLabels == trainY) / trainY.n_elem * 100;
   // Get predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculate accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem;
+  double validAccuracy = arma::accu(predLabels == validY) / validY.n_elem * 100;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << std::endl;
