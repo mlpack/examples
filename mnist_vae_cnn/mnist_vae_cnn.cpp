@@ -29,10 +29,10 @@ using namespace mlpack::ann;
 using namespace ens;
 
 // Convenience typedefs
-typedef FFN<ReconstructionLoss<arma::mat,
-                               arma::mat,
-                               BernoulliDistribution<arma::mat> >,
-            HeInitialization> ReconModel;
+typedef FFN<
+    ReconstructionLoss<arma::mat, arma::mat, BernoulliDistribution<arma::mat>>,
+    HeInitialization>
+    ReconModel;
 
 typedef FFN<MeanSquaredError<>, HeInitialization> MeanSModel;
 
@@ -46,15 +46,13 @@ int main()
   constexpr int batchSize = 64;
   // The step size of the optimizer.
   constexpr double stepSize = 0.001;
-  // The number of interations per cycle.
-  constexpr int iterPerCycle = 56000;
-  // Number of cycles.
-  constexpr int cycles = 10;
+  // The maximum number of possible iteration
+  constexpr int maxIteration = 0;
   // Whether to load a model to train.
   constexpr bool loadModel = false;
   // Whether to save the trained model.
   constexpr bool saveModel = true;
-    // Whether to convert to binary MNIST.
+  // Whether to convert to binary MNIST.
   constexpr bool isBinary = false;
 
   std::cout << "Reading data ..." << std::endl;
@@ -62,13 +60,13 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("vae/mnist_full.csv", fullData, true, false);
+  data::Load("mnist_full.csv", fullData, true, false);
   fullData /= 255.0;
 
   if (isBinary)
   {
-    fullData = arma::conv_to<arma::mat>::from(arma::randu<arma::mat>
-        (fullData.n_rows, fullData.n_cols) <= fullData);
+    fullData = arma::conv_to<arma::mat>::from(
+        arma::randu<arma::mat>(fullData.n_rows, fullData.n_cols) <= fullData);
   }
   else
     fullData = (fullData - 0.5) * 2;
@@ -117,7 +115,7 @@ int main()
   {
     // To use a Sequential object as the first layer, we need to add an
     // identity layer before it.
-    vaeModel.Add<IdentityLayer<> >();
+    vaeModel.Add<IdentityLayer<>>();
 
     /*
      * Encoder.
@@ -125,57 +123,56 @@ int main()
     Sequential<>* encoder = new Sequential<>();
 
     // Add the first convolution layer.
-    encoder->Add<Convolution<> >(
-        1,  // Number of input activation maps
-        16, // Number of output activation maps.
-        5,  // Filter width.
-        5,  // Filter height.
-        2,  // Stride along width.
-        2,  // Stride along height.
-        2,  // Padding width.
-        2,  // Padding height.
-        28, // Input width.
-        28);// Input height.
+    encoder->Add<Convolution<>>(1,   // Number of input activation maps
+                                16,  // Number of output activation maps.
+                                5,   // Filter width.
+                                5,   // Filter height.
+                                2,   // Stride along width.
+                                2,   // Stride along height.
+                                2,   // Padding width.
+                                2,   // Padding height.
+                                28,  // Input width.
+                                28); // Input height.
 
     // Add first ReLU.
-    encoder->Add<LeakyReLU<> >();
+    encoder->Add<LeakyReLU<>>();
     // Add the second convolution layer.
-    encoder->Add<Convolution<> >(16, 24, 5, 5, 1, 1, 0, 0, 14, 14);
+    encoder->Add<Convolution<>>(16, 24, 5, 5, 1, 1, 0, 0, 14, 14);
     // Add the second ReLU.
-    encoder->Add<LeakyReLU<> >();
+    encoder->Add<LeakyReLU<>>();
     // Add the final dense layer.
-    encoder->Add<Linear<> >(10*10*24, 2 * latentSize);
+    encoder->Add<Linear<>>(10 * 10 * 24, 2 * latentSize);
 
     vaeModel.Add(encoder);
 
     /*
      * Reparamterization layer.
      */
-    vaeModel.Add<Reparametrization<> >(latentSize);
+    vaeModel.Add<Reparametrization<>>(latentSize);
 
     /*
      * Decoder.
      */
     Sequential<>* decoder = new Sequential<>();
 
-    decoder->Add<Linear<> >(latentSize, 10*10*24);
-    decoder->Add<LeakyReLU<> >();
+    decoder->Add<Linear<>>(latentSize, 10 * 10 * 24);
+    decoder->Add<LeakyReLU<>>();
 
     // Add the first transposed convolution(deconvolution) layer.
-    decoder->Add<TransposedConvolution<> >(
-        24, // Number of input activation maps.
-        16, // Number of output activation maps.
-        5,  // Filter width.
-        5,  // Filter height.
-        1,  // Stride along width.
-        1,  // Stride along height.
-        0,  // Padding width.
-        0,  // Padding height.
-        10, // Input width.
-        10);// Input height.
+    decoder->Add<TransposedConvolution<>>(
+        24,  // Number of input activation maps.
+        16,  // Number of output activation maps.
+        5,   // Filter width.
+        5,   // Filter height.
+        1,   // Stride along width.
+        1,   // Stride along height.
+        0,   // Padding width.
+        0,   // Padding height.
+        10,  // Input width.
+        10); // Input height.
 
-    decoder->Add<LeakyReLU<> >();
-    decoder->Add<TransposedConvolution<> >(16, 1, 15, 15, 1, 1, 1, 1, 14, 14);
+    decoder->Add<LeakyReLU<>>();
+    decoder->Add<TransposedConvolution<>>(16, 1, 15, 15, 1, 1, 1, 1, 14, 14);
 
     vaeModel.Add(decoder);
   }
@@ -189,11 +186,11 @@ int main()
     // Number of data points that are used in each iteration.
     batchSize,
     // Max number of iterations.
-    iterPerCycle,
+    maxIteration,
     // Tolerance, used as a stopping condition. This small number means we never
     // stop by this condition and continue to optimize up to reaching maximum of
     // iterations.
-    1e-8,
+    -1,
     // Shuffle, If optimizer should take random data points from the dataset at
     // each iteration.
     true,
@@ -203,26 +200,19 @@ int main()
   std::cout << "Initial loss -> " <<
       MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
 
-  const clock_t begin_time = clock();
+  // Train neural network. If this is the first iteration, weights are
+  // random, using current values as starting point otherwise.
+  vaeModel.Train(train,
+                 train,
+                 optimizer,
+                 ens::PrintLoss(),
+                 ens::ProgressBar(),
+                 // Stop the training using Early Stop at min loss.
+                 ens::EarlyStopAtMinLoss());
 
-  // Cycles for monitoring the progress.
-  for (int i = 0; i < cycles; i++)
-  {
-    // Train neural network. If this is the first iteration, weights are
-    // random, using current values as starting point otherwise.
-    vaeModel.Train(train, train, optimizer);
-
-    // Don't reset optimizer's parameters between cycles.
-    optimizer.ResetPolicy() = false;
-
-    std::cout << "Loss after cycle  " << i << " -> " <<
-        MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
-    std::cout << "Time taken for cycle -> " << float(clock() - begin_time) /
-        CLOCKS_PER_SEC << " seconds" << std::endl;
-  }
-
-  std::cout << "Time taken to train -> " << float(clock() - begin_time) /
-      CLOCKS_PER_SEC << " seconds" << std::endl;
+  std::cout << "Time taken to train -> "
+            << float(clock() - begin_time) / CLOCKS_PER_SEC << " seconds"
+            << std::endl;
 
   // Save the model if specified.
   if (saveModel)
