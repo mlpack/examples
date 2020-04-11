@@ -1,38 +1,29 @@
-BIN_PATH := .
-OBJ_PATH := obj
-SRC_PATH := .
+# This is a simple Makefile used to build the example source code.
+# This example might requires some modifications in order to work correctly on
+# your system.
+# If you're not using the Armadillo wrapper, replace `armadillo` with linker commands
+# for the BLAS and LAPACK libraries that you are using.
 
-TARGET_NAME := mnist_simple
-TARGET := $(BIN_PATH)/$(TARGET_NAME)
-MAIN_SRC := mnist_simple.cpp
-LIBS_NAME := armadillo mlpack boost_program_options boost_serialization
+TARGET := mnist_simple
+SRC := mnist_simple.cpp
+LIBS_NAME := armadillo mlpack boost_serialization
 
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra -fopenmp
+CXXFLAGS := -std=c++11 -Wall -Wextra
 LDFLAGS  := -fopenmp
 DBGFLAG := -g
+INCLFLAGS := -I . # Add header directories if there is any.
 
-SRCS := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*,.cpp)))
-OBJS := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRCS)))))
+OBJS := $(SRC:.c=.o)
 LIBS := $(addprefix -l,$(LIBS_NAME))
-
-DISTCLEAN_LIST := $(OBJS)
-
-CLEAN_LIST := $(TARGET) \
-			  $(DISTCLEAN_LIST)
+CLEAN_LIST := $(TARGET)
 
 # default rule
 default: all
 
-#Linking
 $(TARGET): $(OBJS)
-	$(CXX) $(OBJS) $(LIBS) $(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) $(INCLFLAGS) $(LIBS) $(LDFLAGS) $(OBJS) -o $(TARGET)
 
-#Compiling
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c*
-	$(CXX) $(CXXFLAGS) -MP -MMD -c $< -o $@ 
-
-# phony rules
 .PHONY: all
 all: $(TARGET)
 
@@ -40,8 +31,3 @@ all: $(TARGET)
 clean:
 	@echo CLEAN $(CLEAN_LIST)
 	@rm -f $(CLEAN_LIST)
-
-.PHONY: distclean
-distclean:
-	@echo CLEAN $(CLEAN_LIST)
-	@rm -f $(DISTCLEAN_LIST)
