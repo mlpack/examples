@@ -4,3 +4,5 @@ xcode*
 .idea
 cmake-build-*
 .*.sw*
+*.csv
+*.bin
