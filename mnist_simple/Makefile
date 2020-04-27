@@ -14,7 +14,7 @@ LDFLAGS  := -fopenmp
 DBGFLAG := -g
 INCLFLAGS := -I . # Add header directories if there is any.
 
-OBJS := $(SRC:.c=.o)
+OBJS := $(SRC:.cpp=.o)
 LIBS := $(addprefix -l,$(LIBS_NAME))
 CLEAN_LIST := $(TARGET)
 
