@@ -13,7 +13,8 @@ CXXFLAGS := -std=c++11 -Wall -Wextra -O3 -DNDEBUG
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and without optimizations.
 # CXXFLAGS := -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  := -fopenmp
-INCLFLAGS := -I . # Add header directories if there is any.
+# LDFLAGS := -L/path/to/mlpack/library/    # if installed locally
+INCLFLAGS := -I . #Add header directories for any includes that aren't on the default compiler search path.
 
 OBJS := $(SRC:.cpp=.o)
 LIBS := $(addprefix -l,$(LIBS_NAME))
@@ -23,7 +24,7 @@ CLEAN_LIST := $(TARGET)
 default: all
 
 $(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCLFLAGS) $(LIBS) $(LDFLAGS) $(OBJS) -o $(TARGET)
+	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET) $(INCLFLAGS) $(LIBS) $(LDFLAGS)
 
 .PHONY: all
 all: $(TARGET)
