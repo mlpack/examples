@@ -20,7 +20,7 @@ MNIST dataset contains images of handwritten digits. It is one of the most commo
 <img  alt="A visualization of the sample image at index 7777"  src="https://miro.medium.com/max/490/1*nlfLUgHUEj5vW7WVJpxY-g.png">
 </p>
 <p  align="center">
-<i>A visualization of the sample image at index 7777.<i/>
+<i>A visualization of the sample image at index 7777.</i>
 </p>
 
 <br/>
