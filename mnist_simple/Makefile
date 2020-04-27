@@ -9,9 +9,10 @@ SRC := mnist_simple.cpp
 LIBS_NAME := armadillo mlpack boost_serialization
 
 CXX := g++
-CXXFLAGS := -std=c++11 -Wall -Wextra
+CXXFLAGS := -std=c++11 -Wall -Wextra -O3 -DNDEBUG
+# Use these CXXFLAGS instead if you want to compile with debugging symbols and without optimizations.
+# CXXFLAGS := -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  := -fopenmp
-DBGFLAG := -g
 INCLFLAGS := -I . # Add header directories if there is any.
 
 OBJS := $(SRC:.cpp=.o)
