@@ -18,7 +18,7 @@ INCLFLAGS := -I . #Add header directories for any includes that aren't on the de
 
 OBJS := $(SRC:.cpp=.o)
 LIBS := $(addprefix -l,$(LIBS_NAME))
-CLEAN_LIST := $(TARGET)
+CLEAN_LIST := $(TARGET) $(OBJS)
 
 # default rule
 default: all
