@@ -14,7 +14,9 @@ CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
 # CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
 # LDFLAGS += -L/path/to/mlpack/library/    # If installed locally.
-INCLFLAGS := -I . #Add header directories for any includes that aren't on the default compiler search path.
+# Add header directories for any includes that aren't on the default compiler
+# search path.
+INCLFLAGS := -I .
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
