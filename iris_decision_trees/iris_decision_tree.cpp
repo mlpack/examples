@@ -39,18 +39,18 @@ int main(){
   validY = arma::conv_to<arma::Row<size_t>>::from(
           valid.row(train.n_rows-1));
 
-		// Number of classes in the dataset.			
-    const size_t numClasses = arma::max(arma::max(trainY)) + 1;
-		// Minimum leaf size for decision trees.
-    const size_t minLeafSize = 3;
-		// Maximum depth of decision tree.
-    const size_t maxDepth = 15;
+	// Number of classes in the dataset.			
+  const size_t numClasses = arma::max(arma::max(trainY)) + 1;
+	// Minimum leaf size for decision trees.
+  const size_t minLeafSize = 3;
+	// Maximum depth of decision tree.
+  const size_t maxDepth = 15;
 
-		// Minimum gain required for split
-    const double minGainSplit =-1;
+	// Minimum gain required for split
+  const double minGainSplit =-1;
 
-		// Building the model.
-    DecisionTree<> model = DecisionTree<>(  trainX,				// Independent variables
+	// Building the model.
+  DecisionTree<> model = DecisionTree<>(    trainX,				// Independent variables
                                             trainY,				// Dependent variables
                                             numClasses, 	// number of classes
                                             minLeafSize,	// minimum leaf size
@@ -66,15 +66,13 @@ int main(){
 	model.Classify(validX, predictions, probabilities);
 
   // calculating number of correct points.
-	size_t correct = 0;
-      for (size_t i = 0; i < validY.n_cols; ++i)
-        if (predictions[i] == validY[i])
-          ++correct;
 
-      // Print number of correct points.
-      cout << double(correct) / double(validX.n_cols) * 100 << "% "
-          << "correct on test set (" << correct << " / " << validX.n_cols
-          << ")." << endl;
+  const size_t correct = arma::accu(predictions == validY);
+
+  // Print number of correct points.
+  cout<< double(correct) / double(validX.n_cols) * 100 << "% "
+      << "correct on test set (" << correct << " / " << validX.n_cols
+      << ")." << endl;
 	
 	return 0;
 }
