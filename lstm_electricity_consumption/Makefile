@@ -10,10 +10,11 @@ LIBS_NAME := armadillo mlpack boost_serialization
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
-# Use these CXXFLAGS instead if you want to compile with debugging symbols and without optimizations.
+# Use these CXXFLAGS instead if you want to compile with debugging symbols
+# and without optimizations.
 # CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
-# LDFLAGS += -L/path/to/mlpack/library/    # If installed locally.
+LDFLAGS += -L . # /path/to/mlpack/library/  # If installed locally.
 # Add header directories for any includes that aren't on the default compiler
 # search path.
 INCLFLAGS := -I .
