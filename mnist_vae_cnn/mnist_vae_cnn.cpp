@@ -210,10 +210,6 @@ int main()
                  // Stop the training using Early Stop at min loss.
                  ens::EarlyStopAtMinLoss());
 
-  std::cout << "Time taken to train -> "
-            << float(clock() - begin_time) / CLOCKS_PER_SEC << " seconds"
-            << std::endl;
-
   // Save the model if specified.
   if (saveModel)
   {
