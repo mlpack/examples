@@ -6,3 +6,6 @@ cmake-build-*
 .*.sw*
 *.csv
 *.bin
+*.o
+*.a
+*.so
