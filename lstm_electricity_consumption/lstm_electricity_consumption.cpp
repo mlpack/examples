@@ -240,14 +240,16 @@ int main()
       model.Add<Linear<> >(H1, outputSize);
     }
 
-    // Set parameters for the Stochastic Gradient Descent (SGD) optimizer.
-    SGD<AdamUpdate> optimizer(
-        STEP_SIZE, // Step size of the optimizer.
-        BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
-        trainData.n_cols * EPOCHS, // Max number of iterations.
-        1e-8, // Tolerance.
-        true, // Shuffle.
-        AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
+    // Set parameters for the Adam optimizer.
+    ens::Adam optimizer(
+    STEP_SIZE, // Step size of the optimizer.
+    BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
+    0.9, // Exponential decay rate for the first moment estimates.
+    0.999, // Exponential decay rate for the weighted infinity norm estimates.
+    1e-8, // Value used to initialise the mean squared gradient parameter.
+    trainData.n_cols * EPOCHS, // Max number of iterations.
+    1e-8, // Tolerance.
+    true);
 
     // Instead of terminating based on the tolerance of the objective function,
     // we'll depend on the maximum number of iterations, and terminate early using

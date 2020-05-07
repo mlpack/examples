@@ -158,23 +158,16 @@ int main()
 
   cout << "Start training ..." << endl;
 
-  // Set parameters of Stochastic Gradient Descent (SGD) optimizer.
-  SGD<AdamUpdate> optimizer(
-      // Step size of the optimizer.
-      STEP_SIZE,
-      // Batch size. Number of data points that are used in each iteration.
-      BATCH_SIZE,
-      // Max number of iterations.
-      MAX_ITERATIONS,
-      // Tolerance, used as a stopping condition. Such a small value
-      // means we almost never stop by this condition, and continue gradient
-      // descent until the maximum number of iterations is reached.
-      -1,
-      // Shuffle. If optimizer should take random data points from the dataset
-      // at each iteration.
-      true,
-      // Adam update policy.
-      AdamUpdate(1e-8, 0.9, 0.999));
+  // Set parameters for the Adam optimizer.
+  ens::Adam optimizer(
+      STEP_SIZE, // Step size of the optimizer.
+      BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
+      0.9, // Exponential decay rate for the first moment estimates.
+      0.999, // Exponential decay rate for the weighted infinity norm estimates.
+      1e-8, // Value used to initialise the mean squared gradient parameter.
+      MAX_ITERATIONS, // Max number of iterations.
+      1e-8, // Tolerance.
+      true);
 
   // Train the CNN model. If this is the first iteration, weights are
   // randomly initialized between -1 and 1. Otherwise, the values of weights
