@@ -68,7 +68,7 @@ int main()
   const std::string modelFile = "nn_regressor.bin";
 
   // Testing data is taken from the dataset in this ratio.
-  constexpr double RATIO = 0.1; //25%
+  constexpr double RATIO = 0.1; //10%
 
   //! - H1: The number of neurons in the 1st layer.
   constexpr int H1 = 64;
@@ -131,8 +131,7 @@ int main()
   // Only train the model if required.
   if (bTrain || bLoadAndTrain)
   {
-    // Specifying the NN model. RandomInitialization means that initial weights in neurons
-    // are generated randomly in the interval from -1 to 1.
+    // Specifying the NN model.
     FFN<MeanSquaredError<>, HeInitialization> model;
     if (bLoadAndTrain)
     {
@@ -143,33 +142,35 @@ int main()
     else
     {
       // This intermediate layer is needed for connection between input
-      // data and the next TanHLayer layer.
+      // data and the next LeakyReLU layer.
       // Parameters specify the number of input features and number of
       // neurons in the next layer.
       model.Add<Linear<>>(trainX.n_rows, H1);
       // Activation layer:
       model.Add<LeakyReLU<>>();
-      // Connection layer between two activation layers
+      // Connection layer between two activation layers.
       model.Add<Linear<>>(H1, H2);
-      // Activation layer
+      // Activation layer.
       model.Add<LeakyReLU<>>();
-      // Connection layer
+      // Connection layer.
       model.Add<Linear<>>(H2, H3);
-      // Activation layer
+      // Activation layer.
       model.Add<LeakyReLU<>>();
-      // Connection layer => output
+      // Connection layer => output.
       // The output of one neuron is the regression output for one record.
       model.Add<Linear<>>(H3, 1);
     }
 
     // Set parameters for the Stochastic Gradient Descent (SGD) optimizer.
-    SGD<AdamUpdate> optimizer(
+    ens::Adam optimizer(
         STEP_SIZE, // Step size of the optimizer.
-        BATCH_SIZE, // Number of data points that are used in each iteration.
+        BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
+        0.9, // Exponential decay rate for the first moment estimates.
+        0.999, // Exponential decay rate for the weighted infinity norm estimates.
+        1e-8, // Value used to initialise the mean squared gradient parameter.
         trainData.n_cols * EPOCHS, // Max number of iterations.
-        STOP_TOLERANCE,// Tolerance.
-        true, // Shuffle.
-        AdamUpdate(1e-8, 0.9, 0.999)); // Adam update policy.
+        1e-8,// Tolerance.
+        true);
 
     model.Train(trainX,
                 trainY,
