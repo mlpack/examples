@@ -45,6 +45,7 @@
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
+#include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <ensmallen.hpp>
 
 using namespace mlpack;
@@ -62,26 +63,26 @@ double MSE(arma::mat& pred, arma::mat& Y)
 int main()
 {
   //! Path to the dataset used for training and testing.
-  const std::string datasetPath = "bodyfat.tsv";
+  const std::string datasetPath = "./../data/bodyfat.tsv";
   // File for saving the model.
   const std::string modelFile = "nn_regressor.bin";
 
   // Testing data is taken from the dataset in this ratio.
-  constexpr double RATIO = 0.01; //1%
+  constexpr double RATIO = 0.1; //25%
 
   //! - H1: The number of neurons in the 1st layer.
-  constexpr int H1 = 200;
+  constexpr int H1 = 64;
   //! - H2: The number of neurons in the 2nd layer.
-  constexpr int H2 = 150;
+  constexpr int H2 = 128;
   //! - H3: The number of neurons in the 3rd layer.
-  constexpr int H3 = 80;
+  constexpr int H3 = 64;
 
   // Number of epochs for training.
-  const int EPOCHS = 100;
+  const int EPOCHS = 300;
   //! - STEP_SIZE: Step size of the optimizer.
-  constexpr double STEP_SIZE = 5e-5;
+  constexpr double STEP_SIZE = 5e-2;
   //! - BATCH_SIZE: Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 16;
+  constexpr int BATCH_SIZE = 32;
   //! - STOP_TOLERANCE: Stop tolerance;
   // A very small number implies that we do all iterations.
   constexpr double STOP_TOLERANCE = 1e-8;
@@ -132,7 +133,7 @@ int main()
   {
     // Specifying the NN model. RandomInitialization means that initial weights in neurons
     // are generated randomly in the interval from -1 to 1.
-    FFN<MeanSquaredError<>, RandomInitialization> model;
+    FFN<MeanSquaredError<>, HeInitialization> model;
     if (bLoadAndTrain)
     {
       // The model will be trained further.
@@ -147,15 +148,15 @@ int main()
       // neurons in the next layer.
       model.Add<Linear<>>(trainX.n_rows, H1);
       // Activation layer:
-      model.Add<TanHLayer<>>();
+      model.Add<LeakyReLU<>>();
       // Connection layer between two activation layers
       model.Add<Linear<>>(H1, H2);
       // Activation layer
-      model.Add<TanHLayer<>>();
+      model.Add<LeakyReLU<>>();
       // Connection layer
       model.Add<Linear<>>(H2, H3);
       // Activation layer
-      model.Add<TanHLayer<>>();
+      model.Add<LeakyReLU<>>();
       // Connection layer => output
       // The output of one neuron is the regression output for one record.
       model.Add<Linear<>>(H3, 1);
@@ -180,7 +181,7 @@ int main()
                 // Stops the optimization process if the loss stops decreasing
                 // or no improvement has been made. This will terminate the
                 // optimization once we obtain a minima on training set.
-                ens::EarlyStopAtMinLoss());
+                ens::EarlyStopAtMinLoss(20));
 
     std::cout << "Finished training. \n Saving Model" << std::endl;
     data::Save(modelFile, "NNRegressor", model);
@@ -190,7 +191,7 @@ int main()
   // NOTE: the code below is added in order to show how in a real application
   // the model would be saved, loaded and then used for prediction.
   // The following steps will be performed after normalizing the dataset.
-  FFN<MeanSquaredError<>, RandomInitialization> modelP;
+  FFN<MeanSquaredError<>, HeInitialization> modelP;
   // Load weights into the model.
   data::Load(modelFile, "NNRegressor", modelP);
 
@@ -204,7 +205,7 @@ int main()
   std::cout << "Mean Squared Error on Prediction data points: " << validMSE << std::endl;
 
   // Save the prediction results.
-  bool saved = data::Save("results.tsv", predOut, true);
+  bool saved = data::Save("results.csv", predOut, true);
 
   if (!saved)
     std::cout << "Results have not been saved." << std::endl;
