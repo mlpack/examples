@@ -78,7 +78,7 @@ int main()
   constexpr int H3 = 64;
 
   // Number of epochs for training.
-  const int EPOCHS = 300;
+  const int EPOCHS = 100;
   //! - STEP_SIZE: Step size of the optimizer.
   constexpr double STEP_SIZE = 5e-2;
   //! - BATCH_SIZE: Number of data points in each iteration of SGD.
@@ -122,11 +122,18 @@ int main()
   arma::mat validY = validData.row(0);
 
   // Scale all data into the range (0, 1) for increased numerical stability.
-  data::MinMaxScaler scale;
+  data::MinMaxScaler scaleX;
+  // Scaler for predictions.
+  data::MinMaxScaler scaleY;
   // Fit scaler only on training data.
-  scale.Fit(trainX);
-  scale.Transform(trainX, trainX);
-  scale.Transform(validX, validX);
+  scaleX.Fit(trainX);
+  scaleX.Transform(trainX, trainX);
+  scaleX.Transform(validX, validX);
+
+  // Scale training predictions.
+  scaleY.Fit(trainY);
+  scaleY.Transform(trainY, trainY);
+  scaleY.Transform(validY, validY);
 
   // Only train the model if required.
   if (bTrain || bLoadAndTrain)
@@ -169,7 +176,7 @@ int main()
         0.999, // Exponential decay rate for the weighted infinity norm estimates.
         1e-8, // Value used to initialise the mean squared gradient parameter.
         trainData.n_cols * EPOCHS, // Max number of iterations.
-        1e-8,// Tolerance.
+        STOP_TOLERANCE,// Tolerance.
         true);
 
     model.Train(trainX,
@@ -205,6 +212,8 @@ int main()
   double validMSE = MSE(validY, predOut);
   std::cout << "Mean Squared Error on Prediction data points: " << validMSE << std::endl;
 
+  // To get meaningful predictions we need to undo the scaling operation on predictions.
+  scaleY.InverseTransform(predOut, predOut);
   // Save the prediction results.
   bool saved = data::Save("results.csv", predOut, true);
 
