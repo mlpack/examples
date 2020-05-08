@@ -191,7 +191,7 @@ int main()
                 // optimization once we obtain a minima on training set.
                 ens::EarlyStopAtMinLoss(20));
 
-    std::cout << "Finished training. \n Saving Model" << std::endl;
+    std::cout << "Finished training. \nSaving Model" << std::endl;
     data::Save(modelFile, "NNRegressor", model);
     std::cout << "Model saved in " << modelFile << std::endl;
   }

@@ -2,6 +2,7 @@ build*
 xcode*
 .DS_Store
 .idea
+.ipynb_checkpoints
 cmake-build-*
 .*.sw*
 *.csv
