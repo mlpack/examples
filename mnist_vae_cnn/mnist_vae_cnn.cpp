@@ -60,7 +60,7 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("mnist_full.csv", fullData, true, false);
+  data::Load("./../data/mnist_full.csv", fullData, true, false);
   fullData /= 255.0;
 
   if (isBinary)
@@ -179,23 +179,16 @@ int main()
 
   std::cout << "Training ..." << std::endl;
 
-  // Setting parameters for the Stochastic Gradient Descent (SGD) optimizer.
-  SGD<AdamUpdate> optimizer(
-    // Step size of the optimizer.
-    stepSize,
-    // Number of data points that are used in each iteration.
-    batchSize,
-    // Max number of iterations.
-    maxIteration,
-    // Tolerance, used as a stopping condition. This small number means we never
-    // stop by this condition and continue to optimize up to reaching maximum of
-    // iterations.
-    -1,
-    // Shuffle, If optimizer should take random data points from the dataset at
-    // each iteration.
-    true,
-    // Adam update policy.
-    AdamUpdate());
+  // Set parameters for the Adam optimizer.
+  ens::Adam optimizer(
+      stepSize, // Step size of the optimizer.
+      batchSize, // Batch size. Number of data points that are used in each iteration.
+      0.9, // Exponential decay rate for the first moment estimates.
+      0.999, // Exponential decay rate for the weighted infinity norm estimates.
+      1e-8, // Value used to initialise the mean squared gradient parameter.
+      maxIteration, // Max number of iterations.
+      1e-8, // Tolerance.
+      true);
 
   std::cout << "Initial loss -> " <<
       MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
