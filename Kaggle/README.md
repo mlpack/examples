@@ -51,7 +51,7 @@ After splitting the training dataset is stored in the _train_ matrix and validat
 
 ### Results Obtained on Different Models
 
-##### 1. DigitRecognizer
+##### 1. Mnist
 
 For more details related to the model, check out the **DigitRecognizer** Directory.
 
