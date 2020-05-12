@@ -35,7 +35,7 @@ After loading the dataset is stored in the _tempDataset_ Matrix.
 
 ```cpp
 mat tempDataset;
-data::Load("Kaggle/data/train.csv", tempDataset, true);
+data::Load("../data/train.csv", tempDataset, true);
 ```
 
 ##### 2. Splitting The Dataset
