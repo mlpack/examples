@@ -10,7 +10,7 @@ The MNIST dataset contains images of handwritten digits. It is one of the most c
 
 </p>
 <p  align="center">
-<i>Sample Images From The MNIST Database.<i/>
+<i>Sample Images From The MNIST Database.</i>
 </p>
 
 <br/>
