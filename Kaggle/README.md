@@ -63,8 +63,8 @@ For More Details related to the Model, check out the **DigitRecognizerBatchNorm*
 
 After running the model for 50 cycles, the model obatained the best validation set accuracy of **91.5952%**.
 
-##### 3. DigitRecognizerCNN
+##### 3. Mnist CNN
 
-For More Details related to the Model, check out the **DigitRecognizerCNN** Directory.
+For More Details related to the Model, check out the **mnist_cnn** Directory.
 
 After running the model for 20 cycles, the model obtained the best validation set accuracy of **92.8095%**.
