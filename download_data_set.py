@@ -83,7 +83,7 @@ def progress_bar(outputfile, request):
 def mnist_dataset():
   print("Start downloading the mnist dataset")
   train_features = requests.get(
-  "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz")
+      "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz")
   progress_bar("train_features.gz", train_features)
   ungzip("train_features.gz", "train_features.ubytes")
   
