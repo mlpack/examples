@@ -143,7 +143,7 @@ if __name__ == '__main__':
         prog='Download dataset script',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent('''\
-        Dataset script!
+        Dataset downloading script!
         --------------------------------
         This script is used to download the dataset required to run
         mlpack examples.
