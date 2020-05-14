@@ -161,7 +161,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_name', metavar="dataset name", type=str, help="Enter dataset name to download")
     args = parser.parse_args()
 
-    if len(sys.argv)==1:
+    if len(sys.argv) == 1:
       parser.print_help(sys.stderr)
       sys.exit(1)
 
