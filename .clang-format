@@ -1,3 +1,10 @@
+# version: 9.0
+# exclude: CMake/*
+# exclude: doc/*
+# exclude: .travis/config.hpp
+# include: *.h
+# include: *.hpp
+# include: *.cpp
 Language:        Cpp
 AccessModifierOffset: -1
 AlignAfterOpenBracket: Align
