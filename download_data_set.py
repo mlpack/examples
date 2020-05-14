@@ -107,8 +107,7 @@ def mnist_dataset():
   print("Converting features images...")
   convert("train_features.ubytes", "train_labels.ubytes", "mnist_train.csv", 60000)
   print("Converting label images...")
-  convert("test_features.ubytes", "test_labels.ubytes",
-  "mnist_test.csv", 10000)
+  convert("test_features.ubytes", "test_labels.ubytes", "mnist_test.csv", 10000)
   clean()
 
 def electricity_consumption_dataset():
