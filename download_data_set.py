@@ -93,7 +93,7 @@ def mnist_dataset():
   ungzip("train_labels.gz", "train_labels.ubytes")
 
   test_features = requests.get(
-  "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz")
+      "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz")
   progress_bar("test_features.gz", test_features)
   ungzip("test_features.gz", "test_features.ubytes")
   
