@@ -105,8 +105,7 @@ def mnist_dataset():
   print("Converting mnist ubytes images files into csv...")
   print("This might take a while...")
   print("Converting features images...")
-  convert("train_features.ubytes", "train_labels.ubytes",
-  "mnist_train.csv", 60000)
+  convert("train_features.ubytes", "train_labels.ubytes", "mnist_train.csv", 60000)
   print("Converting label images...")
   convert("test_features.ubytes", "test_labels.ubytes",
   "mnist_test.csv", 10000)
