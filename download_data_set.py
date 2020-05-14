@@ -24,18 +24,27 @@ def convert(imgf, labelf, outf, n):
     f.read(16)
     l.read(8)
     images = []
-
+    total_size = n
+    block_size = 1
+    t=tqdm(total=total_size, unit='iB', unit_scale=True)
     for i in range(n):
         image = [ord(l.read(1))]
+        t.update(1)
         for j in range(28*28):
             image.append(ord(f.read(1)))
         images.append(image)
+    t.close()
 
+    total_size = len(images)
+    block_size = 1
+    t=tqdm(total=total_size, unit='iB', unit_scale=True)
     for image in images:
         o.write(",".join(str(pix) for pix in image)+"\n")
+        t.update(1)
     f.close()
     o.close()
     l.close()
+    t.close()
 
 def create_dataset_dir():
   if os.path.exists("data"):
@@ -95,8 +104,10 @@ def mnist_dataset():
 
   print("Converting mnist ubytes images files into csv...")
   print("This might take a while...")
+  print("Converting features images...")
   convert("train_features.ubytes", "train_labels.ubytes",
   "mnist_train.csv", 60000)
+  print("Converting label images...")
   convert("test_features.ubytes", "test_labels.ubytes",
   "mnist_test.csv", 10000)
   clean()
