@@ -8,6 +8,7 @@ import os
 import sys
 import tarfile
 import textwrap
+from tqdm import tqdm
 import requests
 import shutil
 
@@ -58,28 +59,42 @@ def ungzip(gzip_file, outputfile):
   with open(outputfile, 'wb') as f_in, gzip.open(gzip_file, 'rb') as f_out:
     shutil.copyfileobj(f_out, f_in) 
 
+def progress_bar(outputfile, request):
+  total_size = int(request.headers.get('content-length', 0))
+  block_size = 1024 #1 Kibibyte
+  t=tqdm(total=total_size, unit='iB', unit_scale=True)
+  with open(outputfile, 'wb') as f:
+    for data in request.iter_content(block_size):
+      t.update(len(data))
+      f.write(data)
+  t.close()
+  if total_size != 0 and t.n != total_size:
+    print("ERROR, something went wrong")
+
 def mnist_dataset():
   print("Start downloading the mnist dataset")
   train_features = requests.get(
   "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz")
-  open("train_features.gz", 'wb').write(train_features.content)
+  progress_bar("train_features.gz", train_features)
   ungzip("train_features.gz", "train_features.ubytes")
   
   train_labels = requests.get(
   "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz")
-  open("train_labels.gz", 'wb').write(train_labels.content)
+  progress_bar("train_labels.gz", train_labels)
   ungzip("train_labels.gz", "train_labels.ubytes")
 
   test_features = requests.get(
   "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz")
-  open("test_features.gz", 'wb').write(test_features.content)
+  progress_bar("test_features.gz", test_features)
   ungzip("test_features.gz", "test_features.ubytes")
   
   test_labels = requests.get(
   "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz")
-  open("test_labels.gz", 'wb').write(test_labels.content)
+  progress_bar("test_labels.gz", test_labels)
   ungzip("test_labels.gz", "test_labels.ubytes")
 
+  print("Converting mnist ubytes images files into csv...")
+  print("This might take a while...")
   convert("train_features.ubytes", "train_labels.ubytes",
   "mnist_train.csv", 60000)
   convert("test_features.ubytes", "test_labels.ubytes",
@@ -89,17 +104,17 @@ def mnist_dataset():
 def electricity_consumption_dataset():
   print("Download the electricty consumption example datasets")
   electricity = requests.get("https://www.mlpack.org/datasets/examples/electricity-usage.csv")
-  open("electricity-usage.csv", 'wb').write(electricity.content)
+  progress_bar("electricity-usage.csv", electricity)
 
 def stock_exchange_dataset():
   print("Download the stock exchange example datasets")
   stock = requests.get("https://www.mlpack.org/datasets/examples/Google2016-2019.csv")
-  open("stock.csv", 'wb').write(stock.content)
+  progress_bar("stock.csv", stock)
 
 def iris_dataset():
   print("Downloading iris datasets...")
   iris = requests.get("https://www.mlpack.org/datasets/iris.tar.gz")
-  open("iris.tar.gz", 'wb').write(iris.content)
+  progress_bar("iris.tar.gz", iris)
   tar = tarfile.open("iris.tar.gz", "r:gz")
   tar.extractall()
   tar.close()
