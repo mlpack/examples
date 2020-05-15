@@ -47,11 +47,11 @@ def convert(imgf, labelf, outf, n):
     t.close()
 
 def create_dataset_dir():
-  if os.path.exists("data"):
-    os.chdir("data")
+  if os.path.exists("../data"):
+    os.chdir("../data")
   else:
-    os.mkdir("data")
-    os.chdir("data")
+    os.mkdir("../data")
+    os.chdir("../data")
 
 def clean():
   dataset = "."
@@ -160,6 +160,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
+      create_dataset_dir()
       all_datasets()
 
     if args.dataset_name:
