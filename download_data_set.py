@@ -160,8 +160,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
-      parser.print_help(sys.stderr)
-      sys.exit(1)
+      all_datasets()
 
     if args.dataset_name:
       if args.dataset_name == "mnist":
