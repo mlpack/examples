@@ -79,3 +79,10 @@ description (just a little bit more than the title):
  - `mnist_vae_cnn`: use a variational autoencoder with convolutional neural
    networks in the encoder and reparametrization networks to recognize the MNIST
    digits
+   
+### 6. Datasets
+
+All the required dataset needed by the examples can be downloaded using the
+provided script in the `tools` directory. You will have to execute `download_dataset.py`
+and it will download and extract all the necessary dataset in order for examples
+to work perfectly.
