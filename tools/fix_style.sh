@@ -1,6 +1,6 @@
 NAME=`basename "$0"`
 
-if [ ! -f ".clang-format" ]; then
+if [ ! -f "../.clang-format" ]; then
     echo ".clang-format file not found!"
     exit 1
 fi
