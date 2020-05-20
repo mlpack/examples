@@ -7,9 +7,9 @@ fi
 
 CLANG_FORMAT="clang-format"
 
-which "clang-format-4.0" > /dev/null && CLANG_FORMAT="clang-format-4.0"
+which "clang-format-9.0" > /dev/null && CLANG_FORMAT="clang-format-9.0"
 
-FILES=`git ls-files | grep -E "\.(cpp|h|hpp|c)$" | grep -Ev "doc/" | grep -Ev "CMake/" | grep -Ev "src/mlpack/bindings/matlab/" | grep -Ev "src/mlpack/core/arma_extend/" | grep -Ev "src/mlpack/core/boost_backport/" | grep -Ev "src/mlpack/core/core.hpp" | grep -Ev "src/mlpack/methods/ann/visitor/" | grep -Ev "src/mlpack/prereqs.hpp" | grep -Ev "src/mlpack/core.hpp" | grep -Ev ".travis/config.hpp"`
+FILES=`git ls-files | grep -E "\.(cpp|h|hpp|c)$" | grep -Ev "doc/" | grep -Ev "tools/" | grep -Ev "data/"
 
 for FILE in $FILES; do
     if [ "$NAME" != "pre-commit" ]; then
