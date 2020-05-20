@@ -9,7 +9,9 @@ CLANG_FORMAT="clang-format"
 
 which "clang-format" > /dev/null && CLANG_FORMAT="clang-format"
 
-FILES=`git ls-files | grep -E "\.(cpp|h|hpp|c)$" | grep -Ev "doc/" | grep -Ev "tools/" | grep -Ev "data/"
+pushd ../ > /dev/null
+
+FILES=`git ls-files | grep -E "\.(cpp|h|hpp|c)$" | grep -Ev "tools/" | grep -Ev "data/" | grep -Ev ".travis/" `
 
 for FILE in $FILES; do
     if [ "$NAME" != "pre-commit" ]; then
