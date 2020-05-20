@@ -5,7 +5,7 @@ language: cpp
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
-  - curl -O http://masterblaster.mlpack.org:5005/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
+  - curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
 
 # TODO: test examples via Makefiles
 #  - cmake . && make && sudo make install
