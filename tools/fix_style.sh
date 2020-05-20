@@ -7,7 +7,7 @@ fi
 
 CLANG_FORMAT="clang-format"
 
-which "clang-format-9.0" > /dev/null && CLANG_FORMAT="clang-format-9.0"
+which "clang-format" > /dev/null && CLANG_FORMAT="clang-format"
 
 FILES=`git ls-files | grep -E "\.(cpp|h|hpp|c)$" | grep -Ev "doc/" | grep -Ev "tools/" | grep -Ev "data/"
 
