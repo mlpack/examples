@@ -5,6 +5,9 @@ see what it does and play with it.
 Each of the examples are meant to be as simple as possible, and they are
 extensively documented.
 
+All the notebooks in this repository can be easily run on
+https://lab.mlpack.org/.
+
 _(This README is still a work in progress as this repository is transitioned.
 Any comments like this one indicate that something still needs to be done.  So,
 as we work on it, we can remove these comments, and once all the comments are
