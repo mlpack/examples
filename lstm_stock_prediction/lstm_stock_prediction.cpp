@@ -1,6 +1,6 @@
 /**
  * An example of using Recurrent Neural Network (RNN)
- * to make forcasts on a time series of Google stock prices.
+ * to make forecasts on a time series of Google stock prices.
  * which we aim to solve using a simple LSTM neural network.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
