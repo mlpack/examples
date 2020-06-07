@@ -122,8 +122,8 @@ def stock_exchange_dataset():
 
 def body_fat_dataset():
   print("Download the body fat datasets")
-  bodyFat = requests.get("https://www.mlpack.org/datasets/examples/BodyFat.csv")
-  progress_bar("BodyFat.csv", bodyFat)
+  bodyFat = requests.get("https://www.mlpack.org/datasets/examples/bodyfat.tsv")
+  progress_bar("BodyFat.tsv", bodyFat)
 
 def iris_dataset():
   print("Downloading iris datasets...")
