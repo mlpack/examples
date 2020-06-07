@@ -1,6 +1,6 @@
 /**
  * An example of using Recurrent Neural Network (RNN) 
- * to make forcasts on a time series of number of kilowatt-hours used in a
+ * to make forecasts on a time series of number of kilowatt-hours used in a
  * residential home over a 3.5 month period, 25 November 2011 to 17 March 2012,
  * which we aim to solve using a simple LSTM neural network. Electricity usage
  * as recorded by the local utility company on an hour-by-hour basis.
@@ -49,7 +49,7 @@ using namespace mlpack::ann;
 using namespace ens;
 
 /*
- * Function to calcute MSE for arma::cube.
+ * Function to calculate MSE for arma::cube.
  */
 double MSE(arma::cube& pred, arma::cube& Y)
 {
