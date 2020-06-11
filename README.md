@@ -8,19 +8,12 @@ extensively documented.
 All the notebooks in this repository can be easily run on
 https://lab.mlpack.org/.
 
-_(This README is still a work in progress as this repository is transitioned.
-Any comments like this one indicate that something still needs to be done.  So,
-as we work on it, we can remove these comments, and once all the comments are
-removed, we are done. :))_
-
 ### 0. Contents
 
   1. [Overview](#1-overview)
-  2. [Dependencies](#2-dependencies)
-  3. [Building-From-Source](#3-building-from-source)
-  4. [Running Models](#4-running-models)
-  5. [Current Models](#5-current-models)
-  6. [Datasets](#6-datasets)
+  2. [Building the examples and usage](#2-Building-the-examples-and-usage)
+  3. [List of examples](#3-List-of-examples)
+  4. [Datasets](#4-datasets)
 
 ###  1. Overview
 
@@ -40,8 +33,6 @@ Python examples in the `python/` directory, command-line examples in the
 `command-line/` directory, and so forth.
 
 ### 2. Building the examples and usage
-
-_(This section is still in the process of being implemented!)_
 
 In order to keep this repository as simple as possible, there is no build
 system, and all examples are minimal.  For the C++ examples, there is a Makefile
@@ -83,7 +74,12 @@ description (just a little bit more than the title):
    networks in the encoder and reparametrization networks to recognize the MNIST
    digits
    
-### 6. Datasets
+ - `neural_network_regression`: use neural network to do regression on Body fat 
+    dataset
+    
+ - `q_learning`: train a simple deep Q-network agent on CartPole environment
+   
+### 4. Datasets
 
 All the required dataset needed by the examples can be downloaded using the
 provided script in the `tools` directory. You will have to execute `download_dataset.py`
