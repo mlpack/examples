@@ -120,6 +120,11 @@ def stock_exchange_dataset():
   stock = requests.get("https://www.mlpack.org/datasets/examples/Google2016-2019.csv")
   progress_bar("stock.csv", stock)
 
+def body_fat_dataset():
+  print("Download the body fat datasets")
+  bodyFat = requests.get("https://www.mlpack.org/datasets/examples/bodyfat.tsv")
+  progress_bar("BodyFat.tsv", bodyFat)
+
 def iris_dataset():
   print("Downloading iris datasets...")
   iris = requests.get("https://www.mlpack.org/datasets/iris.tar.gz")
@@ -134,6 +139,7 @@ def all_datasets():
   electricity_consumption_dataset()
   stock_exchange_dataset()
   iris_dataset()
+  body_fat_dataset()
 
 if __name__ == '__main__':
 
@@ -153,6 +159,8 @@ if __name__ == '__main__':
         mnist : will download mnist dataset
         electricity : will download electricty_consumption_dataset
         stock : will download stock_exchange dataset
+        iris : will downlaod the iris dataset
+        bodyFat : will download the bodyFat dataset
         all : will download all datasets for all examples
         '''))
  
@@ -176,6 +184,9 @@ if __name__ == '__main__':
       elif args.dataset_name == "iris":
         create_dataset_dir()
         iris_dataset()
+      elif args.dataset_name == "bodyFat":
+        create_dataset_dir()
+        body_fat_dataset()
       elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
