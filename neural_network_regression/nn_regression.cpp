@@ -18,7 +18,7 @@
  *
  * The bodyfat dataset contains estimates of the percentage of body fat
  * determined by underwater weighing and various body circumference measurements
- * for 252 men. Accurate measurement of body fat is very expensive,but by using
+ * for 252 men. Accurate measurement of body fat is very expensive, but by using
  * machine learning it is possible to calculate a prediction with good accuracy
  * by just using some low cost measurements of the body. The columns in the
  * dataset are the following:
