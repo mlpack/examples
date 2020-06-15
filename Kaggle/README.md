@@ -53,13 +53,13 @@ After splitting the training dataset is stored in the _train_ matrix and validat
 
 ##### 1. Mnist
 
-For more details related to the model, check out the **DigitRecognizer** Directory.
+For more details related to the model, check out the **mnist** Directory.
 
 After running the model for 50 epochs, the model obtained a validation set accuracy of **97.2143%**.
 
-##### 2. DigitRecognizerBatchNorm
+##### 2. Mnist Batch Norm
 
-For More Details related to the Model, check out the **DigitRecognizerBatchNorm** Directory.
+For More Details related to the Model, check out the **mnist_batch_norm** Directory.
 
 After running the model for 50 cycles, the model obatained the best validation set accuracy of **91.5952%**.
 
