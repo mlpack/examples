@@ -23,8 +23,12 @@
  * by just using some low cost measurements of the body. The columns in the
  * dataset are the following:
  *
- * Percent body fat (%) => this is the decision column (what we want to get from
- * the model). Age (years) Weight (lbs) Height (inches) Neck circumference (cm)
+ * Percent body fat (%) => this is the decision column (what we want to get from 
+ * the model).
+ * Age (years)
+ * Weight (lbs)
+ * Height (inches)
+ * Neck circumference (cm)
  * Chest circumference (cm)
  * Abdomen 2 circumference (cm)
  * Hip circumference (cm)
