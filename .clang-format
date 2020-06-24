@@ -47,6 +47,7 @@ Cpp11BracedListStyle: true
 DerivePointerAlignment: false
 DisableFormat:   false
 ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: true
 IndentCaseLabels: true
 IndentWidth:     2
 IndentWrappedFunctionNames: false
@@ -65,6 +66,7 @@ PenaltyBreakString: 2123
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Left
+ReflowComments: false
 SortIncludes: false
 SpaceAfterCStyleCast: true
 SpaceAfterTemplateKeyword: false
