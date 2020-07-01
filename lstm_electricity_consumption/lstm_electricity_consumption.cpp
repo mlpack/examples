@@ -16,7 +16,7 @@
  */
 
 /*
-NOTE: the data need to be sorted by date in ascending order! The RNN learns from 
+NOTE: the data need to be sorted by date in ascending order! The RNN learns from
 oldest to newest!
 
 DateTime,Consumption kWh,Off-peak,Mid-peak,On-peak
@@ -72,7 +72,7 @@ void CreateTimeSeriesData(InputDataType dataset,
                           LabelType& y,
                           const size_t rho)
 {
-  for(size_t i = 0; i < dataset.n_cols - rho; i++)
+  for (size_t i = 0; i < dataset.n_cols - rho; i++)
   {
     X.subcube(arma::span(), arma::span(i), arma::span()) =
         dataset.submat(arma::span(), arma::span(i, i + rho - 1));
@@ -98,7 +98,8 @@ void SaveResults(const string& filename,
   // The prediction result is the energy consumption for the next hour and comes
   // from the last slice of the prediction.
   flatDataAndPreds.rows(flatDataAndPreds.n_rows - 1,
-      flatDataAndPreds.n_rows - 1) = predictions.slice(predictions.n_slices - 1);
+                        flatDataAndPreds.n_rows - 1) =
+      predictions.slice(predictions.n_slices - 1);
 
   scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
   // We need to remove the last column because it was not used for training
@@ -115,8 +116,10 @@ void SaveResults(const string& filename,
   // will be for the hour before. In your own application you may of course load
   // any dataset for prediction.
   cout << "The predicted energy consumption for the next hour is : " << endl;
-  cout << " " << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
-      flatDataAndPreds.n_cols - 1) << endl;
+  cout << " "
+       << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
+                           flatDataAndPreds.n_cols - 1)
+       << endl;
 }
 
 int main()
@@ -188,10 +191,11 @@ int main()
   dataset = dataset.submat(1, 1, 1, dataset.n_cols - 1);
 
   // Split the dataset into training and validation sets.
-  arma::mat trainData = dataset.submat(arma::span(),arma::span(0, (1 - RATIO) *
-      dataset.n_cols));
-  arma::mat testData = dataset.submat(arma::span(), arma::span((1 - RATIO) * dataset.n_cols,
-      dataset.n_cols - 1));
+  arma::mat trainData =
+      dataset.submat(arma::span(), arma::span(0, (1 - RATIO) * dataset.n_cols));
+  arma::mat testData = dataset.submat(
+      arma::span(),
+      arma::span((1 - RATIO) * dataset.n_cols, dataset.n_cols - 1));
 
   // Number of iterations per cycle.
   const int EPOCHS = 150;
@@ -232,28 +236,30 @@ int main()
     else
     {
       // Model building.
-      model.Add<IdentityLayer<> >();
-      model.Add<LSTM<> >(inputSize, H1, maxRho);
-      model.Add<LeakyReLU<> >();
-      model.Add<LSTM<> >(H1, H1, maxRho);
-      model.Add<LeakyReLU<> >();
-      model.Add<Linear<> >(H1, outputSize);
+      model.Add<IdentityLayer<>>();
+      model.Add<LSTM<>>(inputSize, H1, maxRho);
+      model.Add<LeakyReLU<>>();
+      model.Add<LSTM<>>(H1, H1, maxRho);
+      model.Add<LeakyReLU<>>();
+      model.Add<Linear<>>(H1, outputSize);
     }
 
     // Set parameters for the Adam optimizer.
     ens::Adam optimizer(
-        STEP_SIZE, // Step size of the optimizer.
-        BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
-        0.9, // Exponential decay rate for the first moment estimates.
-        0.999, // Exponential decay rate for the weighted infinity norm estimates.
+        STEP_SIZE,  // Step size of the optimizer.
+        BATCH_SIZE, // Batch size. Number of data points that are used in each
+                    // iteration.
+        0.9,        // Exponential decay rate for the first moment estimates.
+        0.999,      // Exponential decay rate for the weighted infinity norm
+                    // estimates.
         1e-8, // Value used to initialise the mean squared gradient parameter.
         trainData.n_cols * EPOCHS, // Max number of iterations.
-        1e-8, // Tolerance.
+        1e-8,                      // Tolerance.
         true);
 
     // Instead of terminating based on the tolerance of the objective function,
-    // we'll depend on the maximum number of iterations, and terminate early using
-    // the EarlyStopAtMinLoss callback.
+    // we'll depend on the maximum number of iterations, and terminate early
+    // using the EarlyStopAtMinLoss callback.
     optimizer.Tolerance() = -1;
 
     cout << "Training ..." << endl;
@@ -298,6 +304,6 @@ int main()
   SaveResults(predFile, predOutP, scale, testX);
 
   // Use this on Windows in order to keep the console window open.
-  //cout << "Ready!" << endl;
-  //getchar();
+  // cout << "Ready!" << endl;
+  // getchar();
 }
