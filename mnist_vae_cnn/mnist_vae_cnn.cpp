@@ -181,17 +181,18 @@ int main()
 
   // Set parameters for the Adam optimizer.
   ens::Adam optimizer(
-      stepSize, // Step size of the optimizer.
-      batchSize, // Batch size. Number of data points that are used in each iteration.
-      0.9, // Exponential decay rate for the first moment estimates.
+      stepSize,  // Step size of the optimizer.
+      batchSize, // Batch size. Number of data points that are used in each
+                 // iteration.
+      0.9,       // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
-      1e-8, // Value used to initialise the mean squared gradient parameter.
+      1e-8,  // Value used to initialise the mean squared gradient parameter.
       maxIteration, // Max number of iterations.
-      1e-8, // Tolerance.
+      1e-8,         // Tolerance.
       true);
 
-  std::cout << "Initial loss -> " <<
-      MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
+  std::cout << "Initial loss -> "
+            << MeanTestLoss<MeanSModel>(vaeModel, train_test, 50) << std::endl;
 
   // Train neural network. If this is the first iteration, weights are
   // random, using current values as starting point otherwise.

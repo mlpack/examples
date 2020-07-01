@@ -3,8 +3,9 @@
  * @author Zoltan Somogyi
  *
  * \brief MLPACK TUTORIAL: neural network regression
- * \details Real world example which shows how to create a neural network mlpack/C++ model for regression,
- * how to save and load the model and then use it for prediction (inference).
+ * \details Real world example which shows how to create a neural network
+ * mlpack/C++ model for regression, how to save and load the model and then use
+ * it for prediction (inference).
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
@@ -14,18 +15,16 @@
 
 /**
  * ABOUT THE DATASET bodyfat.tsv (freely available dataset).
- * 
- * The bodyfat dataset contains estimates of the percentage of body fat determined by
- * underwater weighing and various body circumference measurements for 252 men.
- * Accurate measurement of body fat is very expensive,but by using machine learning
- * it is possible to calculate a prediction with good accuracy by just using some low cost
- * measurements of the body. The columns in the dataset are the following:
- * 
- * Percent body fat (%) => this is the decision column (what we want to get from the model).
- * Age (years)
- * Weight (lbs)
- * Height (inches)
- * Neck circumference (cm)
+ *
+ * The bodyfat dataset contains estimates of the percentage of body fat
+ * determined by underwater weighing and various body circumference measurements
+ * for 252 men. Accurate measurement of body fat is very expensive,but by using
+ * machine learning it is possible to calculate a prediction with good accuracy
+ * by just using some low cost measurements of the body. The columns in the
+ * dataset are the following:
+ *
+ * Percent body fat (%) => this is the decision column (what we want to get from
+ * the model). Age (years) Weight (lbs) Height (inches) Neck circumference (cm)
  * Chest circumference (cm)
  * Abdomen 2 circumference (cm)
  * Hip circumference (cm)
@@ -68,7 +67,7 @@ int main()
   const std::string modelFile = "nn_regressor.bin";
 
   // Testing data is taken from the dataset in this ratio.
-  constexpr double RATIO = 0.1; //10%
+  constexpr double RATIO = 0.1; // 10%
 
   //! - H1: The number of neurons in the 1st layer.
   constexpr int H1 = 64;
@@ -112,10 +111,10 @@ int main()
 
   // The train and valid datasets contain both - the features as well as the
   // prediction. Split these into separate matrices.
-  arma::mat trainX = trainData.submat(1, 0, trainData.n_rows - 1,
-      trainData.n_cols - 1);
-  arma::mat validX = validData.submat(1, 0, validData.n_rows - 1,
-      validData.n_cols - 1);
+  arma::mat trainX =
+      trainData.submat(1, 0, trainData.n_rows - 1, trainData.n_cols - 1);
+  arma::mat validX =
+      validData.submat(1, 0, validData.n_rows - 1, validData.n_cols - 1);
 
   // Create prediction data for training and validatiion datasets.
   arma::mat trainY = trainData.row(0);
@@ -170,13 +169,15 @@ int main()
 
     // Set parameters for the Stochastic Gradient Descent (SGD) optimizer.
     ens::Adam optimizer(
-        STEP_SIZE, // Step size of the optimizer.
-        BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
-        0.9, // Exponential decay rate for the first moment estimates.
-        0.999, // Exponential decay rate for the weighted infinity norm estimates.
+        STEP_SIZE,  // Step size of the optimizer.
+        BATCH_SIZE, // Batch size. Number of data points that are used in each
+                    // iteration.
+        0.9,        // Exponential decay rate for the first moment estimates.
+        0.999,      // Exponential decay rate for the weighted infinity norm
+                    // estimates.
         1e-8, // Value used to initialise the mean squared gradient parameter.
         trainData.n_cols * EPOCHS, // Max number of iterations.
-        STOP_TOLERANCE,// Tolerance.
+        STOP_TOLERANCE,            // Tolerance.
         true);
 
     model.Train(trainX,
@@ -210,9 +211,11 @@ int main()
   // We will test the quality of our model by calculating Mean Squared Error on
   // validation dataset.
   double validMSE = MSE(validY, predOut);
-  std::cout << "Mean Squared Error on Prediction data points: " << validMSE << std::endl;
+  std::cout << "Mean Squared Error on Prediction data points: " << validMSE
+            << std::endl;
 
-  // To get meaningful predictions we need to undo the scaling operation on predictions.
+  // To get meaningful predictions we need to undo the scaling operation on
+  // predictions.
   scaleY.InverseTransform(predOut, predOut);
   // Save the prediction results.
   bool saved = data::Save("results.csv", predOut, true);

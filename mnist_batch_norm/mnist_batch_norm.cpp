@@ -126,13 +126,14 @@ int main()
 
   // Set parameters for the Adam optimizer.
   ens::Adam optimizer(
-      STEP_SIZE, // Step size of the optimizer.
-      BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
-      0.9, // Exponential decay rate for the first moment estimates.
+      STEP_SIZE,  // Step size of the optimizer.
+      BATCH_SIZE, // Batch size. Number of data points that are used in each
+                  // iteration.
+      0.9,        // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
-      1e-8, // Value used to initialise the mean squared gradient parameter.
+      1e-8,  // Value used to initialise the mean squared gradient parameter.
       MAX_ITERATIONS, // Max number of iterations.
-      1e-8, // Tolerance.
+      1e-8,           // Tolerance.
       true);
 
   // Train neural network. If this is the first iteration, weights are
@@ -150,12 +151,14 @@ int main()
   model.Predict(trainX, predOut);
   // Calculating accuracy on training data points.
   Row<size_t> predLabels = getLabels(predOut);
-  double trainAccuracy = arma::accu(predLabels == trainY) / (double)trainY.n_elem * 100;
+  double trainAccuracy =
+      arma::accu(predLabels == trainY) / ( double )trainY.n_elem * 100;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
-  double validAccuracy = arma::accu(predLabels == validY) / (double)validY.n_elem * 100;
+  double validAccuracy =
+      arma::accu(predLabels == validY) / ( double )validY.n_elem * 100;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " valid = " << validAccuracy << "%" << endl;

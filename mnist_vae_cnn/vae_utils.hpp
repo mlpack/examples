@@ -27,17 +27,18 @@ double MeanTestLoss(NetworkType model, DataType testSet, size_t batchSize)
   size_t nofPoints = testSet.n_cols;
   size_t i;
 
-  for (i = 0; i < (size_t)nofPoints / batchSize; i++)
+  for (i = 0; i < ( size_t )nofPoints / batchSize; i++)
   {
-    loss += model.Evaluate(testSet.cols(batchSize * i, batchSize * (i + 1) - 1),
-        testSet.cols(batchSize * i, batchSize * (i + 1) - 1));
+    loss +=
+        model.Evaluate(testSet.cols(batchSize * i, batchSize * (i + 1) - 1),
+                       testSet.cols(batchSize * i, batchSize * (i + 1) - 1));
   }
 
   if (nofPoints % batchSize != 0)
   {
     loss += model.Evaluate(testSet.cols(batchSize * i, nofPoints - 1),
-        testSet.cols(batchSize * i, nofPoints - 1));
-    loss /= (int)nofPoints / batchSize + 1;
+                           testSet.cols(batchSize * i, nofPoints - 1));
+    loss /= ( int )nofPoints / batchSize + 1;
   }
   else
     loss /= nofPoints / batchSize;
@@ -52,8 +53,8 @@ void GetSample(DataType input, DataType& samples, bool isBinary)
 {
   if (isBinary)
   {
-    samples = arma::conv_to<DataType>::from(arma::randu<DataType>
-        (input.n_rows, input.n_cols) <= input);
+    samples = arma::conv_to<DataType>::from(
+        arma::randu<DataType>(input.n_rows, input.n_cols) <= input);
     samples *= 255;
   }
   else
