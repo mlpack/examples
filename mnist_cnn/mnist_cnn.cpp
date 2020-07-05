@@ -62,7 +62,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/train.csv", tempDataset, true);
+  data::Load("../data/mnist_train.csv", tempDataset, true);
 
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
@@ -122,7 +122,7 @@ int main()
                            28, // Input width.
                            28  // Input height.
   );
-
+  model.Add<BatchNorm<>>(6, 1e-8, false);
   // Add first ReLU.
   model.Add<LeakyReLU<>>();
 
@@ -145,7 +145,7 @@ int main()
                            12, // Input width.
                            12  // Input height.
   );
-
+  model.Add<BatchNorm<>>(16, 1e-8, false);
   // Add the second ReLU.
   model.Add<LeakyReLU<>>();
 
