@@ -5,10 +5,10 @@ env | sort
 pwd
 
 # jupyter-offlinenotebook is automatically installed by repo2docker.
-# Uninstall to avoid conflicts
+# Uninstall to avoid conflicts.
 jupyter labextension uninstall --no-build jupyter-offlinenotebook
 
-# Upgrade jupyterlab if necessary
+# Upgrade jupyterlab if necessary.
 conda install jupyterlab=2
 
 # Install necessaary kernel and debugger related dependency following 
@@ -105,3 +105,6 @@ wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
 mkdir -p /srv/conda/envs/notebook/include/gym
 cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
 rm -r gym_tcp_api-master
+
+# Copy Julia project file into the home directory.
+cp .binder/Project.toml $HOME
