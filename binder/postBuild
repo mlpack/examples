@@ -1,0 +1,101 @@
+#!/bin/bash
+set -eux
+
+env | sort
+pwd
+
+# jupyter-offlinenotebook is automatically installed by repo2docker.
+# Uninstall to avoid conflicts
+jupyter labextension uninstall --no-build jupyter-offlinenotebook
+
+# Upgrade jupyterlab if necessary
+conda install jupyterlab=2
+
+# Install necessaary kernel and debugger related dependency following 
+# https://github.com/jupyterlab/debugger#installation, doing it in
+# postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
+conda install -c zoq -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs
+
+# Install the debugger in postBuild and not `environment.yml` to 
+# avoid breaking jupyter-offlinenotebook.
+jupyter labextension install @jupyterlab/debugger
+jupyter labextension install @jupyterlab/toc
+
+# Add extra modules needed for examples.
+python -m pip install pandas
+python -m pip install numpy
+python -m pip install seaborn
+
+# repo2docker copies this repo into $HOME which means jupyter labextension
+# picks up hidden dot files and runs into problems so install from a
+# different directory.
+SRCDIR=/srv/conda/src/jupyter-offlinenotebook
+mkdir -p "$SRCDIR"
+
+cd "$SRCDIR"
+git clone https://github.com/manics/jupyter-offlinenotebook.git .
+python -m pip install .
+jupyter labextension link --debug
+
+jupyter kernelspec remove -f xcpp11
+jupyter kernelspec remove -f xcpp17
+
+GOVERS=1.13.5
+
+mkdir -p \
+	$HOME/.local/go/$GOVERS \
+	$HOME/go
+
+curl -O -L https://golang.org/dl/go${GOVERS}.linux-amd64.tar.gz
+tar -C $HOME/.local/go/$GOVERS -zxf go${GOVERS}.linux-amd64.tar.gz
+/bin/rm go${GOVERS}.linux-amd64.tar.gz
+
+export GOROOT=$HOME/.local/go/$GOVERS/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+
+# Install go dependencies and packages.
+go get golang.org/x/tools/cmd/goimports
+go get github.com/gopherdata/gophernotes
+go get gonum.org/v1/gonum/...
+go get gonum.org/v1/plot/...
+
+# Setup environment for Go.
+cat >> $HOME/.setup-go << EOF
+## setup Go
+export GOROOT=$GOROOT
+export GOPATH=$GOPATH
+export PATH=\$GOPATH/bin:\$GOROOT/bin:\$PATH
+EOF
+
+cat >> $HOME/.bashrc << EOF
+. ~/.setup-go
+EOF
+
+# Install the Go kernel.
+mkdir -p ./binder/gophernotes
+cat >| ./binder/gophernotes/kernel.json << EOF
+{
+    "argv": [
+        "$GOPATH/bin/gophernotes",
+        "{connection_file}"
+    ],
+    "display_name": "Go",
+    "language": "go",
+    "name": "go",
+    "env" : {
+        "CGO_CFLAGS": "-I/srv/conda/envs/notebook/include",
+        "CFLAGS": "-I/srv/conda/envs/notebook/include",
+        "CGO_LDFLAGS": "-L/srv/conda/envs/notebook/lib/",
+        "LDFLAGS": "-L/srv/conda/envs/notebook/lib/"
+    }
+}
+EOF
+jupyter kernelspec install ./binder/gophernotes --user
+
+go get -u -d mlpack.org/v1/mlpack
+CGO_CFLAGS="-I/srv/conda/envs/notebook/include" CGO_LDFLAGS="-L/srv/conda/envs/notebook/lib/" go install -v mlpack.org/v1/mlpack
+
+# Add mlpack dependencies to the main header.
+rm /srv/conda/envs/notebook/include/mlpack/core.hpp
+wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/mlpack-core-binder.hpp
