@@ -1,2 +1,8 @@
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Libz = "2ec943e9-cfe8-584d-b93d-64dcb6d567b7"
+mlpack = "cf18a64e-e90e-11e8-37b7-fb5df6478bc0"
+
 [compat]
 julia = "1.3"
