@@ -104,5 +104,4 @@ wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/ml
 wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
 mkdir -p /srv/conda/envs/notebook/include/gym
 cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
-rm master.tar.gz
 rm -r gym_tcp_api-master
