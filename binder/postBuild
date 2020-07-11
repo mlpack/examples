@@ -107,4 +107,4 @@ cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
 rm -r gym_tcp_api-master
 
 # Copy Julia project file into the home directory.
-cp .binder/Project.toml $HOME
+cp ./binder/Project.toml $HOME
