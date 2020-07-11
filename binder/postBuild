@@ -14,7 +14,7 @@ conda install jupyterlab=2
 # Install necessaary kernel and debugger related dependency following 
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs
+conda install -c zoq -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs xwidgets
 
 # Install the debugger in postBuild and not `environment.yml` to 
 # avoid breaking jupyter-offlinenotebook.
@@ -99,3 +99,10 @@ CGO_CFLAGS="-I/srv/conda/envs/notebook/include" CGO_LDFLAGS="-L/srv/conda/envs/n
 # Add mlpack dependencies to the main header.
 rm /srv/conda/envs/notebook/include/mlpack/core.hpp
 wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/mlpack-core-binder.hpp
+
+# Setup https://github.com/zoq/gym_tcp_api. 
+wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
+mkdir -p /srv/conda/envs/notebook/include/gym
+cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
+rm master.tar.gz
+rm -r gym_tcp_api-master
