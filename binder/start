@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Clean up a bit more since may be using the starting directory to work.
-cp binder/Project.toml .
 rm -rf binder
 
 # This must be last line according to 
