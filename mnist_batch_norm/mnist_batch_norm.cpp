@@ -144,7 +144,7 @@ int main()
               ens::PrintLoss(),
               ens::ProgressBar(),
               // Stop the training using Early Stop at min loss.
-              ens::EarlyStopAtMinLoss<arma::mat>(
+              ens::EarlyStopAtMinLoss(
                   [&](const arma::mat& /* param */)
                   {
                     double validationLoss = model.Evaluate(validX, validY);
