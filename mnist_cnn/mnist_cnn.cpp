@@ -181,12 +181,9 @@ int main()
               // Stop the training using Early Stop at min loss.
               ens::EarlyStopAtMinLoss<arma::mat>(
                   [&](const arma::mat& /* param */)
-                  {
-                    double validationLoss =
-                      model.Evaluate(validX, validY);
-                      std::cout << "Validation loss: "
-                                << validationLoss
-                                << std::endl;
+                    double validationLoss = model.Evaluate(validX, validY);
+                    std::cout << "Validation loss: " << validationLoss
+                        << "." << std::endl;
                     return validationLoss;
                   }));
 
