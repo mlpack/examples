@@ -130,7 +130,13 @@ int main()
               ens::PrintLoss(),
               ens::ProgressBar(),
               // Stop the training using Early Stop at min loss.
-              ens::EarlyStopAtMinLoss());
+              ens::EarlyStopAtMinLoss(
+                  [&](const arma::mat& /* param */)
+                  {
+                    double validationLoss = model.Evaluate(validX, validY);
+                    std::cout << "Validation loss: " << validationLoss
+                        << "." << std::endl;
+                  }));
 
   mat predOut;
   // Getting predictions on training data points.
