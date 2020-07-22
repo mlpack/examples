@@ -77,13 +77,9 @@ int main()
   const arma::mat validX =
       valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0;
 
-  // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to
-  // number of classes (in this case from 1 to 10).
-
   // Creating labels for training and validating dataset.
-  const arma::mat trainY = train.row(0) + 1;
-  const arma::mat validY = valid.row(0) + 1;
+  const arma::mat trainY = train.row(0);
+  const arma::mat validY = valid.row(0);
 
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. GlorotInitialization means that
