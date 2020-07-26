@@ -22,8 +22,6 @@ jupyter labextension install @jupyterlab/debugger
 jupyter labextension install @jupyterlab/toc
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 jupyter labextension install bqplot
-#jupyter labextension install @jupyter-widgets/jupyterlab-manager
-#jupyter labextension install bqplot
 
 # Add extra modules needed for examples.
 python -m pip install pandas
@@ -113,6 +111,9 @@ CGO_CFLAGS="-I/srv/conda/envs/notebook/include" CGO_LDFLAGS="-L/srv/conda/envs/n
 # Add mlpack dependencies to the main header.
 rm /srv/conda/envs/notebook/include/mlpack/core.hpp
 wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/mlpack-core-binder.hpp
+
+# Add matplotlib-cpp header.
+wget -O /srv/conda/envs/notebook/include/matplotlibcpp.h https://raw.githubusercontent.com/lava/matplotlib-cpp/master/matplotlibcpp.h
 
 # Setup https://github.com/zoq/gym_tcp_api. 
 wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
