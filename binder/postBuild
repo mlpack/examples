@@ -14,7 +14,7 @@ conda install jupyterlab=2
 # Install necessaary kernel and debugger related dependency following 
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs xwidgets=0.20.1 bqplot cmake xplot=0.15.0
+conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs xwidgets=0.20.1 bqplot cmake xplot=0.15.0 wordcloud
 
 # Install the debugger in postBuild and not `environment.yml` to 
 # avoid breaking jupyter-offlinenotebook.
