@@ -56,7 +56,6 @@ rm temp2.txt
 
 We then create a matrix, where for each message, the frequency of word occurences is counted (more on this on Wikipedia, [here](https://en.wikipedia.org/wiki/Tf–idf) and [here](https://en.wikipedia.org/wiki/Document-term_matrix)). This requires a few lines of code, so the full script, which should be saved as 'makematrix.sh' is below
 
-
 ```
 #!/bin/bash
 declare -a words=()
