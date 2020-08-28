@@ -2,7 +2,7 @@
 
 ## Introduction
 
-In this tutorial, the ML-Pack command line interface will
+In this tutorial, the mlpack command line interface will
 be used to train a machine learning model to classify
 SMS spam. It will be assumed that ML-Pack has been
 successfully installed on your machine. The tutorial has
