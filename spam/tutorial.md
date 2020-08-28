@@ -8,7 +8,6 @@ SMS spam. It will be assumed that mlpack has been
 successfully installed on your machine. The tutorial has
 been tested in a linux environment.
 
-
 ## Example
 
 As an example, we will train some machine learning models to classify spam SMS messages. We will use an example spam dataset in Indonesian provided by Yudi Wibisono.
