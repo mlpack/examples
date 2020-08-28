@@ -4,7 +4,7 @@
 
 In this tutorial, the mlpack command line interface will
 be used to train a machine learning model to classify
-SMS spam. It will be assumed that ML-Pack has been
+SMS spam. It will be assumed that mlpack has been
 successfully installed on your machine. The tutorial has
 been tested in a linux environment.
 
