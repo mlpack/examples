@@ -11,7 +11,7 @@ been tested in a linux environment.
 
 ## Example
 
-As an example, we will train some machine learning models to classify spam SMS messages. We will use an example spam dataset in Indonesian provided by Yudi Wibisono
+As an example, we will train some machine learning models to classify spam SMS messages. We will use an example spam dataset in Indonesian provided by Yudi Wibisono.
 
 
 We will try to classify a message as spam or ham by the number of occurences of a word in a message. We first change the file line endings, remove line 243 which is missing a label and then remove the header from the dataset. Then, we split our data into two files, labels and messages. Since the labels are at the end of the message, the message is reversed and then the label removed and placed in one file. The message is then removed and placed in another file.
