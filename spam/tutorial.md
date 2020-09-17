@@ -130,7 +130,7 @@ done < messagesLetters.txt
 tr ' '  ',' < wordfrequency.txt > data.csv
 ```
 
-Since [Bash](https://www.gnu.org/software/bash/) is an interpreted language, this simple implementation can take upto 30 minutes to complete. If using the above Bash script on your primary workstation, run it as a task with low priority so that you can continue with other work while you wait:
+Since [Bash](https://www.gnu.org/software/bash/) is an interpreted language, this simple implementation can take up to 30 minutes to complete. If using the above Bash script on your primary workstation, run it as a task with low priority so that you can continue with other work while you wait:
 
 ```
 nice -20 bash makematrix.sh
