@@ -263,6 +263,6 @@ Other methods you can try in ML-Pack for this problem include
 * [Perceptron](https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#perceptron)
 
 To improve the error rating, you can try other pre-processing methods on the initial data set.
-Neural networks can give upto 99.95% validation rates, see for example [here](https://thesai.org/Downloads/Volume11No1/Paper_67-The_Impact_of_Deep_Learning_Techniques.pdf), [here](https://www.kaggle.com/kredy10/simple-lstm-for-text-classification) and [here](https://www.kaggle.com/xiu0714/sms-spam-detection-bert-acc-0-993). However, using these techniques with ML-Pack is best covered in another tutorial.
+Neural networks can give up to 99.95% validation rates, see for example [here](https://thesai.org/Downloads/Volume11No1/Paper_67-The_Impact_of_Deep_Learning_Techniques.pdf), [here](https://www.kaggle.com/kredy10/simple-lstm-for-text-classification) and [here](https://www.kaggle.com/xiu0714/sms-spam-detection-bert-acc-0-993). However, using these techniques with mlpack is best covered in another tutorial.
 
 This tutorial is an adaptation of one that first appeared in the [Fedora Magazine](https://fedoramagazine.org/spam-classification-with-ml-pack/).
