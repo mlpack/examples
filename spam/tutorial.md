@@ -153,13 +153,18 @@ mlpack_preprocess_split                        \
 Now train a [Logistic regression model](https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#logistic_regression):
 
 ```
-mlpack_logistic_regression --training_file train.data.csv --labels_file train.labels.csv --lambda 0.1 --output_model_file lr_model.bin
+mlpack_logistic_regression --training_file train.data.csv    \
+                           --labels_file train.labels.csv    \
+                           --lambda 0.1                      \
+                           --output_model_file lr_model.bin
 ```
 
 Finally we test our model by producing predictions,
 
 ```
-mlpack_logistic_regression --input_model_file lr_model.bin --test_file test.data.csv --output_file lr_predictions.csv
+mlpack_logistic_regression --input_model_file lr_model.bin    \
+                           --test_file test.data.csv          \
+                           --output_file lr_predictions.csv
 ```
 
 and comparing the predictions with the exact results,
@@ -243,16 +248,15 @@ bash confusion.sh
 
 You should get output similar to
 
-Logistic Regression
-Total spam 183
-Total ham 159
-Confusion matrix
-             Predicted class
-                 Ham | Spam 
-              ---------------
- Actual| Ham  |  128 | 26
- class | Spam |  31  | 157
-
+> Logistic Regression<br>
+> Total spam 183<br>
+> Total ham 159<br>
+> Confusion matrix<br>
+> |           |          |Predicted |class
+> |  ---      |---       |    ---   |---
+> |           |          | **Ham**  | **Spam** 
+> | **Actual**| **Ham**  |  128     | 26
+> | **class** | **Spam** |  31      | 157
 
 which indicates a reasonable level of classification.
 Other methods you can try in mlpack for this problem include:
