@@ -1,4 +1,4 @@
-# Spam Classification with ML-Pack on the command line
+# Spam Classification with mlpack on the command line
 
 ## Introduction
 
