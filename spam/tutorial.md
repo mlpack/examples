@@ -255,7 +255,7 @@ Confusion matrix
 
 
 which indicates a reasonable level of classification.
-Other methods you can try in ML-Pack for this problem include
+Other methods you can try in mlpack for this problem include:
 * [Naive Bayes](https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#nbc)
 * [Random forest](https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#random_forest) 
 * [Decision tree](https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#decision_tree)
