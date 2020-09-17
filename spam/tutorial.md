@@ -139,14 +139,14 @@ nice -20 bash makematrix.sh
 Once the script has finished running, split the data into testing (30%) and training (70%) sets:
 
 ```
-mlpack_preprocess_split                                       \
-    --input_file data.csv                     \
-    --input_labels_file labels.csv            \
-    --training_file train.data.csv                 \
-    --training_labels_file train.labels.csv   \
-    --test_file test.data.csv                      \
-    --test_labels_file test.labels.csv        \
-    --test_ratio 0.3                                          \
+mlpack_preprocess_split                        \
+    --input_file data.csv                      \
+    --input_labels_file labels.csv             \
+    --training_file train.data.csv             \
+    --training_labels_file train.labels.csv    \
+    --test_file test.data.csv                  \
+    --test_labels_file test.labels.csv         \
+    --test_ratio 0.3                           \
     --verbose
 ```
 
