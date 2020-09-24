@@ -14,7 +14,7 @@ conda install jupyterlab=2
 # Install necessaary kernel and debugger related dependency following 
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack xtensor=0.21.2 llvmdev=5 xeus-python=0.6.12 ptvsd git nodejs xwidgets=0.20.1 bqplot cmake xplot=0.15.0 wordcloud
+conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs bqplot cmake wordcloud xproperty
 
 # Install the debugger in postBuild and not `environment.yml` to 
 # avoid breaking jupyter-offlinenotebook.
@@ -22,6 +22,13 @@ jupyter labextension install @jupyterlab/debugger
 jupyter labextension install @jupyterlab/toc
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
 jupyter labextension install bqplot
+
+# Install latest xwidgets package.
+git clone https://github.com/jupyter-xeus/xwidgets.git
+cd xwidgets && mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
+make install
+cd ../../
 
 # Add extra modules needed for examples.
 python -m pip install pandas
@@ -51,7 +58,7 @@ make install
 
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
-
+cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
 GOVERS=1.13.5
 
 mkdir -p \
