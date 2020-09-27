@@ -69,7 +69,7 @@ int main()
       agent(config, qNetwork, policyNetwork, replayMethod);
 
   const std::string environment = "BipedalWalker-v3";
-  const std::string host = "127.0.0.1";
+  const std::string host = "gym.kurg.org";
   const std::string port = "4040";
 
   Environment env(host, port, environment);
