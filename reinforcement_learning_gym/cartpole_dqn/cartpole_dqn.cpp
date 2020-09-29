@@ -23,7 +23,7 @@ template <
 >
 void train(gym::Environment& env,
            QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
-           RandomReplay<EnvironmentType> replayMethod,
+           RandomReplay<EnvironmentType>& replayMethod,
            TrainingConfig& config,
            std::vector<double>& returnList,
            size_t& episodes,
