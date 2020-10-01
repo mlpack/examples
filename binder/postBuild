@@ -122,6 +122,10 @@ wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/ml
 # Add matplotlib-cpp header.
 wget -O /srv/conda/envs/notebook/include/matplotlibcpp.h https://raw.githubusercontent.com/lava/matplotlib-cpp/master/matplotlibcpp.h
 
+# Add cpp-colorbar header.
+wget -O /srv/conda/envs/notebook/include/stackedbar.hpp https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.hpp
+wget -O /srv/conda/envs/notebook/include/stackedbar.py https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.py
+
 # Add satter-cpp header.
 wget -O /srv/conda/envs/notebook/include/scatter.hpp https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.hpp
 wget -O /srv/conda/envs/notebook/include/scatter.py https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.py
