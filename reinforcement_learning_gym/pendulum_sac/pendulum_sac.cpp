@@ -8,7 +8,7 @@
 #include <mlpack/methods/reinforcement_learning/training_config.hpp>
 
 // Used to run the agent on gym's environment (provided externally) for testing.
-#include "cpp/environment.hpp"
+#include "../gym/environment.hpp"
 
 using namespace mlpack;
 using namespace mlpack::ann;
