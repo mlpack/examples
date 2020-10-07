@@ -17,7 +17,6 @@ using namespace gym;
 int main()
 {
   // Initializing the agent
-
   // Set up the state and action space.
   ContinuousActionEnv::State::dimension = 24;
   ContinuousActionEnv::Action::size = 4;

@@ -51,12 +51,17 @@ void train(gym::Environment& env,
           env.done, 0.99);
       episodeReturn += env.reward;
       agent.TotalSteps()++;
+
       if (agent.Deterministic() || agent.TotalSteps() < config.ExplorationSteps())
         continue;
+
       for (size_t i = 0; i < config.UpdateInterval(); i++)
         agent.Update();
-    } while (!env.done);
-    returnList.push_back(episodeReturn);
+    } 
+
+    while (!env.done);
+      returnList.push_back(episodeReturn);
+
     episodes += 1;
 
     if (returnList.size() > consecutiveEpisodes)
@@ -111,7 +116,6 @@ int main()
       agent(config, qNetwork, policyNetwork, replayMethod);
 
   // Preparation for training the agent
-
   // Set up the gym training environment.
   gym::Environment env("gym.kurg.org", "4040", "Pendulum-v0");
 
@@ -123,14 +127,11 @@ int main()
   // The number of episode returns to keep track of.
   size_t consecutiveEpisodes = 25;
 
-  // Function to train the agent on the Pendulum gym environment.
-  //Let the training begin
-
   // Training the agent for a total of at least 5000 steps.
   train(env, agent, replayMethod, config, returnList, episodes, 
       consecutiveEpisodes, 5000);
 
-  //Testing the trained agent
+  // Testing the trained agent
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
@@ -145,7 +146,7 @@ int main()
   size_t totalSteps = 0;
 
   // Testing the agent on gym's environment.
-  while (1)
+  while (true)
   {
     // State from the environment is passed to the agent's internal representation.
     agent.State().Data() = envTest.observation;
@@ -196,7 +197,7 @@ int main()
   totalSteps = 0;
 
   // Testing the agent on gym's environment.
-  while (1)
+  while (true)
   {
     // State from the environment is passed to the agent's internal representation.
     agent.State().Data() = envTest.observation;
