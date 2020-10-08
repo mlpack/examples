@@ -15,13 +15,11 @@ using namespace mlpack::ann;
 using namespace ens;
 using namespace mlpack::rl;
 
-template <
-  typename EnvironmentType,
-  typename NetworkType,
-  typename UpdaterType,
-  typename PolicyType,
-  typename ReplayType = RandomReplay<EnvironmentType>
->
+template<typename EnvironmentType,
+         typename NetworkType,
+         typename UpdaterType,
+         typename PolicyType,
+         typename ReplayType = RandomReplay<EnvironmentType>>
 void train(gym::Environment& env,
            SAC<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
            RandomReplay<EnvironmentType>& replayMethod,
@@ -47,35 +45,36 @@ void train(gym::Environment& env,
       ContinuousActionEnv::State nextState;
       nextState.Data() = env.observation;
 
-      replayMethod.Store(agent.State(), agent.Action(), env.reward, nextState,
-          env.done, 0.99);
+      replayMethod.Store(
+          agent.State(), agent.Action(), env.reward, nextState, env.done, 0.99);
       episodeReturn += env.reward;
       agent.TotalSteps()++;
 
-      if (agent.Deterministic() || agent.TotalSteps() < config.ExplorationSteps())
+      if (agent.Deterministic()
+          || agent.TotalSteps() < config.ExplorationSteps())
         continue;
 
       for (size_t i = 0; i < config.UpdateInterval(); i++)
         agent.Update();
-    } 
+    }
 
     while (!env.done);
-      returnList.push_back(episodeReturn);
+    returnList.push_back(episodeReturn);
 
     episodes += 1;
 
     if (returnList.size() > consecutiveEpisodes)
       returnList.erase(returnList.begin());
-        
-    double averageReturn = std::accumulate(returnList.begin(),
-                                           returnList.end(), 0.0) /
-                           returnList.size();
+
+    double averageReturn =
+        std::accumulate(returnList.begin(), returnList.end(), 0.0)
+        / returnList.size();
     if (episodes % 4 == 0)
     {
       std::cout << "Avg return in last " << returnList.size()
-          << " episodes: " << averageReturn
-          << "\\t Episode return: " << episodeReturn
-          << "\\t Total steps: " << agent.TotalSteps() << std::endl;
+                << " episodes: " << averageReturn
+                << "\\t Episode return: " << episodeReturn
+                << "\\t Total steps: " << agent.TotalSteps() << std::endl;
     }
   }
 }
@@ -89,17 +88,18 @@ int main()
   ContinuousActionEnv::Action::size = 1;
 
   // Set up the actor and critic networks.
-  FFN<EmptyLoss<>, GaussianInitialization>
-      policyNetwork(EmptyLoss<>(), GaussianInitialization(0, 0.1));
+  FFN<EmptyLoss<>, GaussianInitialization> policyNetwork(
+      EmptyLoss<>(), GaussianInitialization(0, 0.1));
   policyNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension, 32));
   policyNetwork.Add(new ReLULayer<>());
   policyNetwork.Add(new Linear<>(32, ContinuousActionEnv::Action::size));
   policyNetwork.Add(new TanHLayer<>());
 
-  FFN<EmptyLoss<>, GaussianInitialization>
-      qNetwork(EmptyLoss<>(), GaussianInitialization(0, 0.1));
-  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension +
-                            ContinuousActionEnv::Action::size, 32));
+  FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
+      EmptyLoss<>(), GaussianInitialization(0, 0.1));
+  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
+                                + ContinuousActionEnv::Action::size,
+                            32));
   qNetwork.Add(new ReLULayer<>());
   qNetwork.Add(new Linear<>(32, 1));
 
@@ -112,7 +112,10 @@ int main()
   config.UpdateInterval() = 1;
 
   // Set up Soft actor-critic agent.
-  SAC<ContinuousActionEnv, decltype(qNetwork), decltype(policyNetwork), AdamUpdate>
+  SAC<ContinuousActionEnv,
+      decltype(qNetwork),
+      decltype(policyNetwork),
+      AdamUpdate>
       agent(config, qNetwork, policyNetwork, replayMethod);
 
   // Preparation for training the agent
@@ -128,8 +131,14 @@ int main()
   size_t consecutiveEpisodes = 25;
 
   // Training the agent for a total of at least 5000 steps.
-  train(env, agent, replayMethod, config, returnList, episodes, 
-      consecutiveEpisodes, 5000);
+  train(env,
+        agent,
+        replayMethod,
+        config,
+        returnList,
+        episodes,
+        consecutiveEpisodes,
+        5000);
 
   // Testing the trained agent
   agent.Deterministic() = true;
@@ -163,8 +172,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\\t Total reward: " << totalReward << std::endl;
       break;
     }
 
@@ -179,8 +188,14 @@ int main()
 
   // A little more training...
   // Training the same agent for a total of at least 40000 steps.
-  train(env, agent, replayMethod, config, returnList, episodes, 
-      consecutiveEpisodes, 40000);
+  train(env,
+        agent,
+        replayMethod,
+        config,
+        returnList,
+        episodes,
+        consecutiveEpisodes,
+        40000);
 
   // Final agent testing!
 
@@ -214,8 +229,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\\t Total reward: " << totalReward << std::endl;
       break;
     }
 

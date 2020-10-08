@@ -17,21 +17,20 @@ using namespace mlpack::ann;
 using namespace ens;
 using namespace mlpack::rl;
 
-template <
-  typename EnvironmentType,
-  typename NetworkType,
-  typename UpdaterType,
-  typename PolicyType,
-  typename ReplayType = RandomReplay<EnvironmentType>
->
-void train(gym::Environment& env,
-           QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
-           RandomReplay<EnvironmentType>& replayMethod,
-           TrainingConfig& config,
-           std::vector<double>& returnList,
-           size_t& episodes,
-           size_t& consecutiveEpisodes,
-           const size_t numSteps)
+template<typename EnvironmentType,
+         typename NetworkType,
+         typename UpdaterType,
+         typename PolicyType,
+         typename ReplayType = RandomReplay<EnvironmentType>>
+void train(
+    gym::Environment& env,
+    QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
+    RandomReplay<EnvironmentType>& replayMethod,
+    TrainingConfig& config,
+    std::vector<double>& returnList,
+    size_t& episodes,
+    size_t& consecutiveEpisodes,
+    const size_t numSteps)
 {
   agent.Deterministic() = false;
   std::cout << "Training for " << numSteps << " steps." << std::endl;
@@ -49,18 +48,23 @@ void train(gym::Environment& env,
       env.step(action);
       DiscreteActionEnv::State nextState;
       nextState.Data() = env.observation;
-      
+
       // Use an adjusted reward for task completion.
       double adjustedReward = env.reward;
       if (nextState.Data()[0] < -0.8)
         adjustedReward += 0.5;
 
-      replayMethod.Store(agent.State(), agent.Action(), adjustedReward, nextState,
-          env.done, 0.99);
+      replayMethod.Store(agent.State(),
+                         agent.Action(),
+                         adjustedReward,
+                         nextState,
+                         env.done,
+                         0.99);
       episodeReturn += env.reward;
       adjustedEpisodeReturn += adjustedReward;
       agent.TotalSteps()++;
-      if (agent.Deterministic() || agent.TotalSteps() < config.ExplorationSteps())
+      if (agent.Deterministic()
+          || agent.TotalSteps() < config.ExplorationSteps())
         continue;
       agent.TrainAgent();
     } while (!env.done);
@@ -69,17 +73,17 @@ void train(gym::Environment& env,
 
     if (returnList.size() > consecutiveEpisodes)
       returnList.erase(returnList.begin());
-        
-    double averageReturn = std::accumulate(returnList.begin(),
-                                           returnList.end(), 0.0) /
-                           returnList.size();
-    if(episodes % 5 == 0)
+
+    double averageReturn =
+        std::accumulate(returnList.begin(), returnList.end(), 0.0)
+        / returnList.size();
+    if (episodes % 5 == 0)
     {
       std::cout << "Avg return in last " << consecutiveEpisodes
-          << " episodes: " << averageReturn
-          << "\t Episode return: " << episodeReturn
-          << "\t Adjusted return: " << adjustedEpisodeReturn
-          << "\t Total steps: " << agent.TotalSteps() << std::endl;
+                << " episodes: " << averageReturn
+                << "\t Episode return: " << episodeReturn
+                << "\t Adjusted return: " << adjustedEpisodeReturn
+                << "\t Total steps: " << agent.TotalSteps() << std::endl;
     }
   }
 }
@@ -110,7 +114,11 @@ int main()
   config.ExplorationSteps() = 400;
 
   // Set up DQN agent.
-  QLearning<DiscreteActionEnv, decltype(model), AdamUpdate, decltype(policy), decltype(replayMethod)>
+  QLearning<DiscreteActionEnv,
+            decltype(model),
+            AdamUpdate,
+            decltype(policy),
+            decltype(replayMethod)>
       agent(config, model, policy, replayMethod);
 
   // Preparation for training the agent
@@ -143,8 +151,14 @@ int main()
    */
 
   // Training the agent for a total of at least 75 episodes.
-  train(env, agent, replayMethod, config, returnList, episodes, 
-      consecutiveEpisodes, 200*75);
+  train(env,
+        agent,
+        replayMethod,
+        config,
+        returnList,
+        episodes,
+        consecutiveEpisodes,
+        200 * 75);
 
   // Testing the trained agent
   agent.Deterministic() = true;
@@ -178,8 +192,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
@@ -194,8 +208,14 @@ int main()
 
   // A little more training...
   // Training the same agent for a total of at least 300 episodes.
-  train(env, agent, replayMethod, config, returnList, episodes, 
-      consecutiveEpisodes, 200*300);
+  train(env,
+        agent,
+        replayMethod,
+        config,
+        returnList,
+        episodes,
+        consecutiveEpisodes,
+        200 * 300);
 
   // Final agent testing!
   agent.Deterministic() = true;
@@ -228,8 +248,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 

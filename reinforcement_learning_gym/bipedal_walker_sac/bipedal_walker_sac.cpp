@@ -19,44 +19,44 @@ template<typename EnvironmentType,
          typename UpdaterType,
          typename PolicyType,
          typename ReplayType = RandomReplay<EnvironmentType>>
-void
-train(gym::Environment& env,
-      SAC<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
-      NetworkType qNetwork,
-      NetworkType policyNetwork,
-      RandomReplay<EnvironmentType>& replayMethod,
-      TrainingConfig& config,
-      std::vector<double>& returnList,
-      size_t& episodes,
-      size_t& consecutiveEpisodes,
-      const size_t numSteps)
+void train(gym::Environment& env,
+           SAC<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
+           NetworkType qNetwork,
+           NetworkType policyNetwork,
+           RandomReplay<EnvironmentType>& replayMethod,
+           TrainingConfig& config,
+           std::vector<double>& returnList,
+           size_t& episodes,
+           size_t& consecutiveEpisodes,
+           const size_t numSteps)
 {
   agent.Deterministic() = false;
   std::cout << "Training for " << numSteps << " steps." << std::endl;
-  while (agent.TotalSteps() < numSteps) {
+  while (agent.TotalSteps() < numSteps)
+  {
     double episodeReturn = 0;
     env.reset();
-    do {
+    do
+    {
       agent.State().Data() = env.observation;
       agent.SelectAction();
-      arma::mat action = { agent.Action().action };
+      arma::mat action = {agent.Action().action};
 
       env.step(action);
       ContinuousActionEnv::State nextState;
       nextState.Data() = env.observation;
 
       replayMethod.Store(
-        agent.State(), agent.Action(), env.reward, nextState, env.done, 0.99);
+          agent.State(), agent.Action(), env.reward, nextState, env.done, 0.99);
       episodeReturn += env.reward;
       agent.TotalSteps()++;
-      if (agent.Deterministic() ||
-          agent.TotalSteps() < config.ExplorationSteps())
+      if (agent.Deterministic()
+          || agent.TotalSteps() < config.ExplorationSteps())
         continue;
       for (size_t i = 0; i < config.UpdateInterval(); i++)
         agent.Update();
-    } 
-    while (!env.done);
-      returnList.push_back(episodeReturn);
+    } while (!env.done);
+    returnList.push_back(episodeReturn);
 
     episodes += 1;
 
@@ -64,14 +64,16 @@ train(gym::Environment& env,
       returnList.erase(returnList.begin());
 
     double averageReturn =
-      std::accumulate(returnList.begin(), returnList.end(), 0.0) /
-      returnList.size();
+        std::accumulate(returnList.begin(), returnList.end(), 0.0)
+        / returnList.size();
 
     std::cout << "Average return in last" << returnList.size()
-              << " consecutive episodes:" << averageReturn << " steps:" << agent.TotalSteps()
+              << " consecutive episodes:" << averageReturn
+              << " steps:" << agent.TotalSteps()
               << " Episode return:" << episodeReturn << std::endl;
 
-    if (episodes % 10 == 0) {
+    if (episodes % 10 == 0)
+    {
       data::Save("./" + std::to_string(episodes) + "qNetwork.xml",
                  "episode_" + std::to_string(episodes),
                  qNetwork);
@@ -84,8 +86,7 @@ train(gym::Environment& env,
   }
 }
 
-int
-main()
+int main()
 {
   // Initializing the agent
   // Set up the state and action space.
@@ -96,7 +97,7 @@ main()
 
   // Set up the actor and critic networks.
   FFN<EmptyLoss<>, GaussianInitialization> policyNetwork(
-    EmptyLoss<>(), GaussianInitialization(0, 0.01));
+      EmptyLoss<>(), GaussianInitialization(0, 0.01));
   policyNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension, 128));
   policyNetwork.Add(new ReLULayer<>());
   policyNetwork.Add(new Linear<>(128, 128));
@@ -106,9 +107,9 @@ main()
   policyNetwork.ResetParameters();
 
   FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
-    EmptyLoss<>(), GaussianInitialization(0, 0.01));
-  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension +
-                              ContinuousActionEnv::Action::size,
+      EmptyLoss<>(), GaussianInitialization(0, 0.01));
+  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
+                                + ContinuousActionEnv::Action::size,
                             128));
   qNetwork.Add(new ReLULayer<>());
   qNetwork.Add(new Linear<>(128, 128));
@@ -149,7 +150,7 @@ main()
       decltype(qNetwork),
       decltype(policyNetwork),
       AdamUpdate>
-    agent(config, qNetwork, policyNetwork, replayMethod);
+      agent(config, qNetwork, policyNetwork, replayMethod);
 
   const std::string environment = "BipedalWalker-v3";
   const std::string host = "gym.kurg.org";
@@ -161,7 +162,7 @@ main()
   size_t episodes = 0;
   bool converged = true;
   size_t consecutiveEpisodes = 50;
-  if (!usePreTrainedModel) 
+  if (!usePreTrainedModel)
   {
     train(env,
           agent,
@@ -195,7 +196,7 @@ main()
   size_t totalSteps = 0;
 
   // Testing the agent on gym's environment.
-  while (1) 
+  while (1)
   {
     // State from the environment is passed to the agent's internal
     // representation.
@@ -206,13 +207,13 @@ main()
     agent.SelectAction();
 
     // Action to take, decided by the policy.
-    arma::mat action = { agent.Action().action };
+    arma::mat action = {agent.Action().action};
 
     envTest.step(action);
     totalReward += envTest.reward;
     totalSteps += 1;
 
-    if (envTest.done) 
+    if (envTest.done)
     {
       std::cout << " Total steps: " << totalSteps
                 << "\\t Total reward: " << totalReward << std::endl;
