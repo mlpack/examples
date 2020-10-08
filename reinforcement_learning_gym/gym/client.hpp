@@ -34,9 +34,9 @@ class Client
 {
  public:
   static void async_read_handler(const boost::system::error_code& err,
-                        boost::system::error_code* err_out,
-                        std::size_t bytes_transferred,
-                        std::size_t* bytes_out)
+                                 boost::system::error_code* err_out,
+                                 std::size_t bytes_transferred,
+                                 std::size_t* bytes_out)
   {
     *err_out = err;
     *bytes_out = bytes_transferred;
@@ -199,10 +199,11 @@ class Client
   //! Locally stored io service.
   boost::asio::io_service io_service;
 
-  deadline_timer deadline;
-
   //! Locally stored socket object.
   tcp::socket s;
+
+  //! Object to control connection timeouts.
+  deadline_timer deadline;
 
   //! Locally-stored compression parameter.
   size_t compressionLevel;
