@@ -122,6 +122,10 @@ wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/ml
 # Add matplotlib-cpp header.
 wget -O /srv/conda/envs/notebook/include/matplotlibcpp.h https://raw.githubusercontent.com/lava/matplotlib-cpp/master/matplotlibcpp.h
 
+# Add cpp-wordcloud files. 
+wget -O /srv/conda/envs/notebook/include/wordcloud.hpp https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wordcloud.hpp
+wget -O /srv/conda/envs/notebook/include/wcloud.py https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wcloud.py
+
 # Add cpp-colorbar header.
 wget -O /srv/conda/envs/notebook/include/stackedbar.hpp https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.hpp
 wget -O /srv/conda/envs/notebook/include/stackedbar.py https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.py
