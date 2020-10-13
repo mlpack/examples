@@ -23,6 +23,10 @@
 
 #include <ensmallen.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || (ENS_VERSION_MINOR < 13))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack;
 using namespace mlpack::ann;
 
@@ -60,7 +64,7 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("./../data/mnist_full.csv", fullData, true, false);
+  data::Load("./../data/mnist_train.csv", fullData, true, false);
   fullData /= 255.0;
 
   if (isBinary)
