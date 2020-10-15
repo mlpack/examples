@@ -21,7 +21,7 @@
 
 #include <ensmallen.hpp>
 
-#if ((ENS_VERSION_MAJOR < 2) || (ENS_VERSION_MINOR < 13))
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
   #error "need ensmallen version 2.13.0 or later"
 #endif
 
