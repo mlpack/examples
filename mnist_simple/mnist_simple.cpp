@@ -136,6 +136,7 @@ int main()
                     double validationLoss = model.Evaluate(validX, validY);
                     std::cout << "Validation loss: " << validationLoss
                         << "." << std::endl;
+                    return validationLoss;
                   }));
 
   mat predOut;
