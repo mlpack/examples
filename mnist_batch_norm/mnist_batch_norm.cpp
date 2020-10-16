@@ -24,6 +24,10 @@
 #include <ensmallen.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack;
 using namespace mlpack::ann;
 

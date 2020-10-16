@@ -24,6 +24,10 @@
 #include <ensmallen.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack::ann;
 
 using namespace arma;
@@ -59,7 +63,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  mlpack::data::Load("../data/train.csv", dataset, true);
+  mlpack::data::Load("../data/mnist_train.csv", dataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -160,7 +164,7 @@ int main()
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
   arma::mat testingDataset;
-  mlpack::data::Load("../data/test.csv", testingDataset, true);
+  mlpack::data::Load("../data/mnist_test.csv", testingDataset, true);
 
   // As before, it's necessary to get rid of header.
   arma::mat testX = testingDataset.submat(
