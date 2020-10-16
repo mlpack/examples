@@ -122,6 +122,9 @@ int main()
       1e-8,           // Tolerance.
       true);
 
+  // Declare callback to store best trainning weights.
+  ens::StoreBestCoordinates<arma::mat> bestCoordinates;
+
   // Train neural network. If this is the first iteration, weights are
   // random, using current values as starting point otherwise.
   model.Train(trainX,
@@ -136,7 +139,12 @@ int main()
                     double validationLoss = model.Evaluate(validX, validY);
                     std::cout << "Validation loss: " << validationLoss
                         << "." << std::endl;
-                  }));
+                  }),
+              // Store best coordinates (neural network weights)
+              bestCoordinates);
+
+  // Save the best trainning weights into the model.
+  model.Parameters() = bestCoordinates.BestCoordinates();
 
   mat predOut;
   // Getting predictions on training data points.
