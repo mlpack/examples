@@ -40,10 +40,12 @@ install:
 
 script:
   # Finally, build all the examples.
-  - for f in */Makefile; do
+  - |
+    for f in */Makefile; do
       dir=`dirname $f`;
       cd $dir;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
+      echo "Make target $target_name in directory $dir.";
       make;
       ./$target_name;
     done
