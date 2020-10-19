@@ -5,18 +5,48 @@ language: cpp
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
-  - curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz && tar xvzf armadillo-8.400.0.tar.gz && cd armadillo-8.400.0
 
-# TODO: test examples via Makefiles
-#  - cmake . && make && sudo make install
-#  - cd $TRAVIS_BUILD_DIR && git clone https://github.com/mlpack/mlpack.git --depth 1
-#  - cd mlpack && mkdir mlpack_build && cd mlpack_build && cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_TESTS=OFF .. && make -j2 && sudo make install
+  # Install Armadillo 8.400.0 (the oldest supported version).
+  - curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz
+  - tar xvzf armadillo-8.400.0.tar.gz
+  - cd armadillo-8.400.0
+  - cmake .
+  - make
+  - sudo make install
+
+  # Build and install the latest version of ensmallen.
+  - cd $TRAVIS_BUILD_DIR
+  - curl -O http://www.ensmallen.org/files/ensmallen-latest.tar.gz -o ensmallen-latest.tar.gz
+  - tar xvzf ensmallen-latest.tar.gz
+  - cd ensmallen-*/
+  - mkdir build
+  - cd build
+  - cmake -DBUILD_TESTS=OFF ../
+  - make
+  - sudo make install
+
+  # Build mlpack.
+  - cd $TRAVIS_BUILD_DIR
+  - git clone https://github.com/mlpack/mlpack.git --depth 1
+  - cd mlpack
+  - mkdir build
+  - cd build
+  - cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
+  - make -j2
+  - sudo make install
 
 install:
-#  - cd $TRAVIS_BUILD_DIR && mkdir build && cd build && cmake -DUSE_OPENMP=OFF ..
+  # Nothing to do.
+
 script:
-#  - make -j2
-  - echo "currently not doing anything for build!"
+  # Finally, build all the examples.
+  - for f in */Makefile; do
+      dir=`dirname $f`;
+      cd $dir;
+      target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
+      make
+      ./$target_name
+    done
 
 notifications:
   email:
