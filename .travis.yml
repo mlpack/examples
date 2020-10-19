@@ -44,8 +44,8 @@ script:
       dir=`dirname $f`;
       cd $dir;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
-      make
-      ./$target_name
+      make;
+      ./$target_name;
     done
 
 notifications:
