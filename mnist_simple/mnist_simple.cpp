@@ -140,6 +140,7 @@ int main()
                     double validationLoss = model.Evaluate(validX, validY);
                     std::cout << "Validation loss: " << validationLoss
                         << "." << std::endl;
+                    return validationLoss;
                   }));
 
   mat predOut;
@@ -168,7 +169,7 @@ int main()
 
   // As before, it's necessary to get rid of header.
   arma::mat testX = testingDataset.submat(
-      0, 1, testingDataset.n_rows - 1, testingDataset.n_cols - 1);
+      0, 1, testingDataset.n_rows - 2, testingDataset.n_cols - 1);
 
   std::cout << "Predicting ..." << endl;
   mat testPredOut;
