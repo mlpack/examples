@@ -44,7 +44,9 @@ before_install:
   - cd ../
 
 install:
-  # Nothing to do.
+  # Download datasets.
+  - pip install tqdm
+  - tools/download_data_set.py
 
 script:
   # Finally, build all the examples.
