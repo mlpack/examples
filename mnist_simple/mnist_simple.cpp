@@ -143,7 +143,7 @@ int main()
               // Store best coordinates (neural network weights)
               bestCoordinates);
 
-  // Save the best trainning weights into the model.
+  // Save the best training weights into the model.
   model.Parameters() = bestCoordinates.BestCoordinates();
 
   mat predOut;
