@@ -127,7 +127,7 @@ int main()
   // Change the names of these files as necessary. They should be correct
   // already, if your program's working directory contains the data and/or
   // model.
-  const string dataFile = "electricity-usage.csv";
+  const string dataFile = "../data/electricity-usage.csv";
   // example: const string dataFile =
   //                  "C:/mlpack-model-app/electricity-usage.csv";
   // example: const string dataFile =

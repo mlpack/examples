@@ -76,7 +76,7 @@ int main()
   mat tempDataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/train.csv", tempDataset, true);
+  data::Load("../data/mnist_train.csv", tempDataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -183,7 +183,7 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
 
-  mlpack::data::Load("../data/test.csv", tempDataset, true);
+  mlpack::data::Load("../data/mnist_test.csv", tempDataset, true);
 
   mat testX =
       tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
