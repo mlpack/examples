@@ -13,7 +13,7 @@ before_install:
   - curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz
   - tar xvzf armadillo-8.400.0.tar.gz
   - cd armadillo-8.400.0
-  - cmake .
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr .
   - make
   - sudo make install
 
@@ -24,7 +24,7 @@ before_install:
   - cd ensmallen-*/
   - mkdir build
   - cd build
-  - cmake -DBUILD_TESTS=OFF ../
+  - cmake -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr ../
   - make
   - sudo make install
   - cd ../
@@ -35,7 +35,7 @@ before_install:
   - cd mlpack
   - mkdir build
   - cd build
-  - cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
   - make -j2
   - sudo make install
   - cd ../
