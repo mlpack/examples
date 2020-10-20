@@ -6,6 +6,9 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev
 
+  - mkdir deps/
+  - cd deps/
+
   # Install Armadillo 8.400.0 (the oldest supported version).
   - curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz
   - tar xvzf armadillo-8.400.0.tar.gz
@@ -24,6 +27,7 @@ before_install:
   - cmake -DBUILD_TESTS=OFF ../
   - make
   - sudo make install
+  - cd ../
 
   # Build mlpack.
   - cd $TRAVIS_BUILD_DIR
@@ -34,6 +38,10 @@ before_install:
   - cmake -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
   - make -j2
   - sudo make install
+  - cd ../
+
+  # Leave deps/.
+  - cd ../
 
 install:
   # Nothing to do.
