@@ -64,7 +64,7 @@ script:
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";
       make;
-      ./$target_name;
+      ./$target_name > target.log;
       cd ../;
     done
 
