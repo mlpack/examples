@@ -122,7 +122,7 @@ int main()
       1e-8,           // Tolerance.
       true);
 
-  // Declare callback to store best trainning weights.
+  // Declare callback to store best training weights.
   ens::StoreBestCoordinates<arma::mat> bestCoordinates;
 
   // Train neural network. If this is the first iteration, weights are
