@@ -56,6 +56,7 @@ script:
       echo "Make target $target_name in directory $dir.";
       make;
       ./$target_name;
+      cd ../;
     done
 
 notifications:
