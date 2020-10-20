@@ -47,7 +47,9 @@ install:
   # Download datasets.
   - pwd
   - pip install tqdm
-  - tools/download_data_set.py
+  - cd tools/
+  - download_data_set.py
+  - cd ../
   - ls data/
 
 script:
