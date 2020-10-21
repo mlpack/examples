@@ -1,0 +1,6 @@
+install.packages("mlpack")
+install.packages("data.table")
+install.packages("wordcloud")
+install.packages("tm")
+install.packages("dplyr")
+install.packages("ggplot2")
