@@ -21,6 +21,10 @@
 
 #include <ensmallen.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack;
 using namespace mlpack::ann;
 
@@ -62,7 +66,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/train.csv", tempDataset, true);
+  data::Load("../data/mnist_train.csv", tempDataset, true);
 
   // The original Kaggle dataset CSV file has headings for each column,
   // so it's necessary to get rid of the first row. In Armadillo representation,
@@ -213,7 +217,7 @@ int main()
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/test.csv", tempDataset, true);
+  data::Load("../data/mnist_test.csv", tempDataset, true);
 
   // As before, it's necessary to get rid of column headings.
   mat testX =
