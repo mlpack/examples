@@ -73,8 +73,20 @@ script:
       make;
       # Filter out "epoch in progress" lines.
       ./$target_name | grep -v -- '\.] ';
+      if [ "$?" != "0" ]; then
+          echo "Example failed: $dir" >> faillog;
+      fi
       cd ../;
     done
+  # Print any failures.
+  - |
+    if [ -f faillog ]; then
+      echo "Some examples failed!";
+      echo "";
+      cat faillog;
+      exit 1;
+    fi
+
 
 notifications:
   email:
