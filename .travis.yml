@@ -60,6 +60,13 @@ script:
   - |
     for f in */Makefile; do
       dir=`dirname $f`;
+
+      # TODO: this takes too long right now.
+      if [ "$dir" == "mnist_cnn" ];
+      then
+        continue;
+      fi
+
       cd $dir;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";
