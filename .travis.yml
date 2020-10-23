@@ -74,7 +74,7 @@ script:
       # Filter out "epoch in progress" lines.
       ./$target_name | grep -v -- '\.] ';
       if [ "$?" != "0" ]; then
-          echo "Example failed: $dir" >> faillog;
+          echo "Example failed: $dir" >> ../faillog;
       fi
       cd ../;
     done
