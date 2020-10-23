@@ -73,7 +73,7 @@ script:
       make;
       # Filter out "epoch in progress" lines.
       ./$target_name | grep -v -- '\.] ';
-      if [ "${PIPESTATUS[0]}?" != "0" ]; then
+      if [ "${PIPESTATUS[0]}" != "0" ]; then
           echo "Example failed: $dir"
           echo "Example failed: $dir" >> ../faillog;
       else
