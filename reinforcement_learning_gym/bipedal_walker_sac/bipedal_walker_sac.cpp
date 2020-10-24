@@ -145,7 +145,6 @@ int main()
    * To default is to use the pretrained model. Otherwise you can disable this
    * by change the pretrained_flag to false and then recompile this example.
    */
-
   SAC<ContinuousActionEnv,
       decltype(qNetwork),
       decltype(policyNetwork),
