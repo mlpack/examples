@@ -14,7 +14,7 @@ conda install jupyterlab=2
 # Install necessaary kernel and debugger related dependency following 
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs bqplot cmake wordcloud xproperty
+conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs bqplot cmake wordcloud xproperty imageio
 
 # Install the debugger in postBuild and not `environment.yml` to 
 # avoid breaking jupyter-offlinenotebook.
@@ -121,6 +121,18 @@ wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/ml
 
 # Add matplotlib-cpp header.
 wget -O /srv/conda/envs/notebook/include/matplotlibcpp.h https://raw.githubusercontent.com/lava/matplotlib-cpp/master/matplotlibcpp.h
+
+# Add cpp-wordcloud files. 
+wget -O /srv/conda/envs/notebook/include/wordcloud.hpp https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wordcloud.hpp
+wget -O /srv/conda/envs/notebook/include/wcloud.py https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wcloud.py
+
+# Add cpp-colorbar header.
+wget -O /srv/conda/envs/notebook/include/stackedbar.hpp https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.hpp
+wget -O /srv/conda/envs/notebook/include/stackedbar.py https://raw.githubusercontent.com/zoq/cpp-colorbar/master/stackedbar.py
+
+# Add satter-cpp header.
+wget -O /srv/conda/envs/notebook/include/scatter.hpp https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.hpp
+wget -O /srv/conda/envs/notebook/include/scatter.py https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.py
 
 # Setup https://github.com/zoq/gym_tcp_api. 
 wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
