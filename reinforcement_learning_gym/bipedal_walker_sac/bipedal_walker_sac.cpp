@@ -19,7 +19,7 @@ template<typename EnvironmentType,
          typename UpdaterType,
          typename PolicyType,
          typename ReplayType = RandomReplay<EnvironmentType>>
-void train(gym::Environment& env,
+void Train(gym::Environment& env,
            SAC<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
            NetworkType qNetwork,
            NetworkType policyNetwork,
@@ -164,7 +164,7 @@ int main()
   size_t consecutiveEpisodes = 50;
   if (!usePreTrainedModel)
   {
-    train(env,
+    Train(env,
           agent,
           qNetwork,
           policyNetwork,

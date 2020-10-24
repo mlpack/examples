@@ -22,7 +22,7 @@ template<typename EnvironmentType,
          typename UpdaterType,
          typename PolicyType,
          typename ReplayType = RandomReplay<EnvironmentType>>
-void train(
+void Train(
     gym::Environment& env,
     QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
     RandomReplay<EnvironmentType>& replayMethod,
@@ -138,7 +138,7 @@ int main()
 
   // Let the training begin
   // Training the agent for a total of at least 5000 steps.
-  train(env,
+  Train(env,
         agent,
         replayMethod,
         config,
@@ -193,7 +193,7 @@ int main()
   std::string url = envTest.url();
 
   //A little more training...
-  train(env,
+  Train(env,
         agent,
         replayMethod,
         config,

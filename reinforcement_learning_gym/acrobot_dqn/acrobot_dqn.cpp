@@ -1,7 +1,15 @@
-// Including necessary libraries and namespacesd"
+/**
+ * This example shows how to get use 3-Step Double DQN with Prioritized Replay
+ * to train an agent to get high scores for the
+ * [Acrobot](https://gym.openai.com/envs/Acrobot-v1) environment.
+ * We make the agent train and test on OpenAI Gym toolkit's GUI interface provided
+ * through a distributed infrastructure (TCP API). More details can be found
+ * [here](https://github.com/zoq/gym_tcp_api).
+ * A video of the trained agent can be seen in the end.
+ */
 
+// Including necessary libraries and namespaces
 #include <mlpack/core.hpp>
-
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/reinforcement_learning/q_learning.hpp>
 #include <mlpack/methods/reinforcement_learning/q_networks/simple_dqn.hpp>
@@ -17,6 +25,7 @@ using namespace mlpack::ann;
 using namespace ens;
 using namespace mlpack::rl;
 
+// Function to train the agent on the Acrobot-v1 gym environment.
 template<typename EnvironmentType,
          typename NetworkType,
          typename UpdaterType,
@@ -37,7 +46,6 @@ void Train(
   while (agent.TotalSteps() < numSteps)
   {
     double episodeReturn = 0;
-    double adjustedEpisodeReturn = 0;
     env.reset();
     do
     {
@@ -49,22 +57,11 @@ void Train(
       DiscreteActionEnv::State nextState;
       nextState.Data() = env.observation;
 
-      // Use an adjusted reward for task completion.
-      double adjustedReward = env.reward;
-      if (nextState.Data()[0] < -0.8)
-        adjustedReward += 0.5;
-
-      replayMethod.Store(agent.State(),
-                         agent.Action(),
-                         adjustedReward,
-                         nextState,
-                         env.done,
-                         0.99);
+      replayMethod.Store(agent.State(), agent.Action(), env.reward, nextState,
+          env.done, 0.99);
       episodeReturn += env.reward;
-      adjustedEpisodeReturn += adjustedReward;
       agent.TotalSteps()++;
-      if (agent.Deterministic()
-          || agent.TotalSteps() < config.ExplorationSteps())
+      if (agent.Deterministic() || agent.TotalSteps() < config.ExplorationSteps())
         continue;
       agent.TrainAgent();
     } while (!env.done);
@@ -73,17 +70,16 @@ void Train(
 
     if (returnList.size() > consecutiveEpisodes)
       returnList.erase(returnList.begin());
-
-    double averageReturn =
-        std::accumulate(returnList.begin(), returnList.end(), 0.0)
-        / returnList.size();
-    if (episodes % 5 == 0)
+        
+    double averageReturn = std::accumulate(returnList.begin(),
+                                           returnList.end(), 0.0) /
+                           returnList.size();
+    if(episodes % 5 == 0)
     {
       std::cout << "Avg return in last " << consecutiveEpisodes
-                << " episodes: " << averageReturn
-                << "\t Episode return: " << episodeReturn
-                << "\t Adjusted return: " << adjustedEpisodeReturn
-                << "\t Total steps: " << agent.TotalSteps() << std::endl;
+          << " episodes: " << averageReturn
+          << "\t Episode return: " << episodeReturn
+          << "\t Total steps: " << agent.TotalSteps() << std::endl;
     }
   }
 }
@@ -91,40 +87,38 @@ void Train(
 int main()
 {
   // Initializing the agent
+
   // Set up the state and action space.
-  DiscreteActionEnv::State::dimension = 2;
+  DiscreteActionEnv::State::dimension = 6;
   DiscreteActionEnv::Action::size = 3;
 
   // Set up the network.
-  FFN<MeanSquaredError<>, GaussianInitialization> network(
-      MeanSquaredError<>(), GaussianInitialization(0, 1));
-  network.Add<Linear<>>(DiscreteActionEnv::State::dimension, 128);
-  network.Add<ReLULayer<>>();
-  network.Add<Linear<>>(128, DiscreteActionEnv::Action::size);
-  // Set up the network.
-  SimpleDQN<> model(network);
+  FFN<MeanSquaredError<>, RandomInitialization> module(MeanSquaredError<>(), RandomInitialization(-1, 1));
+  module.Add<Linear<>>(DiscreteActionEnv::State::dimension, 64);
+  module.Add<ReLULayer<>>();
+  module.Add<Linear<>>(64, DiscreteActionEnv::Action::size);
+  SimpleDQN<FFN<MeanSquaredError<>, RandomInitialization>> model(module);
 
   // Set up the policy method.
   GreedyPolicy<DiscreteActionEnv> policy(1.0, 1000, 0.1, 0.99);
-  RandomReplay<DiscreteActionEnv> replayMethod(32, 10000);
+  // To enable 3-step learning, we set the last parameter of the replay method as 3.
+  PrioritizedReplay<DiscreteActionEnv> replayMethod(64, 5000, 0.6, 3);
 
   // Set up training configurations.
   TrainingConfig config;
   config.TargetNetworkSyncInterval() = 100;
-  config.ExplorationSteps() = 400;
+  config.ExplorationSteps() = 500;
+
+  // We use double Q learning for this example.
+  config.DoubleQLearning() = true;
 
   // Set up DQN agent.
-  QLearning<DiscreteActionEnv,
-            decltype(model),
-            AdamUpdate,
-            decltype(policy),
-            decltype(replayMethod)>
-      agent(config, model, policy, replayMethod);
+  QLearning<DiscreteActionEnv, decltype(model), AdamUpdate, decltype(policy),
+    decltype(replayMethod)>  agent(config, model, policy, replayMethod);
 
   // Preparation for training the agent
-
   // Set up the gym training environment.
-  gym::Environment env("gym.kurg.org", "4040", "MountainCar-v0");
+  gym::Environment env("gym.kurg.org", "4040", "Acrobot-v1");
 
   // Initializing training variables.
   std::vector<double> returnList;
@@ -134,23 +128,7 @@ int main()
   // The number of episode returns to keep track of.
   size_t consecutiveEpisodes = 50;
 
-  /**
-   * An important point to note for Mountain Car setup is that for each step that
-   * the 
-   * car does not reach the goal located at position `0.5`, the environment returns
-   * a reward of `-1`. Now, since the agent’s reward never changes until completion
-   * of the episode, it is difficult for our algorithm to improve until it randomly
-   * reaches the top of the hill.
-   * That is unless we modify the reward by giving an additional `0.5` reward for
-   * every time the agent managed to drag the car in the backward direction 
-   * (i.e position < `-0.8`). This was important to gain momentum to climb the hill.
-   * This minor tweak can greatly increase sample efficiency.
-   * Note here that `Episode return:` is the actual (environment's) return, whereas 
-   * `Adjusted return:` is the return calculated from the adjusted reward function 
-   * we described earlier.
-   */
-
-  // Training the agent for a total of at least 75 episodes.
+  // Training the agent for a total of at least 25000 steps.
   Train(env,
         agent,
         replayMethod,
@@ -158,13 +136,13 @@ int main()
         returnList,
         episodes,
         consecutiveEpisodes,
-        200 * 75);
+        25000);
 
   // Testing the trained agent
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "MountainCar-v0");
+  gym::Environment envTest("gym.kurg.org", "4040", "Acrobot-v1");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
@@ -192,8 +170,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps
-                << "\t Total reward: " << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
+          << totalReward << std::endl;
       break;
     }
 
@@ -203,24 +181,17 @@ int main()
   }
 
   envTest.close();
-  std::string url = envTest.url();
-  std::cout << url << std::endl;
+  std::cout << envTest.url() << std::endl;
 
-  // A little more training...
-  // Training the same agent for a total of at least 300 episodes.
-  Train(env,
-        agent,
-        replayMethod,
-        config,
-        returnList,
-        episodes,
-        consecutiveEpisodes,
-        200 * 300);
-
-  // Final agent testing!
+  /** 
+   * Due to the stochasticity of the environment, it's quite possible that sometimes
+   * the agent is not able to solve it in each test. So, we test the agent once
+   * more, just to be sure.
+   */
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
+  gym::Environment envTest("gym.kurg.org", "4040", "Acrobot-v1");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
@@ -248,8 +219,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps
-                << "\t Total reward: " << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
+          << totalReward << std::endl;
       break;
     }
 
@@ -259,6 +230,5 @@ int main()
   }
 
   envTest.close();
-  url = envTest.url();
-  std::cout << url << std::endl;
+  std::cout << envTest.url() << std::endl;
 }

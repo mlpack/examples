@@ -20,7 +20,7 @@ template<typename EnvironmentType,
          typename UpdaterType,
          typename PolicyType,
          typename ReplayType = RandomReplay<EnvironmentType>>
-void train(gym::Environment& env,
+void Train(gym::Environment& env,
            SAC<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
            RandomReplay<EnvironmentType>& replayMethod,
            TrainingConfig& config,
@@ -131,7 +131,7 @@ int main()
   size_t consecutiveEpisodes = 25;
 
   // Training the agent for a total of at least 5000 steps.
-  train(env,
+  Train(env,
         agent,
         replayMethod,
         config,
@@ -188,7 +188,7 @@ int main()
 
   // A little more training...
   // Training the same agent for a total of at least 40000 steps.
-  train(env,
+  Train(env,
         agent,
         replayMethod,
         config,
