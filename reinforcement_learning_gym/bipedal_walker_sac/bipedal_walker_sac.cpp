@@ -142,8 +142,8 @@ int main()
    * You can train the model from scratch by running the following
    * training function or you can use the pretrained model already
    * provided in this repository.
-   * To default is to use the pretrained model. Otherwise you can disable this
-   * by change the pretrained_flag to false and then recompile this example.
+   * To default is to use the usePreTrainedModel. Otherwise you can disable this
+   * by change the usePreTrainedModel to false and then recompile this example.
    */
   SAC<ContinuousActionEnv,
       decltype(qNetwork),
@@ -225,6 +225,5 @@ int main()
   }
 
   envTest.close();
-  std::string url = envTest.url();
-  std::cout << url;
+  std::cout<< envTest.url() << std::endl;
 }

@@ -169,8 +169,7 @@ int main()
   }
 
   envTest.close();
-  std::string url = envTest.url();
-  std::cout << url;
+  std::cout << envTest.url() << std::endl;
 
   // A little more training...
   Train(env,
@@ -227,6 +226,5 @@ int main()
   }
 
   envTest.close();
-  url = envTest.url();
-  std::cout << url;
+  std::cout << envTest.url() << std::endl;
 }

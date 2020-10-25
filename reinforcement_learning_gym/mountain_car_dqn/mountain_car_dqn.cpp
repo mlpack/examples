@@ -203,8 +203,7 @@ int main()
   }
 
   envTest.close();
-  std::string url = envTest.url();
-  std::cout << url << std::endl;
+  std::cout << envTest.url() << std::endl;
 
   // A little more training...
   // Training the same agent for a total of at least 300 episodes.
@@ -259,6 +258,5 @@ int main()
   }
 
   envTest.close();
-  url = envTest.url();
-  std::cout << url << std::endl;
+  std::cout << envTest.url() << std::endl;
 }
