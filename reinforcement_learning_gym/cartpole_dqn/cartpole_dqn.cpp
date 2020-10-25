@@ -1,3 +1,14 @@
+/**
+ * This notebook shows how to get started with training reinforcement learning agents,
+ * particularly DQN agents, using mlpack. Here, we train a
+ * [Simple DQN](https://www.cs.toronto.edu/~vmnih/docs/dqn.pdf) agent to get high scores
+ * for the [CartPole](https://gym.openai.com/envs/CartPole-v0) environment.
+ * We make the agent train and test on OpenAI Gym toolkit's GUI interface provided 
+ * through a distributed infrastructure (TCP API). More details can be found
+ * [here](https://github.com/zoq/gym_tcp_api).
+ * A video of the trained agent can be seen in the end.
+ */
+
 // Including necessary libraries and namespaces"
 #include <mlpack/core.hpp>
 #include <mlpack/methods/ann/ffn.hpp>

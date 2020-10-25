@@ -1,3 +1,14 @@
+/**
+ * Here, we train a [Soft Actor-Critic](https://arxiv.org/abs/1801.01290) agent to get
+ * high scores for the [Bipedal Walker](https://gym.openai.com/envs/BipedalWalker-v2/) 
+ * environment.
+ * We make the agent train and test on OpenAI Gym toolkit's GUI interface provided 
+ * through a distributed infrastructure (TCP API). More details can be found
+ * [here](https://github.com/zoq/gym_tcp_api).
+ * A video of the trained agent can be seen in the end.
+ */
+
+// Including necessary libraries and namespaces
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/gaussian_init.hpp>
 #include <mlpack/methods/ann/loss_functions/empty_loss.hpp>
