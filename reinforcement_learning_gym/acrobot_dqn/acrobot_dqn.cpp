@@ -33,8 +33,8 @@ template<typename EnvironmentType,
          typename ReplayType = RandomReplay<EnvironmentType>>
 void Train(
     gym::Environment& env,
-    QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType>& agent,
-    RandomReplay<EnvironmentType>& replayMethod,
+    QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType, ReplayType>& agent,
+    PrioritizedReplay<EnvironmentType>& replayMethod,
     TrainingConfig& config,
     std::vector<double>& returnList,
     size_t& episodes,
@@ -87,17 +87,17 @@ void Train(
 int main()
 {
   // Initializing the agent
-
   // Set up the state and action space.
   DiscreteActionEnv::State::dimension = 6;
   DiscreteActionEnv::Action::size = 3;
 
   // Set up the network.
-  FFN<MeanSquaredError<>, RandomInitialization> module(MeanSquaredError<>(), RandomInitialization(-1, 1));
+  FFN<MeanSquaredError<>, GaussianInitialization> module(
+      MeanSquaredError<>(), GaussianInitialization(0, 1));
   module.Add<Linear<>>(DiscreteActionEnv::State::dimension, 64);
   module.Add<ReLULayer<>>();
   module.Add<Linear<>>(64, DiscreteActionEnv::Action::size);
-  SimpleDQN<FFN<MeanSquaredError<>, RandomInitialization>> model(module);
+  SimpleDQN<> model(module);
 
   // Set up the policy method.
   GreedyPolicy<DiscreteActionEnv> policy(1.0, 1000, 0.1, 0.99);
@@ -191,7 +191,6 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "Acrobot-v1");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
