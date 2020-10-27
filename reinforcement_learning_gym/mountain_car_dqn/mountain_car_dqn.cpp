@@ -7,7 +7,7 @@
  * A video of the trained agent can be seen in the end.
  */
 
-// Including necessary libraries and namespacesd"
+// Including necessary libraries and namespaces.
 #include <mlpack/core.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/reinforcement_learning/q_learning.hpp>
