@@ -125,7 +125,7 @@ int main()
   size_t consecutiveEpisodes = 50;
   // Function to train the agent on mlpack's own implementation of the CartPole environment.
 
-  // Let the training begin
+  // Let the training begin.
   // Training the agent for a total of at least 2500 steps.
   Train(env,
         agent,
