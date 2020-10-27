@@ -89,7 +89,7 @@ void Train(
 
 int main()
 {
-  //Initializing the agent
+  // Initializing the agent.
   // Set up the state and action space.
   DiscreteActionEnv::State::dimension = 4;
   DiscreteActionEnv::Action::size = 2;
