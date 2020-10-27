@@ -126,7 +126,7 @@ int main()
   // The number of episode returns to keep track of.
   size_t consecutiveEpisodes = 50;
 
-  // Let the training begin
+  // Let the training begin.
   // Training the agent for a total of at least 10000 steps.
   Train(env,
         agent,
