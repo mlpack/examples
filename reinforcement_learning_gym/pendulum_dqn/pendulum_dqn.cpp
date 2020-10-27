@@ -144,7 +144,7 @@ int main()
    * results!
    * */
 
-  // Let the training begin
+  // Let the training begin.
   // Training the agent for a total of at least 5000 steps.
   Train(env,
         agent,
