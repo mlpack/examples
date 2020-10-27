@@ -91,7 +91,7 @@ void Train(gym::Environment& env,
 
 int main()
 {
-  //Initializing the agent
+  // Initializing the agent.
 
   // Set up the state and action space.
   ContinuousActionEnv::State::dimension = 3;
