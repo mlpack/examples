@@ -113,7 +113,7 @@ int main()
   QLearning<DiscreteActionEnv, decltype(model), AdamUpdate, decltype(policy)>
       agent(config, model, policy, replayMethod);
 
-  // Preparation for training the agent
+  // Preparation for training the agent.
 
   // Set up the gym training environment.
   gym::Environment env("gym.kurg.org", "4040", "Pendulum-v0");
