@@ -88,11 +88,9 @@ void Train(gym::Environment& env,
     if (episodes % 10 == 0)
     {
       data::Save("./" + std::to_string(episodes) + "qNetwork.xml",
-                 "episode_" + std::to_string(episodes),
-                 qNetwork);
+          "episode_" + std::to_string(episodes), qNetwork);
       data::Save("./" + std::to_string(episodes) + "policyNetwork.xml",
-                 "episode_" + std::to_string(episodes),
-                 policyNetwork);
+          "episode_" + std::to_string(episodes), policyNetwork);
     }
     if (averageReturn > -50)
       break;
