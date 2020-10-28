@@ -31,15 +31,18 @@ template<typename EnvironmentType,
          typename UpdaterType,
          typename PolicyType,
          typename ReplayType = RandomReplay<EnvironmentType>>
-void Train(
-    gym::Environment& env,
-    QLearning<EnvironmentType, NetworkType, UpdaterType, PolicyType, ReplayType>& agent,
-    PrioritizedReplay<EnvironmentType>& replayMethod,
-    TrainingConfig& config,
-    std::vector<double>& returnList,
-    size_t& episodes,
-    size_t& consecutiveEpisodes,
-    const size_t numSteps)
+void Train(gym::Environment& env,
+           QLearning<EnvironmentType,
+                     NetworkType,
+                     UpdaterType,
+                     PolicyType,
+                     ReplayType>& agent,
+           PrioritizedReplay<EnvironmentType>& replayMethod,
+           TrainingConfig& config,
+           std::vector<double>& returnList,
+           size_t& episodes,
+           size_t& consecutiveEpisodes,
+           const size_t numSteps)
 {
   agent.Deterministic() = false;
   std::cout << "Training for " << numSteps << " steps." << std::endl;
@@ -57,11 +60,12 @@ void Train(
       DiscreteActionEnv::State nextState;
       nextState.Data() = env.observation;
 
-      replayMethod.Store(agent.State(), agent.Action(), env.reward, nextState,
-          env.done, 0.99);
+      replayMethod.Store(
+          agent.State(), agent.Action(), env.reward, nextState, env.done, 0.99);
       episodeReturn += env.reward;
       agent.TotalSteps()++;
-      if (agent.Deterministic() || agent.TotalSteps() < config.ExplorationSteps())
+      if (agent.Deterministic()
+          || agent.TotalSteps() < config.ExplorationSteps())
       {
         continue;
       }
@@ -72,16 +76,16 @@ void Train(
 
     if (returnList.size() > consecutiveEpisodes)
       returnList.erase(returnList.begin());
-        
-    double averageReturn = std::accumulate(returnList.begin(),
-                                           returnList.end(), 0.0) /
-                           returnList.size();
-    if(episodes % 5 == 0)
+
+    double averageReturn =
+        std::accumulate(returnList.begin(), returnList.end(), 0.0)
+        / returnList.size();
+    if (episodes % 5 == 0)
     {
       std::cout << "Avg return in last " << consecutiveEpisodes
-          << " episodes: " << averageReturn
-          << "\t Episode return: " << episodeReturn
-          << "\t Total steps: " << agent.TotalSteps() << std::endl;
+                << " episodes: " << averageReturn
+                << "\t Episode return: " << episodeReturn
+                << "\t Total steps: " << agent.TotalSteps() << std::endl;
     }
   }
 }
@@ -115,8 +119,12 @@ int main()
   config.DoubleQLearning() = true;
 
   // Set up DQN agent.
-  QLearning<DiscreteActionEnv, decltype(model), AdamUpdate, decltype(policy),
-    decltype(replayMethod)>  agent(config, model, policy, replayMethod);
+  QLearning<DiscreteActionEnv,
+            decltype(model),
+            AdamUpdate,
+            decltype(policy),
+            decltype(replayMethod)>
+      agent(config, model, policy, replayMethod);
 
   // Preparation for training the agent
   // Set up the gym training environment.
@@ -172,8 +180,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
@@ -220,8 +228,8 @@ int main()
 
     if (envTest.done)
     {
-      std::cout << " Total steps: " << totalSteps << "\t Total reward: "
-          << totalReward << std::endl;
+      std::cout << " Total steps: " << totalSteps
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
