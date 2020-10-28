@@ -1,4 +1,3 @@
-install.packages("mlpack")
 install.packages("data.table")
 install.packages("wordcloud")
 install.packages("tm")
