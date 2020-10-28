@@ -194,10 +194,12 @@ int main()
         consecutiveEpisodes,
         100000);
 
-  // Final agent testing!
-  // *Note*: If you don't find a satisfactory output, please rerun the cell
-  // below. It's not guaranteed that the agent will receive high rewards on all
-  // test runs.
+  /*
+   * Final agent testing!
+   * *Note*: If you don't find a satisfactory output, please rerun the code block
+   * below. It's not guaranteed that the agent will receive high rewards on all
+   * test runs.
+   */
 
   agent.Deterministic() = true;
 

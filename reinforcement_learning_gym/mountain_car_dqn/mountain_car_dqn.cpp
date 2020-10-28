@@ -145,11 +145,10 @@ int main()
 
   /**
    * An important point to note for Mountain Car setup is that for each step that
-   * the 
-   * car does not reach the goal located at position `0.5`, the environment returns
-   * a reward of `-1`. Now, since the agent’s reward never changes until completion
-   * of the episode, it is difficult for our algorithm to improve until it randomly
-   * reaches the top of the hill.
+   * the car does not reach the goal located at position `0.5`, the environment
+   * returns a reward of `-1`. Now, since the agent’s reward never changes until 
+   * completion of the episode, it is difficult for our algorithm to improve until
+   * it randomly reaches the top of the hill.
    * That is unless we modify the reward by giving an additional `0.5` reward for
    * every time the agent managed to drag the car in the backward direction 
    * (i.e position < `-0.8`). This was important to gain momentum to climb the hill.
