@@ -122,8 +122,7 @@ int main()
   FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
       EmptyLoss<>(), GaussianInitialization(0, 0.01));
   qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
-                                + ContinuousActionEnv::Action::size,
-                            128));
+    + ContinuousActionEnv::Action::size, 128));
   qNetwork.Add(new ReLULayer<>());
   qNetwork.Add(new Linear<>(128, 128));
   qNetwork.Add(new ReLULayer<>());
