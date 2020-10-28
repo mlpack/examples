@@ -62,7 +62,9 @@ void Train(gym::Environment& env,
 
       if (agent.Deterministic()
           || agent.TotalSteps() < config.ExplorationSteps())
+      {
         continue;
+      }
 
       for (size_t i = 0; i < config.UpdateInterval(); i++)
         agent.Update();
@@ -108,8 +110,7 @@ int main()
   FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
       EmptyLoss<>(), GaussianInitialization(0, 0.1));
   qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
-                                + ContinuousActionEnv::Action::size,
-                            32));
+      + ContinuousActionEnv::Action::size, 32));
   qNetwork.Add(new ReLULayer<>());
   qNetwork.Add(new Linear<>(32, 1));
 

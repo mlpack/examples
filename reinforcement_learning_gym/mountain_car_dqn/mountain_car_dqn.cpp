@@ -72,7 +72,9 @@ void Train(
       agent.TotalSteps()++;
       if (agent.Deterministic()
           || agent.TotalSteps() < config.ExplorationSteps())
+      {
         continue;
+      }
       agent.TrainAgent();
     } while (!env.done);
     returnList.push_back(episodeReturn);

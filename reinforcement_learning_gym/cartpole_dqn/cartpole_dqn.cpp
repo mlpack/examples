@@ -62,7 +62,9 @@ void Train(
       agent.TotalSteps()++;
       if (agent.Deterministic()
           || agent.TotalSteps() < config.ExplorationSteps())
+      {
         continue;
+      }
       agent.TrainAgent();
     }
 

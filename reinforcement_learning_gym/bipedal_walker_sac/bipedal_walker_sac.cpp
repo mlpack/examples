@@ -63,7 +63,9 @@ void Train(gym::Environment& env,
       agent.TotalSteps()++;
       if (agent.Deterministic()
           || agent.TotalSteps() < config.ExplorationSteps())
+      {
         continue;
+      }
       for (size_t i = 0; i < config.UpdateInterval(); i++)
         agent.Update();
     } while (!env.done);
