@@ -33,6 +33,10 @@ before_install:
   - cd $TRAVIS_BUILD_DIR
   - wget https://github.com/USCiLab/cereal/archive/v1.3.0.tar.gz
   - tar -xvzpf v1.3.0.tar.gz
+  - cd cereal-1.3.0
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr .
+  - make
+  - make install
 
   # Build mlpack.
   - cd $TRAVIS_BUILD_DIR
@@ -40,7 +44,7 @@ before_install:
   - cd mlpack
   - mkdir build
   - cd build
-  - cmake -DCMAKE_INSTALL_PREFIX=/usr -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF -DCEREAL_INCLUDE_DIR=$TRAVIS_BUILD_DIR/cereal-1.3.0/include/ ..
+  - cmake -DCMAKE_INSTALL_PREFIX=/usr -DUSE_OPENMP=OFF -DBUILD_CLI_EXECUTABLES=OFF -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
   - make -j2
   - sudo make install
   - cd ../
