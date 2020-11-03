@@ -37,6 +37,8 @@ before_install:
   - cmake -DCMAKE_INSTALL_PREFIX=/usr .
   - make
   - sudo make install
+  - cd $TRAVIS_BUILD_DIR
+  - sudo rm -rf cereal-1.3.0
 
   # Build mlpack.
   - cd $TRAVIS_BUILD_DIR
