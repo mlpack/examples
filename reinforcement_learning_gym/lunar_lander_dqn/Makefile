@@ -6,7 +6,7 @@
 
 TARGET := lunar_lander_dqn
 SRC := lunar_lander_dqn.cpp
-LIBS_NAME := armadillo mlpack boost_serialization boost_iostreams
+LIBS_NAME := armadillo mlpack boost_iostreams
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
