@@ -99,7 +99,7 @@ void Train(gym::Environment& env,
 
 int main()
 {
-  // Initializing the agent
+  // Initializing the agent.
   // Set up the state and action space.
   ContinuousActionEnv::State::dimension = 24;
   ContinuousActionEnv::Action::size = 4;
@@ -186,7 +186,7 @@ int main()
   }
 
   /**
-   * Testing the trained agent
+   * Testing the trained agent.
    * It is so amazing to see how just a matrix of numbers, operated in a certain
    * fashion, is able to develop a walking gait. Thats the beauty of Artificial
    * Neural Networks! Set up Soft actor-critic agent.

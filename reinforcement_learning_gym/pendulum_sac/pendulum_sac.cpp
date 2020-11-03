@@ -151,7 +151,7 @@ int main()
         consecutiveEpisodes,
         5000);
 
-  // Testing the trained agent
+  // Testing the trained agent.
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
