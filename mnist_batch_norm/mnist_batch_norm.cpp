@@ -186,7 +186,7 @@ int main()
   mlpack::data::Load("../data/mnist_test.csv", tempDataset, true);
 
   mat testX =
-      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+      tempDataset.submat(1, 0, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
 
   mat testPredOut;
   // Getting predictions on test data points .
