@@ -79,10 +79,10 @@ script:
       fi
 
       # TODO: the dataset appears to be in the wrong place.
-      #if [ "$dir" == "lstm_stock_prediction" ];
-      #then
-      #  continue;
-      #fi
+      if [ "$dir" == "lstm_stock_prediction" ];
+      then
+        continue;
+      fi
 
       # TODO: the prediction data appears to be the wrong size.
       #if [ "$dir" == "mnist_batch_norm" ];
