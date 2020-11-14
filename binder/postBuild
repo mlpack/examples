@@ -11,7 +11,7 @@ jupyter labextension uninstall --no-build jupyter-offlinenotebook
 # Upgrade jupyterlab if necessary.
 conda install jupyterlab=2
 
-# Install necessaary kernel and debugger related dependency following
+# Install necessary kernel and debugger related dependency following
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
 conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs cmake wordcloud xplot xproperty imageio
