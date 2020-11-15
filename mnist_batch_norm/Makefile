@@ -6,7 +6,7 @@
 
 TARGET := mnist_batch_norm
 SRC := mnist_batch_norm.cpp
-LIBS_NAME := armadillo mlpack boost_serialization
+LIBS_NAME := armadillo mlpack
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
