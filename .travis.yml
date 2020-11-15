@@ -78,6 +78,12 @@ script:
         continue;
       fi
 
+      # TODO: the dataset cannot be loaded.	
+      if [ "$dir" == "mnist_vae_cnn" ];	
+      then	
+        continue;	
+      fi	
+
       cd $dir;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";
