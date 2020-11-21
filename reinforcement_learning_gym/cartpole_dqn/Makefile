@@ -4,19 +4,19 @@
 # If you're not using the Armadillo wrapper, replace `armadillo` with linker commands
 # for the BLAS and LAPACK libraries that you are using.
 
-TARGET := lstm_electricity_consumption
-SRC := lstm_electricity_consumption.cpp
-LIBS_NAME := armadillo mlpack
+TARGET := cartpole_dqn
+SRC := cartpole_dqn.cpp
+LIBS_NAME := armadillo mlpack boost_iostreams
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
-# Use these CXXFLAGS instead if you want to compile with debugging symbols
-# and without optimizations.
+# Use these CXXFLAGS instead if you want to compile with debugging symbols and
+# without optimizations.
 # CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
-LDFLAGS += -L . # /path/to/mlpack/library/  # If installed locally.
-# Add header directories for any includes that aren't on the default compiler
-# search path.
+LDFLAGS += -L . # /path/to/mlpack/library/  # if installed locally.
+# Add header directories for any includes that aren't on the
+# default compiler search path.
 INCLFLAGS := -I .
 CXXFLAGS += $(INCLFLAGS)
 

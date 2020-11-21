@@ -11,17 +11,17 @@ jupyter labextension uninstall --no-build jupyter-offlinenotebook
 # Upgrade jupyterlab if necessary.
 conda install jupyterlab=2
 
-# Install necessaary kernel and debugger related dependency following 
+# Install necessary kernel and debugger related dependency following
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs bqplot cmake wordcloud xproperty imageio
+conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs cmake wordcloud xplot xproperty imageio
 
-# Install the debugger in postBuild and not `environment.yml` to 
+# Install the debugger in postBuild and not `environment.yml` to
 # avoid breaking jupyter-offlinenotebook.
 jupyter labextension install @jupyterlab/debugger
 jupyter labextension install @jupyterlab/toc
 jupyter labextension install @jupyter-widgets/jupyterlab-manager
-jupyter labextension install bqplot
+jupyter labextension install bqplot@^0.4.3
 
 # Install latest xwidgets package.
 git clone https://github.com/jupyter-xeus/xwidgets.git
@@ -46,16 +46,6 @@ git clone https://github.com/manics/jupyter-offlinenotebook.git .
 python -m pip install .
 jupyter labextension link --debug
 
-SRCDIRXPLOT=/srv/conda/src/xplot
-mkdir -p "$SRCDIRXPLOT"
-
-cd "$SRCDIRXPLOT"
-git clone https://github.com/zoq/xplot.git .
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
-make install
-
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
 cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
@@ -77,7 +67,6 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 go get golang.org/x/tools/cmd/goimports
 go get github.com/gopherdata/gophernotes
 go get gonum.org/v1/gonum/...
-go get gonum.org/v1/plot/...
 
 # Setup environment for Go.
 cat >> $HOME/.setup-go << EOF
@@ -122,7 +111,7 @@ wget -O /srv/conda/envs/notebook/include/mlpack/core.hpp http://data.kurg.org/ml
 # Add matplotlib-cpp header.
 wget -O /srv/conda/envs/notebook/include/matplotlibcpp.h https://raw.githubusercontent.com/lava/matplotlib-cpp/master/matplotlibcpp.h
 
-# Add cpp-wordcloud files. 
+# Add cpp-wordcloud files.
 wget -O /srv/conda/envs/notebook/include/wordcloud.hpp https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wordcloud.hpp
 wget -O /srv/conda/envs/notebook/include/wcloud.py https://raw.githubusercontent.com/zoq/cpp-wordcloud/master/wcloud.py
 
@@ -134,7 +123,7 @@ wget -O /srv/conda/envs/notebook/include/stackedbar.py https://raw.githubusercon
 wget -O /srv/conda/envs/notebook/include/scatter.hpp https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.hpp
 wget -O /srv/conda/envs/notebook/include/scatter.py https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.py
 
-# Setup https://github.com/zoq/gym_tcp_api. 
+# Setup https://github.com/zoq/gym_tcp_api.
 wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
 mkdir -p /srv/conda/envs/notebook/include/gym
 cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
