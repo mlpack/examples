@@ -123,6 +123,10 @@ wget -O /srv/conda/envs/notebook/include/stackedbar.py https://raw.githubusercon
 wget -O /srv/conda/envs/notebook/include/scatter.hpp https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.hpp
 wget -O /srv/conda/envs/notebook/include/scatter.py https://raw.githubusercontent.com/zoq/cpp-scatter/master/scatter.py
 
+# Add 3dplot-cpp header.
+wget -O /srv/conda/envs/notebook/include/plot3d.hpp https://raw.githubusercontent.com/zoq/cpp-3dplot/master/plot3d.hpp
+wget -O /srv/conda/envs/notebook/include/plot3d.py https://raw.githubusercontent.com/zoq/cpp-3dplot/master/plot3d.py
+
 # Setup https://github.com/zoq/gym_tcp_api.
 wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
 mkdir -p /srv/conda/envs/notebook/include/gym
