@@ -133,6 +133,6 @@ mkdir -p /srv/conda/envs/notebook/include/gym
 cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
 rm -r gym_tcp_api-master
 
-# cleanup.
+# Cleanup.
 conda clean --all
 rm -rf xwidgets
