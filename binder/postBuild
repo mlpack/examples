@@ -132,3 +132,7 @@ wget -c https://github.com/zoq/gym_tcp_api/archive/master.tar.gz -O - | tar -xz
 mkdir -p /srv/conda/envs/notebook/include/gym
 cp -r gym_tcp_api-master/cpp/* /srv/conda/envs/notebook/include/gym/
 rm -r gym_tcp_api-master
+
+# cleanup.
+conda clean --all
+rm -rf xwidgets
