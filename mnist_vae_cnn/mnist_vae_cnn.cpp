@@ -70,7 +70,9 @@ int main()
         arma::randu<arma::mat>(fullData.n_rows, fullData.n_cols) <= fullData);
   }
   else
+  {
     fullData = (fullData - 0.5) * 2;
+  }
 
   arma::mat train, validation;
   data::Split(fullData, validation, train, trainRatio);

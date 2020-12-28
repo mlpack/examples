@@ -81,13 +81,12 @@ int main()
   const arma::mat validX =
       valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0;
 
-  // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to
-  // number of classes (in this case from 1 to 10).
+  // Labels should specify the class of a data point and be in the interval [0,
+  // numClasses).
 
   // Creating labels for training and validating dataset.
-  const arma::mat trainY = train.row(0) + 1;
-  const arma::mat validY = valid.row(0) + 1;
+  const arma::mat trainY = train.row(0);
+  const arma::mat validY = valid.row(0);
 
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. GlorotInitialization means that
@@ -157,13 +156,13 @@ int main()
   // Calculating accuracy on training data points.
   arma::Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
-      arma::accu(predLabels == trainY) / ( double )trainY.n_elem * 100;
+      arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
   double validAccuracy =
-      arma::accu(predLabels == validY) / ( double )validY.n_elem * 100;
+      arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << endl;
