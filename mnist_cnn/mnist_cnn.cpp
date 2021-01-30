@@ -38,7 +38,7 @@ arma::Row<size_t> getLabels(arma::mat predOut)
   arma::Row<size_t> predLabels(predOut.n_cols);
   for (arma::uword i = 0; i < predOut.n_cols; ++i)
   {
-    predLabels(i) = predOut.col(i).index_max() + 1;
+    predLabels(i) = predOut.col(i).index_max();
   }
   return predLabels;
 }
