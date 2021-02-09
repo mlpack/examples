@@ -96,34 +96,39 @@ void SaveResults(const string filename,
   arma::mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
   scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
 
-  //The prediction results are the (high, low) for the next day and comming from 
-  //the last slice from the prediction.
+  // The prediction results are the (high, low) for the next day and come from
+  // the last slice from the prediction.
   arma::mat temp = predictions.slice(predictions.n_slices - 1);
 
-  //NOTE: We add 3 extra rows here in order to recreate the input data 
-  //structure used to transform the data. This is needed in order to be able 
-  //to use the right scaling parameters for the specific column stock 
-  //high, low).
+  // NOTE: We add 3 extra rows here in order to recreate the input data
+  // structure used to transform the data. This is needed in order to be able 
+  // to use the right scaling parameters for the specific column stock 
+  // (high, low).
   temp.insert_rows(0, 3, 0);
   scale.InverseTransform(temp, temp);
 
-  //We shift the predictions into place to be in syncrone with the input data
-  //and add one more record to the input. Please note that in this way the last 
-  //input record is replaced with zeros and the first prediction record is also zero.
+  // We shift the predictions such that the true values are synchronized with
+  // the predictions, and we also add one more record to the input. Please note
+  // that this means the last input record is zero and the first prediction record
+  // is also zero.
   temp.insert_cols(0, 1, true);
   flatDataAndPreds.insert_cols(flatDataAndPreds.n_cols, 1, true);
 
-  //We add the prediction as the last two columns (stock high, low)
+  // We add the prediction as the last two columns (stock high, low).
+
   flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows, temp.rows(temp.n_rows - 2, temp.n_rows - 1));
 
-  //Save the data to file. The last columns are the predictions; the preceding 
-  //columns are the data used to generate those predictions.
+  // Save the data to file. The last columns are the predictions; the preceding 
+  // columns are the data used to generate those predictions.
   data::Save(filename, flatDataAndPreds);
 
-  //Print the output to screen.
-  cout << "The predicted Google stock (high, low) for the last day is: " << endl;
-  cout << "  (" << flatDataAndPreds(flatDataAndPreds.n_rows - 2, flatDataAndPreds.n_cols - 1) << " ,";
-  cout << flatDataAndPreds(flatDataAndPreds.n_rows - 1, flatDataAndPreds.n_cols - 1) << ")" << endl;
+  // Print the output to screen.
+  cout << "The predicted Google stock (high, low) for the last day is: "
+      << endl;
+  cout << "  (" << flatDataAndPreds(flatDataAndPreds.n_rows - 2,
+      flatDataAndPreds.n_cols - 1) << " ,";
+  cout << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
+      flatDataAndPreds.n_cols - 1) << ")" << endl;
 }
 
 int main()
