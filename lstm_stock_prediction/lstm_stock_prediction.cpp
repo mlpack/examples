@@ -94,37 +94,41 @@ void SaveResults(const string filename,
                  const arma::cube& testX)
 {
   arma::mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
+  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
 
   // The prediction results are the (high, low) for the next day and come from
   // the last slice from the prediction.
-  flatDataAndPreds.rows(flatDataAndPreds.n_rows - 2,
-                        flatDataAndPreds.n_rows - 1) =
-      predictions.slice(predictions.n_slices - 1);
+  arma::mat temp = predictions.slice(predictions.n_slices - 1);
 
-  scale.InverseTransform(flatDataAndPreds, flatDataAndPreds);
+  // NOTE: We add 3 extra rows here in order to recreate the input data
+  // structure used to transform the data. This is needed in order to be able 
+  // to use the right scaling parameters for the specific column stock 
+  // (high, low).
+  temp.insert_rows(0, 3, 0);
+  scale.InverseTransform(temp, temp);
 
-  // We need to remove the last column because it was not used for training
-  // (there is no next day to predict).
-  flatDataAndPreds.shed_col(flatDataAndPreds.n_cols - 1);
+  // We shift the predictions such that the true values are synchronized with
+  // the predictions, and we also add one more record to the input. Please note
+  // that this means the last input record is zero and the first prediction record
+  // is also zero.
+  temp.insert_cols(0, 1, true);
+  flatDataAndPreds.insert_cols(flatDataAndPreds.n_cols, 1, true);
 
-  // Save the data to file. The last columns are the predictions; the preceding
+  // We add the prediction as the last two columns (stock high, low).
+
+  flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows, temp.rows(temp.n_rows - 2, temp.n_rows - 1));
+
+  // Save the data to file. The last columns are the predictions; the preceding 
   // columns are the data used to generate those predictions.
   data::Save(filename, flatDataAndPreds);
 
   // Print the output to screen.
-  // NOTE: we do not have the last data point in the input for the prediction
-  // because we did not use it for the training, therefore the prediction result
-  // will be for the day before. In your own application you may of course load
-  // any dataset for prediction.
   cout << "The predicted Google stock (high, low) for the last day is: "
-       << endl;
-  cout << "  ("
-       << flatDataAndPreds(flatDataAndPreds.n_rows - 2,
-                           flatDataAndPreds.n_cols - 1)
-       << ", ";
+      << endl;
+  cout << "  (" << flatDataAndPreds(flatDataAndPreds.n_rows - 2,
+      flatDataAndPreds.n_cols - 1) << " ,";
   cout << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
-                           flatDataAndPreds.n_cols - 1)
-       << ")" << endl;
+      flatDataAndPreds.n_cols - 1) << ")" << endl;
 }
 
 int main()
@@ -214,10 +218,10 @@ int main()
   // The 3rd dimension is the rho number of past data records the RNN uses for
   // learning.
   arma::cube trainX, trainY, testX, testY;
-  trainX.set_size(inputSize, trainData.n_cols - rho + 1, rho);
-  trainY.set_size(outputSize, trainData.n_cols - rho + 1, rho);
-  testX.set_size(inputSize, testData.n_cols - rho + 1, rho);
-  testY.set_size(outputSize, testData.n_cols - rho + 1, rho);
+  trainX.set_size(inputSize, trainData.n_cols - rho, rho);
+  trainY.set_size(outputSize, trainData.n_cols - rho, rho);
+  testX.set_size(inputSize, testData.n_cols - rho, rho);
+  testY.set_size(outputSize, testData.n_cols - rho, rho);
 
   // Create training sets for one-step-ahead regression.
   CreateTimeSeriesData(trainData, trainX, trainY, rho);
