@@ -62,17 +62,11 @@ int main()
 
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
-  mat tempDataset;
+  mat dataset;
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_train.csv", tempDataset, true);
-
-  // The original Kaggle dataset CSV file has headings for each column,
-  // so it's necessary to get rid of the first row. In Armadillo representation,
-  // this corresponds to the first column of our data matrix.
-  mat dataset =
-      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  data::Load("../data/mnist_train.csv", dataset, true);
 
   // Split the dataset into training and validation sets.
   mat train, valid;
@@ -216,16 +210,12 @@ int main()
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_test.csv", tempDataset, true);
-
-  // As before, it's necessary to get rid of column headings.
-  mat testX =
-      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  data::Load("../data/mnist_test.csv", dataset, true);
 
   // Matrix to store the predictions on test dataset.
   mat testPredOut;
   // Get predictions on test data points.
-  model.Predict(testX, testPredOut);
+  model.Predict(dataset, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
   std::cout << "Saving predicted labels to \"results.csv.\"..." << std::endl;

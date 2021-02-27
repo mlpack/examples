@@ -171,17 +171,12 @@ int main()
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  arma::mat testingDataset;
-  mlpack::data::Load("../data/mnist_test.csv", testingDataset, true);
-
-  // As before, it's necessary to get rid of header.
-  arma::mat testX = testingDataset.submat(
-      0, 1, testingDataset.n_rows - 2, testingDataset.n_cols - 1);
+  mlpack::data::Load("../data/mnist_test.csv", dataset, true);
 
   std::cout << "Predicting ..." << endl;
   mat testPredOut;
   // Getting predictions on test data points.
-  model.Predict(testX, testPredOut);
+  model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
   std::cout << "Saving predicted labels to \"results.csv\" ..." << std::endl;

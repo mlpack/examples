@@ -61,7 +61,6 @@ int main()
   // Each column represents a data point.
   arma::mat fullData;
   data::Load("../data/mnist_train.csv", fullData, true, false);
-  fullData = fullData.submat(0, 1, fullData.n_rows - 1, fullData.n_cols - 1);
   fullData /= 255.0;
 
   if (isBinary)
