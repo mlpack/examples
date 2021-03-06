@@ -211,6 +211,7 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
   data::Load("../data/mnist_test.csv", dataset, true);
+  dataset.shed_row(dataset.n_rows - 1); // Remove labels before predicting.
 
   // Matrix to store the predictions on test dataset.
   mat testPredOut;

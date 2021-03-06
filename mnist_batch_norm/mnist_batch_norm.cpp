@@ -178,6 +178,7 @@ int main()
   // https://www.kaggle.com/c/digit-recognizer/data
 
   mlpack::data::Load("../data/mnist_test.csv", dataset, true);
+  dataset.shed_row(dataset.n_rows - 1); // Remove labels.
 
   mat testPredOut;
   // Getting predictions on test data points .
