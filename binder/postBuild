@@ -26,7 +26,7 @@ jupyter labextension install bqplot@^0.4.3
 
 # Install latest xtl package.
 git clone https://github.com/xtensor-stack/xtl.git
-cd xwidgets && mkdir build && cd build
+cd xtl && mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 cd ../../
