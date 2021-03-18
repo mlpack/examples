@@ -14,7 +14,7 @@ conda install jupyterlab=2
 # Install necessary kernel and debugger related dependency following
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs cmake wordcloud xplot xproperty imageio xeus
+conda install -c zoq -c QuantStack -c conda-forge -c hi2p-perim xeus-cling mlpack llvmdev=5 ptvsd git nodejs cmake wordcloud xplot xproperty imageio zeromq cppzmq xtl OpenSSL nlohmann_json libuuid
 
 # Install the debugger in postBuild and not `environment.yml` to
 # avoid breaking jupyter-offlinenotebook.
@@ -27,6 +27,13 @@ jupyter labextension install bqplot@^0.4.3
 # Install latest xtl package.
 git clone https://github.com/xtensor-stack/xtl.git
 cd xtl && mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
+make install
+cd ../../
+
+# Install latest xeus package.
+git clone https://github.com/jupyter-xeus/xeus.git
+cd xeus && mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 cd ../../
