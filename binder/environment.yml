@@ -37,3 +37,8 @@ dependencies:
 # mlpack
 - c-compiler
 - cxx-compiler
+- armadillo
+- cereal
+- cmake
+- boost-cpp
+- openblas
