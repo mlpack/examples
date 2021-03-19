@@ -9,12 +9,12 @@ pwd
 jupyter labextension uninstall --no-build jupyter-offlinenotebook
 
 # Upgrade jupyterlab if necessary.
-conda install jupyterlab=2
+conda install jupyterlab=3
 
 # Install necessary kernel and debugger related dependency following
 # https://github.com/jupyterlab/debugger#installation, doing it in
 # postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c conda-forge -c xeus-cling xplot xwidgets
+conda install -c conda-forge xeus-cling xplot xwidgets
 
 # Install the debugger in postBuild and not `environment.yml` to
 # avoid breaking jupyter-offlinenotebook.
