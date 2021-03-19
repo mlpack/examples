@@ -1,4 +1,5 @@
 channels:
+-c zoq
 - conda-forge
 dependencies:
 # Jupyter
