@@ -9,7 +9,7 @@ dependencies:
 - nbconvert=6
 # Python Kernel
 - ipykernel=5.1
-- xeus-python=0.9
+- xeus-python
 - ipywidgets=7.6
 - widgetsnbextension=3.5
 - ipyleaflet=0.13
@@ -28,11 +28,9 @@ dependencies:
 - traittypes==0.2.1
 - invoke=1.2
 # C++ Kernel
-- xeus-cling=0.10
-- xtensor=0.20.8
-- xtensor-blas=0.16.1
-- xwidgets=0.24.2
-- xleaflet=0.13.1
+- xeus-cling
+- xtensor
+- xwidgets
 # R Kernel
 - r-ggplot2
 - r-irkernel=1.0
