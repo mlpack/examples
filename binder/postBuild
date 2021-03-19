@@ -5,7 +5,7 @@ cd mlpack
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ -DBUILD_PYTHON_BINDINGS=ON -DBUILD_TESTS=OFF -DUSE_OPENMP=OFF ..
-make -j2
+make
 make install
 cd ../../
 
