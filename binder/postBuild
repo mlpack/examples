@@ -8,15 +8,4 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 
-invoke build --env-name=root --no-kernel
-invoke demofiles
-invoke talk -t demo
-rm -rf demofiles
-rm -rf notebooks
-rm -rf narrative
-rm -rf slides
-rm demo/notebooks/Julia.ipynb
 jupyter lab clean
-
-# Setup a workspace
-jupyter lab workspaces import binder/workspace.json
