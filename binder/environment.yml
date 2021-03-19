@@ -47,3 +47,4 @@ dependencies:
 - cython
 - numpy
 - pandas
+- pthread-stubs
