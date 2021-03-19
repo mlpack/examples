@@ -37,4 +37,4 @@ dependencies:
 - r-ggplot2
 - r-irkernel=1.0
 # mlpack
-- mlpack
+- mlpack=3.4.1.1
