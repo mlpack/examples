@@ -37,16 +37,16 @@ cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 cd ../../
 
-# Install latest xproperty package.
-git clone https://github.com/jupyter-xeus/xproperty.git
-cd xproperty && mkdir build && cd build
+# Install latest xtl package.
+git clone https://github.com/xtensor-stack/xtl.git
+cd xtl && mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 cd ../../
 
-# Install latest xtl package.
-git clone https://github.com/xtensor-stack/xtl.git
-cd xtl && mkdir build && cd build
+# Install latest xproperty package.
+git clone https://github.com/jupyter-xeus/xproperty.git
+cd xproperty && mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
 make install
 cd ../../
