@@ -1,3 +1,7 @@
 set -ex
 
+jupyter kernelspec remove -f xcpp11
+jupyter kernelspec remove -f xcpp17
+cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
+
 jupyter lab clean
