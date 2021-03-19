@@ -1,27 +1,14 @@
-#!/bin/bash
-set -eux
+set -ex
 
-env | sort
-pwd
+invoke build --env-name=root --no-kernel
+invoke demofiles
+invoke talk -t demo
+rm -rf demofiles
+rm -rf notebooks
+rm -rf narrative
+rm -rf slides
+rm demo/notebooks/Julia.ipynb
+jupyter lab clean
 
-# jupyter-offlinenotebook is automatically installed by repo2docker.
-# Uninstall to avoid conflicts.
-jupyter labextension uninstall --no-build jupyter-offlinenotebook
-
-# Upgrade jupyterlab if necessary.
-conda install jupyterlab=3
-
-# Install necessary kernel and debugger related dependency following
-# https://github.com/jupyterlab/debugger#installation, doing it in
-# postBuild and not `environment.yml` to avoid breaking jupyter-offlinenotebook.
-conda install -c conda-forge xeus-cling xplot xwidgets
-
-# Install the debugger in postBuild and not `environment.yml` to
-# avoid breaking jupyter-offlinenotebook.
-jupyter labextension install @jupyterlab/debugger
-jupyter labextension install @jupyterlab/toc
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
-jupyter labextension install bqplot@^0.4.3
-
-# Cleanup.
-conda clean --all
+# Setup a workspace
+jupyter lab workspaces import binder/workspace.json
