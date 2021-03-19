@@ -43,3 +43,7 @@ dependencies:
 - boost-cpp
 - openblas
 - openmp
+- setuptools
+- cython
+- numpy
+- pandas

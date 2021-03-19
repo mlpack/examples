@@ -4,7 +4,7 @@ git clone https://github.com/mlpack/mlpack.git
 cd mlpack
 mkdir build
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ ..
+cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ -DBUILD_PYTHON_BINDINGS=ON -DBUILD_TESTS=OFF ..
 make -j2
 make install
 cd ../../
@@ -12,5 +12,10 @@ cd ../../
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
 cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
+
+cp $HOME/binder/xeus-cling.hpp /srv/conda/envs/notebook/include/mlpack/
+sed -i '1s/^/#include "xeus-cling.hpp" \n/' /srv/conda/envs/notebook/include/mlpack/core.hpp
+
+cp $HOME/binder/matplotlibcpp.h /srv/conda/envs/notebook/include/
 
 jupyter lab clean
