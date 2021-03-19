@@ -47,4 +47,4 @@ dependencies:
 - cython
 - numpy
 - pandas
-- pthread-stubs
+- gxx_linux-64
