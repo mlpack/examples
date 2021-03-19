@@ -42,3 +42,4 @@ dependencies:
 - cmake
 - boost-cpp
 - openblas
+- openmp
