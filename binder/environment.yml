@@ -36,6 +36,7 @@ dependencies:
 - r-ggplot2
 - r-irkernel=1.0
 # mlpack
+- cmake
 - armadillo
 - boost
 - armadillo
