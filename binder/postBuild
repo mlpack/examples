@@ -1,14 +1,5 @@
 set -ex
 
-git clone https://github.com/mlpack/mlpack.git
-cd mlpack
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/srv/conda/envs/notebook/ -DBUILD_PYTHON_BINDINGS=ON -DBUILD_TESTS=OFF -DUSE_OPENMP=OFF ..
-# make
-# make install
-cd ../../
-
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
 cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json

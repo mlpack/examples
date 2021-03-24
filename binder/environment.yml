@@ -1,5 +1,4 @@
 channels:
-- zoq
 - conda-forge
 dependencies:
 # Jupyter
@@ -48,3 +47,4 @@ dependencies:
 - numpy
 - pandas
 - gxx_linux-64
+- mlpack
