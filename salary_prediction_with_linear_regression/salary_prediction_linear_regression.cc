@@ -25,6 +25,7 @@ int main() {
   inputs.shed_col(0);
 
   // Print the first 5 rows of the input data
+  std::cout<<std::setw(18)<<"Years Of Experience"<<std::setw(10)<<"Salary"<<std::endl;
   std::cout<<inputs.submat(0, 0, inputs.n_rows-1, 5).t()<<std::endl;
 
   // Plot the input data
@@ -37,25 +38,32 @@ int main() {
 
   // Split the data into features (X) and target (y) variables
   // Labels are the last row
-  arma::rowvec targets = arma::conv_to<arma::rowvec>::from(inputs.row(inputs.n_rows - 1));
+  arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(inputs.row(inputs.n_rows - 1));
   // Labels are dropped from the originally loaded data to be used as features
   inputs.shed_row(inputs.n_rows - 1);
 
   // Split the dataset using mlpack
-  //arma::mat Xtrain, Xtest;
-  //arma::Row<size_t> Ytrain, Ytest;
-  //data::Split(inputs, targets, Xtrain, Xtest,Ytrain, Ytest, 0.4);
+  arma::mat Xtrain;
+  arma::mat Xtest;
+  arma::Row<size_t> Ytrain;
+  arma::Row<size_t> Ytest;
+  data::Split(inputs, targets, Xtrain, Xtest, Ytrain, Ytest, 0.4);
+
+  arma::rowvec y_train = arma::conv_to<arma::rowvec>::from(Ytrain);
+  arma::rowvec y_test = arma::conv_to<arma::rowvec>::from(Ytest);
 
   // Create and Train Linear Regression model
-  LinearRegression lr(inputs, targets, 0.5);
+  LinearRegression lr(Xtrain, y_train, 0.5);
   
   arma::rowvec y_preds;
-  lr.Predict(inputs, y_preds);
+  lr.Predict(Xtest, y_preds);
 
+  std::vector<double> x_test = arma::conv_to<std::vector<double>>::from(Xtest);
+  std::vector<double> y_t = arma::conv_to<std::vector<double>>::from(y_test);
   std::vector<double> y_p = arma::conv_to<std::vector<double>>::from(y_preds);
 
-  plt::scatter(x, y, 5);
-  plt::plot(x,y_p);
+  plt::scatter(x_test, y_t, 5);
+  plt::plot(x_test,y_p);
   plt::show();
 
   return 0;
