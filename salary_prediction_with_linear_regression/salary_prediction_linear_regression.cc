@@ -7,6 +7,7 @@
 #include<mlpack/core.hpp>
 #include<mlpack/core/data/split_data.hpp>
 #include<mlpack/methods/linear_regression/linear_regression.hpp>
+#include<cmath>
 
 // Header file for visualization
 #include<matplotlibcpp.h>
@@ -65,6 +66,10 @@ int main() {
   plt::scatter(x_test, y_t, 5);
   plt::plot(x_test,y_p);
   plt::show();
+
+  std::cout<<"Mean Absolute Error: "<<arma::mean(arma::abs(y_preds - y_test))<<std::endl;
+  std::cout<<"Mean Squared Error: "<<arma::mean(arma::pow(y_preds - y_test,2))<<std::endl;
+  std::cout<<"Root Mean Squared Error: "<<sqrt(arma::mean(arma::pow(y_preds - y_test,2)))<<std::endl;
 
   return 0;
 }
