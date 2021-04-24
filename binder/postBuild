@@ -8,5 +8,6 @@ cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp1
 # sed -i '1s/^/#include "xeus-cling.hpp" \n/' /srv/conda/envs/notebook/include/mlpack/core.hpp
 
 cp $HOME/binder/matplotlibcpp.h /srv/conda/envs/notebook/include/
+cp $HOME/utils/* /srv/conda/envs/notebook/include/
 
 jupyter lab clean
