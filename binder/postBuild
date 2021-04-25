@@ -2,10 +2,9 @@ set -ex
 
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
-cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
 
+cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
 cp $HOME/binder/xeus-cling.hpp /srv/conda/envs/notebook/include/mlpack/
-sed -i '1s/^/#include "xeus-cling.hpp" \n/' /srv/conda/envs/notebook/include/mlpack/core.hpp
 
 cp $HOME/utils/* /srv/conda/envs/notebook/include/
 
