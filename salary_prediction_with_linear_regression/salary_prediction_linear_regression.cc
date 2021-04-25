@@ -4,10 +4,10 @@
  * A simple example usage of Linear Regression
  * applied to Salary dataset
  */
-#include<mlpack/core.hpp>
-#include<mlpack/core/data/split_data.hpp>
-#include<mlpack/methods/linear_regression/linear_regression.hpp>
-#include<cmath>
+#include <mlpack/core.hpp>
+#include <mlpack/core/data/split_data.hpp>
+#include <mlpack/methods/linear_regression/linear_regression.hpp>
+#include <cmath>
 
 // Header file for visualization
 #include<matplotlibcpp.h>
