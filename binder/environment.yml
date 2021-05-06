@@ -1,0 +1,50 @@
+channels:
+- conda-forge
+dependencies:
+# Jupyter
+- jupyterlab=3
+- jupyter-offlinenotebook=0.2
+- nodejs=12
+- nbconvert=6
+# Python Kernel
+- ipykernel=5.1
+- xeus-python
+- ipywidgets=7.6
+- widgetsnbextension=3.5
+- ipyleaflet=0.13
+- altair=4.1
+- bqplot=0.12.20
+- dask=2020.12
+- matplotlib=3.1
+- pandas=1
+- python=3.7
+- scikit-image=0.15
+- scikit-learn=0.21
+- seaborn=0.11
+- tensorflow=1.13
+- sympy=1.4
+- pyyaml
+- traittypes==0.2.1
+- invoke=1.2
+# C++ Kernel
+- xeus-cling
+- xtensor
+- xwidgets
+# R Kernel
+- r-ggplot2
+- r-irkernel=1.0
+# mlpack
+- c-compiler
+- cxx-compiler
+- armadillo
+- cereal
+- cmake
+- boost-cpp
+- openblas
+- openmp
+- setuptools
+- cython
+- numpy
+- pandas
+- gxx_linux-64
+- mlpack
