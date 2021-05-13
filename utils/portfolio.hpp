@@ -5,10 +5,7 @@
 #include <Python.h>
 #include <string>
 
-int PortFolio(const std::string& stock0,
-              const std::string& stock1,
-              const std::string& stock2,
-              const std::string& stock3,
+int PortFolio(const std::vector<std::string>& stocks,
               const std::string& start,
               const std::string& end,
               const std::string& filename = "output.csv")
@@ -29,31 +26,25 @@ int PortFolio(const std::string& stock0,
   if (pModule != NULL)
   {
     pFunc = PyObject_GetAttrString(pModule, "cportfolio");
-
+    size_t numStocks = stocks.size();
     if (pFunc && PyCallable_Check(pFunc))
     {
-      pArgs = PyTuple_New(7);
+      pArgs = PyTuple_New(numStocks + 3);
 
-      PyObject* pValueStock0 = PyUnicode_FromString(stock0.c_str());
-      PyTuple_SetItem(pArgs, 0, pValueStock0);
-
-      PyObject* pValueStock1 = PyUnicode_FromString(stock1.c_str());
-      PyTuple_SetItem(pArgs, 1, pValueStock1);
-
-      PyObject* pValueStock2 = PyUnicode_FromString(stock2.c_str());
-      PyTuple_SetItem(pArgs, 2, pValueStock2);
-
-      PyObject* pValueStock3 = PyUnicode_FromString(stock3.c_str());
-      PyTuple_SetItem(pArgs, 3, pValueStock3);
+      for(size_t idx = 0; idx < numStocks; ++idx)
+      {
+        PyObject* pValueCurrentStock = PyUnicode_FromString(stocks[idx].c_str());
+        PyTuple_SetItem(pArgs, idx, pValueCurrentStock);
+      }
 
       PyObject* pValueStart = PyUnicode_FromString(start.c_str());
-      PyTuple_SetItem(pArgs, 4, pValueStart);
+      PyTuple_SetItem(pArgs, numStocks, pValueStart);
 
       PyObject* pValueEnd = PyUnicode_FromString(end.c_str());
-      PyTuple_SetItem(pArgs, 5, pValueEnd);
+      PyTuple_SetItem(pArgs, numStocks + 1, pValueEnd);
 
       PyObject* pValueFilename = PyUnicode_FromString(filename.c_str());
-      PyTuple_SetItem(pArgs, 6, pValueFilename);
+      PyTuple_SetItem(pArgs, numStocks + 2, pValueFilename);
 
       pValue = PyObject_CallObject(pFunc, pArgs);
       Py_DECREF(pArgs);
