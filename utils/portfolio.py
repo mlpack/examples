@@ -7,4 +7,5 @@ def cportfolio(stocks, start, end, filename='portfolio.csv'):
   test = test['Adj Close']
 
   returns = np.log(test/test.shift(1))
-  returns.to_csv(filename)
+  returns = returns.iloc[1:]
+  returns.to_csv(filename, header=False, index=False)
