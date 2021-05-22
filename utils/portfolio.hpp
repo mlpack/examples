@@ -5,7 +5,7 @@
 #include <Python.h>
 #include <string>
 
-int PortFolio(const std::vector<std::string>& stocks,
+int PortFolio(const std::string& stocks,
               const std::string& dataSource,
               const std::string& start,
               const std::string& end,
@@ -17,8 +17,8 @@ int PortFolio(const std::vector<std::string>& stocks,
 
   Py_Initialize();
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString("sys.path.append(\".\")");
   PyRun_SimpleString("sys.path.append(\"/srv/conda/envs/notebook/include/\")");
+  PyRun_SimpleString("sys.path.append(\"../utils/\")");
   pName = PyUnicode_DecodeFSDefault("portfolio");
 
   pModule = PyImport_Import(pName);
@@ -30,25 +30,23 @@ int PortFolio(const std::vector<std::string>& stocks,
     size_t numStocks = stocks.size();
     if (pFunc && PyCallable_Check(pFunc))
     {
-      pArgs = PyTuple_New(numStocks + 4);
+      pArgs = PyTuple_New(5);
 
-      for(size_t idx = 0; idx < numStocks; ++idx)
-      {
-        PyObject* pValueCurrentStock = PyUnicode_FromString(stocks[idx].c_str());
-        PyTuple_SetItem(pArgs, idx, pValueCurrentStock);
-      }
+      //! Comma separated stocks
+      PyObject* pValueStocks= PyUnicode_FromString(stocks.c_str());
+      PyTuple_SetItem(pArgs, 0, pValueStocks);
 
       PyObject* pValueSource= PyUnicode_FromString(dataSource.c_str());
-      PyTuple_SetItem(pArgs, numStocks, pValueSource);
+      PyTuple_SetItem(pArgs, 1, pValueSource);
 
       PyObject* pValueStart = PyUnicode_FromString(start.c_str());
-      PyTuple_SetItem(pArgs, numStocks + 1, pValueStart);
+      PyTuple_SetItem(pArgs, 2, pValueStart);
 
       PyObject* pValueEnd = PyUnicode_FromString(end.c_str());
-      PyTuple_SetItem(pArgs, numStocks + 2, pValueEnd);
+      PyTuple_SetItem(pArgs, 3, pValueEnd);
 
       PyObject* pValueFilePath = PyUnicode_FromString(filePath.c_str());
-      PyTuple_SetItem(pArgs, numStocks + 3, pValueFilePath);
+      PyTuple_SetItem(pArgs, 4, pValueFilePath);
 
       pValue = PyObject_CallObject(pFunc, pArgs);
       Py_DECREF(pArgs);
