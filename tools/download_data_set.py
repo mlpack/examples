@@ -149,6 +149,7 @@ def all_datasets():
   stock_exchange_dataset()
   iris_dataset()
   body_fat_dataset()
+  spam_dataset()
 
 if __name__ == '__main__':
 
@@ -170,6 +171,7 @@ if __name__ == '__main__':
         stock : will download stock_exchange dataset
         iris : will downlaod the iris dataset
         bodyFat : will download the bodyFat dataset
+        spam : will download the spam dataset
         all : will download all datasets for all examples
         '''))
  
@@ -196,6 +198,9 @@ if __name__ == '__main__':
       elif args.dataset_name == "bodyFat":
         create_dataset_dir()
         body_fat_dataset()
+      elif args.dataset_name == "spam":
+        create_dataset_dir()
+        spam_dataset()
       elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
