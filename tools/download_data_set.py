@@ -118,7 +118,7 @@ def electricity_consumption_dataset():
 def stock_exchange_dataset():
   print("Download the stock exchange example datasets")
   stock = requests.get("https://www.mlpack.org/datasets/examples/Google2016-2019.csv")
-  progress_bar("stock.csv", stock)
+  progress_bar("Google2016-2019.csv", stock)
 
 def body_fat_dataset():
   print("Download the body fat datasets")

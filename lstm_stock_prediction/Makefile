@@ -6,7 +6,7 @@
 
 TARGET := lstm_stock_prediction
 SRC := lstm_stock_prediction.cpp
-LIBS_NAME := armadillo mlpack boost_serialization
+LIBS_NAME := armadillo mlpack
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
