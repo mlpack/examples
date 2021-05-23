@@ -6,7 +6,7 @@
 
 TARGET := mnist_cnn
 SRC := mnist_cnn.cpp
-LIBS_NAME := armadillo mlpack boost_serialization
+LIBS_NAME := armadillo mlpack
 
 CXX := g++
 CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp

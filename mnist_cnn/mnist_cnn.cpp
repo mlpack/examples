@@ -21,6 +21,10 @@
 
 #include <ensmallen.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack;
 using namespace mlpack::ann;
 
@@ -34,7 +38,7 @@ arma::Row<size_t> getLabels(arma::mat predOut)
   arma::Row<size_t> predLabels(predOut.n_cols);
   for (arma::uword i = 0; i < predOut.n_cols; ++i)
   {
-    predLabels(i) = predOut.col(i).index_max() + 1;
+    predLabels(i) = predOut.col(i).index_max();
   }
   return predLabels;
 }
@@ -58,17 +62,11 @@ int main()
 
   // Labeled dataset that contains data for training is loaded from CSV file.
   // Rows represent features, columns represent data points.
-  mat tempDataset;
+  mat dataset;
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/train.csv", tempDataset, true);
-
-  // The original Kaggle dataset CSV file has headings for each column,
-  // so it's necessary to get rid of the first row. In Armadillo representation,
-  // this corresponds to the first column of our data matrix.
-  mat dataset =
-      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  data::Load("../data/mnist_train.csv", dataset, true);
 
   // Split the dataset into training and validation sets.
   mat train, valid;
@@ -79,13 +77,12 @@ int main()
   const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
   const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
 
-  // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to
-  // number of classes (in this case from 1 to 10).
+  // Labels should specify the class of a data point and be in the interval [0,
+  // numClasses).
 
   // Create labels for training and validatiion datasets.
-  const mat trainY = train.row(0) + 1;
-  const mat validY = valid.row(0) + 1;
+  const mat trainY = train.row(0);
+  const mat validY = valid.row(0);
 
   // Specify the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. RandomInitialization means that
@@ -181,6 +178,7 @@ int main()
               // Stop the training using Early Stop at min loss.
               ens::EarlyStopAtMinLoss(
                   [&](const arma::mat& /* param */)
+                  {
                     double validationLoss = model.Evaluate(validX, validY);
                     std::cout << "Validation loss: " << validationLoss
                         << "." << std::endl;
@@ -194,13 +192,13 @@ int main()
   // Calculate accuracy on training data points.
   arma::Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
-      arma::accu(predLabels == trainY) / ( double )trainY.n_elem * 100;
+      arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
   // Get predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculate accuracy on validating data points.
   predLabels = getLabels(predOut);
   double validAccuracy =
-      arma::accu(predLabels == validY) / ( double )validY.n_elem * 100;
+      arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << std::endl;
@@ -212,16 +210,13 @@ int main()
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/test.csv", tempDataset, true);
-
-  // As before, it's necessary to get rid of column headings.
-  mat testX =
-      tempDataset.submat(0, 1, tempDataset.n_rows - 1, tempDataset.n_cols - 1);
+  data::Load("../data/mnist_test.csv", dataset, true);
+  dataset.shed_row(dataset.n_rows - 1); // Remove labels before predicting.
 
   // Matrix to store the predictions on test dataset.
   mat testPredOut;
   // Get predictions on test data points.
-  model.Predict(testX, testPredOut);
+  model.Predict(dataset, testPredOut);
   // Generate labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
   std::cout << "Saving predicted labels to \"results.csv.\"..." << std::endl;

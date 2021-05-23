@@ -24,6 +24,10 @@
 #include <ensmallen.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 
+#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+  #error "need ensmallen version 2.13.0 or later"
+#endif
+
 using namespace mlpack::ann;
 
 using namespace arma;
@@ -35,7 +39,7 @@ arma::Row<size_t> getLabels(arma::mat predOut)
   arma::Row<size_t> predLabels(predOut.n_cols);
   for (arma::uword i = 0; i < predOut.n_cols; ++i)
   {
-    predLabels(i) = predOut.col(i).index_max() + 1;
+    predLabels(i) = predOut.col(i).index_max();
   }
   return predLabels;
 }
@@ -59,7 +63,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  mlpack::data::Load("../data/train.csv", dataset, true);
+  mlpack::data::Load("../data/mnist_train.csv", dataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -77,13 +81,12 @@ int main()
   const arma::mat validX =
       valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0;
 
-  // According to NegativeLogLikelihood output layer of NN, labels should
-  // specify class of a data point and be in the interval from 1 to
-  // number of classes (in this case from 1 to 10).
+  // Labels should specify the class of a data point and be in the interval [0,
+  // numClasses).
 
   // Creating labels for training and validating dataset.
-  const arma::mat trainY = train.row(0) + 1;
-  const arma::mat validY = valid.row(0) + 1;
+  const arma::mat trainY = train.row(0);
+  const arma::mat validY = valid.row(0);
 
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. GlorotInitialization means that
@@ -122,6 +125,9 @@ int main()
       1e-8,           // Tolerance.
       true);
 
+  // Declare callback to store best training weights.
+  ens::StoreBestCoordinates<arma::mat> bestCoordinates;
+
   // Train neural network. If this is the first iteration, weights are
   // random, using current values as starting point otherwise.
   model.Train(trainX,
@@ -136,7 +142,13 @@ int main()
                     double validationLoss = model.Evaluate(validX, validY);
                     std::cout << "Validation loss: " << validationLoss
                         << "." << std::endl;
-                  }));
+                    return validationLoss;
+                  }),
+              // Store best coordinates (neural network weights)
+              bestCoordinates);
+
+  // Save the best training weights into the model.
+  model.Parameters() = bestCoordinates.BestCoordinates();
 
   mat predOut;
   // Getting predictions on training data points.
@@ -144,13 +156,13 @@ int main()
   // Calculating accuracy on training data points.
   arma::Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
-      arma::accu(predLabels == trainY) / ( double )trainY.n_elem * 100;
+      arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
   double validAccuracy =
-      arma::accu(predLabels == validY) / ( double )validY.n_elem * 100;
+      arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
   std::cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << endl;
@@ -159,17 +171,13 @@ int main()
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  arma::mat testingDataset;
-  mlpack::data::Load("../data/test.csv", testingDataset, true);
-
-  // As before, it's necessary to get rid of header.
-  arma::mat testX = testingDataset.submat(
-      0, 1, testingDataset.n_rows - 1, testingDataset.n_cols - 1);
+  mlpack::data::Load("../data/mnist_test.csv", dataset, true);
+  dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 
   std::cout << "Predicting ..." << endl;
   mat testPredOut;
   // Getting predictions on test data points.
-  model.Predict(testX, testPredOut);
+  model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
   std::cout << "Saving predicted labels to \"results.csv\" ..." << std::endl;
