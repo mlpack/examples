@@ -31,10 +31,10 @@ int Portfolio(const std::string& stocks,
       pArgs = PyTuple_New(5);
 
       //! Comma separated stocks.
-      PyObject* pValueStocks= PyUnicode_FromString(stocks.c_str());
+      PyObject* pValueStocks = PyUnicode_FromString(stocks.c_str());
       PyTuple_SetItem(pArgs, 0, pValueStocks);
 
-      PyObject* pValueSource= PyUnicode_FromString(dataSource.c_str());
+      PyObject* pValueSource = PyUnicode_FromString(dataSource.c_str());
       PyTuple_SetItem(pArgs, 1, pValueSource);
 
       PyObject* pValueStart = PyUnicode_FromString(start.c_str());

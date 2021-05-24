@@ -17,7 +17,7 @@ def cportfolio(stocks, dataSource, start, end, filePath='portfolio.csv'):
 
   directory = os.path.dirname(filePath)
 
-  # If the non-empty specified directory doesn't exist.
+  # Create dir if the specified non-empty dir doesn't exist.
   if not os.path.exists(directory) and directory:
     os.makedirs(directory)
 
