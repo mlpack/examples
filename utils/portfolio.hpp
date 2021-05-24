@@ -26,12 +26,11 @@ int Portfolio(const std::string& stocks,
   if (pModule != NULL)
   {
     pFunc = PyObject_GetAttrString(pModule, "cportfolio");
-    size_t numStocks = stocks.size();
     if (pFunc && PyCallable_Check(pFunc))
     {
       pArgs = PyTuple_New(5);
 
-      //! Comma separated stocks
+      //! Comma separated stocks.
       PyObject* pValueStocks= PyUnicode_FromString(stocks.c_str());
       PyTuple_SetItem(pArgs, 0, pValueStocks);
 
