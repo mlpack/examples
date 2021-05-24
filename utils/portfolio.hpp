@@ -5,7 +5,7 @@
 #include <Python.h>
 #include <string>
 
-int PortFolio(const std::string& stocks,
+int Portfolio(const std::string& stocks,
               const std::string& dataSource,
               const std::string& start,
               const std::string& end,
