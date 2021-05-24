@@ -18,7 +18,6 @@ int StackedBar(const std::string& values,
   Py_Initialize();
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
-  PyRun_SimpleString("sys.path.append(\"/srv/conda/envs/notebook/include/\")");
   pName = PyUnicode_DecodeFSDefault("stackedbar");
 
   pModule = PyImport_Import(pName);

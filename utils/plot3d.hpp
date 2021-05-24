@@ -24,7 +24,6 @@ int Plot3D(const std::string& x,
   Py_Initialize();
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
-  PyRun_SimpleString("sys.path.append(\"/srv/conda/envs/notebook/include/\")");
   pName = PyUnicode_DecodeFSDefault("plot3d");
 
   pModule = PyImport_Import(pName);
