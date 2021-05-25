@@ -1,5 +1,6 @@
 channels:
 - conda-forge
+- zoq
 dependencies:
 # Jupyter
 - jupyterlab=3
@@ -49,3 +50,4 @@ dependencies:
 - pandas
 - gxx_linux-64
 - mlpack
+- ensmallen
