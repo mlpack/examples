@@ -133,6 +133,11 @@ def iris_dataset():
   tar.extractall()
   tar.close()
   clean()
+
+def salary_dataset():
+  print("Downloading salary dataset...")
+  salary = requests.get("http://mlpack.org/datasets/Salary_Data.csv")
+  progress_bar("Salary_Data.csv", salary)
   
 def all_datasets():
   mnist_dataset()
@@ -140,6 +145,7 @@ def all_datasets():
   stock_exchange_dataset()
   iris_dataset()
   body_fat_dataset()
+  salary_dataset()
 
 if __name__ == '__main__':
 
@@ -161,6 +167,7 @@ if __name__ == '__main__':
         stock : will download stock_exchange dataset
         iris : will downlaod the iris dataset
         bodyFat : will download the bodyFat dataset
+        salary: will download the salary dataset
         all : will download all datasets for all examples
         '''))
  
@@ -187,6 +194,9 @@ if __name__ == '__main__':
       elif args.dataset_name == "bodyFat":
         create_dataset_dir()
         body_fat_dataset()
+      elif args.dataset_name == "salary":
+        create_dataset_dir()
+        salary_dataset()
       elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
