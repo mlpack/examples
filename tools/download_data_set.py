@@ -144,8 +144,9 @@ def all_datasets():
   electricity_consumption_dataset()
   stock_exchange_dataset()
   iris_dataset()
-  body_fat_dataset()
   salary_dataset()
+  body_fat_dataset()
+  
 
 if __name__ == '__main__':
 
