@@ -88,8 +88,8 @@ int main()
   data::Split(fullData, validation, train, trainRatio);
   
   // Loss is calculated on train_test data after each cycle.
-  arma::mat train_test, dump;
-  data::Split(train, dump, train_test, 0.045);
+  arma::mat trainTest, dump;
+  data::Split(train, dump, trainTest, 0.045);
 
   // No of iterations of the optimizer.
   int iterPerCycle = (epochs * train.n_cols);
@@ -210,8 +210,8 @@ int main()
       1e-8,         // Tolerance.
       true);
       
-  const clock_t begin_time = clock();
-  clock_t cycle_time = begin_time;
+  const clock_t beginTime = clock();
+  clock_t cycleTime = beginTime;
 
   // Cycles for monitoring the progress.
   for (int i = 0; i < cycles; i++)
@@ -219,22 +219,22 @@ int main()
     // Train neural network. If this is the first iteration, weights are
     // random, using current values as starting point otherwise.
     vaeModel.Train(train,
-     		   train,
-     		   optimizer,
-     		   ens::PrintLoss(),
-     		   ens::ProgressBar());
+                   train,
+                   optimizer,
+                   ens::PrintLoss(),
+                   ens::ProgressBar());
      		   
     // Don't reset optimizer's parameters between cycles.
     optimizer.ResetPolicy() = false;
 
     std::cout << "Loss after cycle  " << i << " -> " <<
         MeanTestLoss<MeanSModel>(vaeModel, train_test, batchSize) << std::endl;
-    std::cout << "Time taken for cycle -> " << float(clock() - cycle_time) /
+    std::cout << "Time taken for cycle -> " << float(clock() - cycleTime) /
         CLOCKS_PER_SEC << " seconds" << std::endl;
-    cycle_time = clock();
+    cycleTime = clock();
   }
 
-  std::cout << "Time taken to train -> " << float(clock() - begin_time) /
+  std::cout << "Time taken to train -> " << float(clock() - beginTime) /
       CLOCKS_PER_SEC << " seconds" << std::endl;
 
   // Save the model if specified.
