@@ -222,13 +222,14 @@ int main()
                    train,
                    optimizer,
                    ens::PrintLoss(),
-                   ens::ProgressBar());
+                   ens::ProgressBar(),
+                   ens::Report());
      		   
     // Don't reset optimizer's parameters between cycles.
     optimizer.ResetPolicy() = false;
 
     std::cout << "Loss after cycle  " << i << " -> " <<
-        MeanTestLoss<MeanSModel>(vaeModel, train_test, batchSize) << std::endl;
+        MeanTestLoss<MeanSModel>(vaeModel, trainTest, batchSize) << std::endl;
     std::cout << "Time taken for cycle -> " << float(clock() - cycleTime) /
         CLOCKS_PER_SEC << " seconds" << std::endl;
     cycleTime = clock();
