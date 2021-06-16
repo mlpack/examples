@@ -51,7 +51,7 @@ int main()
     fullData = 
         fullData.submat(0, 1, fullData.n_rows - 1, fullData.n_cols -1);
     fullData /= 255.0;
-    // Get rid of the labels
+    // Get rid of the labels.
     fullData =
         fullData.submat(1, 0, fullData.n_rows - 1, fullData.n_cols - 1);
 
