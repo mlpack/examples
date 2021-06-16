@@ -47,7 +47,7 @@ int main()
   if (loadData)
   {
     data::Load("../data/mnist_train.csv", fullData, true, false);
-    // Get rid of the header
+    // Get rid of the header.
     fullData = 
         fullData.submat(0, 1, fullData.n_rows - 1, fullData.n_cols -1);
     fullData /= 255.0;
