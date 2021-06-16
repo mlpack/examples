@@ -212,7 +212,6 @@ int main()
       
   const clock_t begin_time = clock();
   clock_t cycle_time = begin_time;
-  
 
   // Cycles for monitoring the progress.
   for (int i = 0; i < cycles; i++)
