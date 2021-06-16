@@ -91,7 +91,7 @@ int main()
   arma::mat train_test, dump;
   data::Split(train, dump, train_test, 0.045);
 
-  // No of iterations of the optimizer
+  // No of iterations of the optimizer.
   int iterPerCycle = (epochs * train.n_cols);
 
   /**
