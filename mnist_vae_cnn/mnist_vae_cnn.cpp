@@ -211,8 +211,6 @@ int main()
       true);
       
   const clock_t beginTime = clock();
-  clock_t cycleTime = beginTime;
-
   // Cycles for monitoring the progress.
   for (int i = 0; i < cycles; i++)
   {
@@ -230,9 +228,6 @@ int main()
 
     std::cout << "Loss after cycle  " << i << " -> " <<
         MeanTestLoss<MeanSModel>(vaeModel, trainTest, batchSize) << std::endl;
-    std::cout << "Time taken for cycle -> " << float(clock() - cycleTime) /
-        CLOCKS_PER_SEC << " seconds" << std::endl;
-    cycleTime = clock();
   }
 
   std::cout << "Time taken to train -> " << float(clock() - beginTime) /
