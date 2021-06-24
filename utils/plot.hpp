@@ -5,7 +5,7 @@
 #include <Python.h>
 #include <string>
 
-int scatter(const std::string fname, const std::string type,const std::string figTitle, const int figWidth = 26, const int figHeight = 7) {
+int scatter(const std::string& fname, const std::string& type, const std::string& figTitle, const int figWidth = 26, const int figHeight = 7) {
 
     PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
@@ -40,13 +40,13 @@ int scatter(const std::string fname, const std::string type,const std::string fi
     return 0;
 }
 
-int barplot(const std::string fname, const std::string x, const std::string y, const std::string figTitle, const int figWidth = 5, const int figHeight = 7) {
+int barplot(const std::string& fname, const std::string& x, const std::string& y, const std::string& figTitle, const int figWidth = 5, const int figHeight = 7) {
 
     PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
     Py_Initialize();
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(\"./\")");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
     
     pName = PyUnicode_DecodeFSDefault("plot");
     pModule = PyImport_Import(pName);
@@ -78,13 +78,13 @@ int barplot(const std::string fname, const std::string x, const std::string y, c
     return 0;
 }
 
-int heatmap(const std::string fname, const std::string colorMap, const std::string figTitle, const int annotation = false, const int figWidth = 12, const int figHeight = 6) {
+int heatmap(const std::string& fname, const std::string& colorMap, const std::string& figTitle, const int annotation = false, const int figWidth = 12, const int figHeight = 6) {
 
     PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
     Py_Initialize();
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(\"./\")");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
     
     pName = PyUnicode_DecodeFSDefault("plot");
     pModule = PyImport_Import(pName);
@@ -116,13 +116,13 @@ int heatmap(const std::string fname, const std::string colorMap, const std::stri
     return 0;
 }
 
-int lmplot(const std::string fname, const std::string figTitle, const int figWidth = 6, const int figHeight = 7) {
+int lmplot(const std::string& fname, const std::string& figTitle, const int figWidth = 6, const int figHeight = 7) {
 
     PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
     Py_Initialize();
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(\"./\")");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
     
     pName = PyUnicode_DecodeFSDefault("plot");
     pModule = PyImport_Import(pName);
@@ -148,13 +148,13 @@ int lmplot(const std::string fname, const std::string figTitle, const int figWid
     return 0;
 }
 
-int histplot(const std::string fname, const std::string figTitle, const int figWidth = 6, const int figHeight = 4) {
+int histplot(const std::string& fname, const std::string& figTitle, const int figWidth = 6, const int figHeight = 4) {
 
     PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
     Py_Initialize();
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path.append(\"./\")");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
     
     pName = PyUnicode_DecodeFSDefault("plot");
     pModule = PyImport_Import(pName);
@@ -181,4 +181,3 @@ int histplot(const std::string fname, const std::string figTitle, const int figW
 }
 
 #endif
-
