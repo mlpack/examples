@@ -73,7 +73,7 @@ int PandasScatter(const std::string& inFile,
 
       PyObject* pValueHeight = PyLong_FromLong(height);
       PyTuple_SetItem(pArgs, 5, pValueHeight);
-      
+
       // The rest of the c++ part can stay the same.
 
       pValue = PyObject_CallObject(pFunc, pArgs);
@@ -119,12 +119,12 @@ int PandasScatterColor(const std::string& inFile,
 {
   PyObject *pName, *pModule, *pFunc;
   PyObject *pArgs, *pValue;
-  int i; 
+  int i;
   Py_Initialize();
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
   pName = PyUnicode_DecodeFSDefault("pandasscatter");
-  
+
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
@@ -141,22 +141,22 @@ int PandasScatterColor(const std::string& inFile,
       PyTuple_SetItem(pArgs, 1, pValueX);
 
       PyObject* pValueY = PyUnicode_FromString(y.c_str());
-      PyTuple_SetItem(pArgs,2, pValueY);
-      
+      PyTuple_SetItem(pArgs, 2, pValueY);
+
       PyObject* pValueLabel = PyUnicode_FromString(label.c_str());
-      PyTuple_SetItem(pArgs,3, pValueLabel);
-      
+      PyTuple_SetItem(pArgs, 3, pValueLabel);
+
        PyObject* pValueC = PyUnicode_FromString(c.c_str());
-      PyTuple_SetItem(pArgs,4, pValueC);
-      
+      PyTuple_SetItem(pArgs, 4, pValueC);
+
       PyObject* pValueoutFile = PyUnicode_FromString(outFile.c_str());
       PyTuple_SetItem(pArgs, 5, pValueoutFile);
 
       PyObject* pValueWidth = PyLong_FromLong(width);
       PyTuple_SetItem(pArgs, 6, pValueWidth);
-       
+
       PyObject* pValueHeight = PyLong_FromLong(height);
-      PyTuple_SetItem(pArgs,7,pValueHeight);
+      PyTuple_SetItem(pArgs, 7, pValueHeight);
 
       pValue = PyObject_CallObject(pFunc, pArgs);
       Py_DECREF(pArgs);
@@ -190,5 +190,91 @@ int PandasScatterColor(const std::string& inFile,
   }
   return 0;
 }
+int PandasScatterMap(const std::string& inFile,
+                      const std::string& imgFile,
+                       const std::string& x,
+                       const std::string& y,
+                       const std::string& label,
+                       const std::string& c,
+                       const std::string& outFile,
+                       const int width = 10,
+                       const int height= 10)
+{
+  PyObject *pName, *pModule, *pFunc;
+  PyObject *pArgs, *pValue;
+  int i;
+  Py_Initialize();
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append(\"../utils/\")");
+  pName = PyUnicode_DecodeFSDefault("pandasscatter");
 
+  pModule = PyImport_Import(pName);
+  Py_DECREF(pName);
+
+  if(pModule != NULL){
+    pFunc = PyObject_GetAttrString(pModule, "cpandasscattermap");
+    if( pFunc && PyCallable_Check(pFunc))
+    {
+      pArgs = PyTuple_New(9);
+
+      PyObject* pValueinFile = PyUnicode_FromString(inFile.c_str());
+      PyTuple_SetItem(pArgs, 0, pValueinFile);
+
+      PyObject* pValueimgFile = PyUnicode_FromString(imgFile.c_str());
+      PyTuple_SetItem(pArgs, 1, pValueimgFile);
+
+
+      PyObject* pValueX = PyUnicode_FromString(x.c_str());
+      PyTuple_SetItem(pArgs, 2, pValueX);
+
+      PyObject* pValueY = PyUnicode_FromString(y.c_str());
+      PyTuple_SetItem(pArgs, 3, pValueY);
+
+      PyObject* pValueLabel = PyUnicode_FromString(label.c_str());
+      PyTuple_SetItem(pArgs, 4, pValueLabel);
+
+       PyObject* pValueC = PyUnicode_FromString(c.c_str());
+      PyTuple_SetItem(pArgs, 5, pValueC);
+
+      PyObject* pValueoutFile = PyUnicode_FromString(outFile.c_str());
+      PyTuple_SetItem(pArgs, 6, pValueoutFile);
+
+      PyObject* pValueWidth = PyLong_FromLong(width);
+      PyTuple_SetItem(pArgs, 7, pValueWidth);
+
+      PyObject* pValueHeight = PyLong_FromLong(height);
+      PyTuple_SetItem(pArgs, 8, pValueHeight);
+
+      pValue = PyObject_CallObject(pFunc, pArgs);
+      Py_DECREF(pArgs);
+      if (pValue != NULL)
+      {
+        Py_DECREF(pValue);
+      }
+      else
+      {
+        Py_DECREF(pFunc);
+        Py_DECREF(pModule);
+        PyErr_Print();
+        fprintf(stderr,"Call Failed.\n");
+        return 1;
+      }
+
+    }
+    else
+    {
+      if(PyErr_Occurred())
+        PyErr_Print();
+    }
+
+    Py_XDECREF(pFunc);
+    Py_DECREF(pModule);
+  }
+  else
+  {
+    PyErr_Print();
+    return -1;
+  }
+  return 0;
+}
 #endif
