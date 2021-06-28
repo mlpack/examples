@@ -6,8 +6,15 @@
 #include <string>
 
 int scatter(const std::string& fname,
-            const std::string& type,
-            const std::string& figTitle,
+            const std::string& xCol,
+            const std::string& yCol,
+            const std::string& dateCol = "",
+            const std::string& maskCol = "",
+            const std::string& type = "",
+            const std::string& color = "",
+            const std::string& xLabel = "",
+            const std::string& yLabel = "",
+            const std::string& figTitle = "",
             const int figWidth = 26,
             const int figHeight = 7)
 {
@@ -23,22 +30,43 @@ int scatter(const std::string& fname,
 
   pFunc = PyObject_GetAttrString(pModule, "cscatter");
 
-  pArgs = PyTuple_New(5);
+  pArgs = PyTuple_New(12);
 
   PyObject* pFname = PyString_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
-
+    
+  PyObject* pXcol = PyString_FromString(xCol.c_str());
+  PyTuple_SetItem(pArgs, 1, pXcol);
+    
+  PyObject* pYcol = PyString_FromString(yCol.c_str());
+  PyTuple_SetItem(pArgs, 2, pYcol);
+    
+  PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+  PyTuple_SetItem(pArgs, 3, pDateCol);
+  
+  PyObject* pMaskCol = PyString_FromString(maskCol.c_str());
+  PyTuple_SetItem(pArgs, 4, pMaskCol);  
+  
   PyObject* pType = PyString_FromString(type.c_str());
-  PyTuple_SetItem(pArgs, 1, pType);
+  PyTuple_SetItem(pArgs, 5, pType);
+  
+  PyObject* pColor = PyString_FromString(color.c_str());
+  PyTuple_SetItem(pArgs, 6, pColor);
+
+  PyObject* pXlabel = PyString_FromString(xLabel.c_str());
+  PyTuple_SetItem(pArgs, 7, pXlabel);
+    
+  PyObject* pYlabel = PyString_FromString(yLabel.c_str());
+  PyTuple_SetItem(pArgs, 8, pYlabel);
 
   PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
-  PyTuple_SetItem(pArgs, 2, pFigTitle);
+  PyTuple_SetItem(pArgs, 9, pFigTitle);
 
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
-  PyTuple_SetItem(pArgs, 3, pFigWidth);
+  PyTuple_SetItem(pArgs, 10, pFigWidth);
 
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
-  PyTuple_SetItem(pArgs, 4, pFigHeight);
+  PyTuple_SetItem(pArgs, 11, pFigHeight);
 
   pValue = PyObject_CallObject(pFunc, pArgs);
 
@@ -48,7 +76,8 @@ int scatter(const std::string& fname,
 int barplot(const std::string& fname,
             const std::string& x,
             const std::string& y,
-            const std::string& figTitle,
+            const std::string& dateCol = "",
+            const std::string& figTitle = "",
             const int figWidth = 5,
             const int figHeight = 7)
 {
@@ -64,7 +93,7 @@ int barplot(const std::string& fname,
 
   pFunc = PyObject_GetAttrString(pModule, "cbarplot");
 
-  pArgs = PyTuple_New(6);
+  pArgs = PyTuple_New(7);
 
   PyObject* pFname = PyString_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
@@ -74,15 +103,18 @@ int barplot(const std::string& fname,
 
   PyObject* pY = PyString_FromString(y.c_str());
   PyTuple_SetItem(pArgs, 2, pY);
+    
+  PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+  PyTuple_SetItem(pArgs, 3, pDateCol);
 
   PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
-  PyTuple_SetItem(pArgs, 3, pFigTitle);
+  PyTuple_SetItem(pArgs, 4, pFigTitle);
 
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
-  PyTuple_SetItem(pArgs, 4, pFigWidth);
+  PyTuple_SetItem(pArgs, 5, pFigWidth);
 
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
-  PyTuple_SetItem(pArgs, 5, pFigHeight);
+  PyTuple_SetItem(pArgs, 6, pFigHeight);
 
   pValue = PyObject_CallObject(pFunc, pArgs);
 
@@ -91,7 +123,7 @@ int barplot(const std::string& fname,
 
 int heatmap(const std::string& fname,
             const std::string& colorMap,
-            const std::string& figTitle,
+            const std::string& figTitle = "",
             const int annotation = false,
             const int figWidth = 12,
             const int figHeight = 6)
