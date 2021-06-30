@@ -46,8 +46,10 @@ int main()
   constexpr int batchSize = 64;
   // The step size of the optimizer.
   constexpr double stepSize = 0.001;
-  // The maximum number of possible iteration
-  constexpr int maxIteration = 0;
+  // Number of epochs/ cycle
+  constexpr int epochs = 1;
+  // Number of cycles
+  constexpr int cycles = 10;
   // Whether to load a model to train.
   constexpr bool loadModel = false;
   // Whether to save the trained model.
@@ -84,6 +86,13 @@ int main()
 
   arma::mat train, validation;
   data::Split(fullData, validation, train, trainRatio);
+  
+  // Loss is calculated on train_test data after each cycle.
+  arma::mat trainTest, dump;
+  data::Split(train, dump, trainTest, 0.045);
+
+  // No of iterations of the optimizer.
+  int iterPerCycle = (epochs * train.n_cols);
 
   /**
    * Model architecture:
@@ -107,7 +116,7 @@ int main()
    *         size 5x5, stride = 1, padding = 0) ---> 14x14x16
    * 14x14x16 ------------- Leaky ReLU ------------> 14x14x16
    * 14x14x16 ---- transposed conv (1 filter of
-   *         size 15x15, stride = 1, padding = 1) -> 28x28x1
+   *         size 15x15, stride = 0, padding = 1) -> 28x28x1
    */
 
   // Creating the VAE model.
@@ -197,24 +206,37 @@ int main()
       0.9,       // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
       1e-8,  // Value used to initialise the mean squared gradient parameter.
-      maxIteration, // Max number of iterations.
+      iterPerCycle, // Max number of iterations.
       1e-8,         // Tolerance.
       true);
+      
+  const clock_t beginTime = clock();
+  // Cycles for monitoring the progress.
+  for (int i = 0; i < cycles; i++)
+  {
+    // Train neural network. If this is the first iteration, weights are
+    // random, using current values as starting point otherwise.
+    vaeModel.Train(train,
+                   train,
+                   optimizer,
+                   ens::PrintLoss(),
+                   ens::ProgressBar(),
+                   ens::Report());
+     		   
+    // Don't reset optimizer's parameters between cycles.
+    optimizer.ResetPolicy() = false;
 
-  // Train neural network. If this is the first iteration, weights are
-  // random, using current values as starting point otherwise.
-  vaeModel.Train(train,
-                 train,
-                 optimizer,
-                 ens::PrintLoss(),
-                 ens::ProgressBar(),
-                 // Stop the training using Early Stop at min loss.
-                 ens::EarlyStopAtMinLoss());
+    std::cout << "Loss after cycle  " << i << " -> " <<
+        MeanTestLoss<MeanSModel>(vaeModel, trainTest, batchSize) << std::endl;
+  }
+
+  std::cout << "Time taken to train -> " << float(clock() - beginTime) /
+      CLOCKS_PER_SEC << " seconds" << std::endl;
 
   // Save the model if specified.
   if (saveModel)
   {
-    data::Save("vae/saved_models/vaeCNN.bin", "vaeCNN", vaeModel);
+    data::Save("./saved_models/vaeCNN.bin", "vaeCNN", vaeModel);
     std::cout << "Model saved in vae/saved_models." << std::endl;
   }
 }
