@@ -316,4 +316,58 @@ int histplot(const std::string& fname,
   return 0;
 }
 
+
+int missing(const std::string& fname,
+            const std::string& colorMap,
+            const std::string& figTitle = "",
+            const int figWidth = 12,
+            const int figHeight = 6)
+{
+
+  // PyObject contains info Python needs to treat a pointer to an object as an object.
+  // It contains object's reference count and pointer to corresponding object type.  
+  PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
+
+  // Initialize Python Interpreter.  
+  Py_Initialize();
+  // Import sys module in Interpreter and add current path to python search path.  
+  PyRun_SimpleString("import sys");
+  PyRun_SimpleString("sys.path.append(\"../utils/\")");
+
+  // Import the Python module.  
+  pName = PyUnicode_DecodeFSDefault("plot");
+  pModule = PyImport_Import(pName);
+
+  // Get the reference to Python Function to call.  
+  pFunc = PyObject_GetAttrString(pModule, "cmissing");
+
+  // Create a tuple object to hold the arguments for function call.  
+  pArgs = PyTuple_New(5);
+
+  // String object representing the name of the dataset to be loaded.  
+  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyTuple_SetItem(pArgs, 0, pFname);
+
+  // String object representing the name of color map to be used for plotting.
+  PyObject* pColorMap = PyString_FromString(colorMap.c_str());
+  PyTuple_SetItem(pArgs, 1, pColorMap);
+
+  // String object representing the title of the figure.  
+  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyTuple_SetItem(pArgs, 2, pFigTitle);
+
+  // Integer object representing the width of the figure.  
+  PyObject* pFigWidth = PyLong_FromLong(figWidth);
+  PyTuple_SetItem(pArgs, 3, pFigWidth);
+
+  // Integer object representing the height of the figure.  
+  PyObject* pFigHeight = PyLong_FromLong(figHeight);
+  PyTuple_SetItem(pArgs, 4, pFigHeight);
+
+  // Call the function by passing the reference to function & tuple holding arguments.  
+  pValue = PyObject_CallObject(pFunc, pArgs);
+
+  return 0;
+}
+
 #endif

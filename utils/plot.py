@@ -121,6 +121,35 @@ def cheatmap(filename: str,
     plt.savefig(f"{figTitle}.png")
     plt.close()
     
+    
+def cmissing(filename: str, 
+             cmap: str, 
+             figTitle: str, 
+             figWidth: int = 12, 
+             figHeight: int = 6) -> None:
+    """
+    Creates a heatmap (correlation map) of the dataset and saves it.
+    
+        Parameters:
+                filename (str): Name of the dataset to load.
+                cmap (str): Name of the color map to be used for plotting.
+                annotate (bool): Indicates whether plot should be annotated with correlation values.
+                figTitle (str): Title for the figure to be save; defaults to None.
+                figWidth (int): Width of the figure; defaults to 12.
+                figHeight (int): Height of the figure; defaults to 6.
+
+            Returns:
+                (None): Function does not return anything.
+    """
+    sns.set(color_codes=True)
+    df = pd.read_csv(filename)
+#     fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = sns.heatmap(df.isnull(), cmap=cmap, cbar=False)
+    plt.title(figTitle)
+    plt.savefig(f"{figTitle}.png")
+    plt.close() 
+    
+    
 def clmplot(filename: str, 
             figTitle: str = None, 
             figWidth: int = 6, 
