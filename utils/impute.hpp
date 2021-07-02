@@ -35,10 +35,6 @@ int Impute(const std::string& inFile,
     pName = PyUnicode_DecodeFSDefault("impute");
 
     pModule = PyImport_Import(pName);
-
-    pFunc = PyObject_GetAttrString(pModule, "imputer");
-
-    pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
     if( pModule != NULL)
