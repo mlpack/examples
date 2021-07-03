@@ -43,7 +43,7 @@ int resample(const std::string& fname,
              const std::string& target,
              const std::string& negValue,
              const std::string& posValue,
-             const std::string& kind = "oversample",
+             const std::string& kind,
              const std::string& dateCol = "",
              const int& randomState = 123)
              
