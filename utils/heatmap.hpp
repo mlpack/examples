@@ -12,9 +12,9 @@
 // since this is what passed from the C++ notebook to python script
 
 int HeatMap(const std::string& inFile,
+            const std::string& outFile = "histogram.png",
             const int width = 15,
-            const int height = 10,
-            const std::string& outFile = "histogram.png")
+            const int height = 10)
 
 {
     // Calls python function cpandahist and plots the heatmap
@@ -58,14 +58,15 @@ int HeatMap(const std::string& inFile,
             //Here we just set the index of the argument.
             PyTuple_SetItem(pArgs, 0, pValueinFile);
 
+            PyObject* pValueoutFile = PyUnicode_FromString(outFile.c_str());
+            PyTuple_SetItem(pArgs, 1, pValueoutFile);
+
             PyObject* pValuewidth = PyLong_FromLong(width);
-            PyTuple_SetItem(pArgs, 1, pValuewidth);
+            PyTuple_SetItem(pArgs, 2, pValuewidth);
 
             PyObject* pValueheight = PyLong_FromLong(height);
-            PyTuple_SetItem(pArgs, 2, pValueheight);
+            PyTuple_SetItem(pArgs, 3, pValueheight);
 
-            PyObject* pValueoutFile = PyUnicode_FromString(outFile.c_str());
-            PyTuple_SetItem(pArgs, 3, pValueoutFile);
 
             // The rest of the c++ part can remain same.
 
