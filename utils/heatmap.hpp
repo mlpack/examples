@@ -1,5 +1,5 @@
 // Inside the C++ notebook we can use:
-// HeatMap("filename.csv",width, height, annot, "heatmap.png")
+// HeatMap("filename.csv",width, height,"heatmap.png")
 
 #ifndef CHEATMAP_HPP
 #define CHEATMAP_HPP
@@ -17,7 +17,7 @@ int HeatMap(const std::string& inFile,
             const std::string& outFile = "histogram.png")
 
 {
-    // Calls python function cpandahist and plots the histogram
+    // Calls python function cpandahist and plots the heatmap
 
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue;
@@ -32,7 +32,7 @@ int HeatMap(const std::string& inFile,
     PyRun_SimpleString("sys.path.append(\"../utils/\")");
 
     // Name of python script without extension
-    pName = PyUnicode_DecodeFSDefault("histogram");
+    pName = PyUnicode_DecodeFSDefault("heatmap");
 
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
@@ -40,8 +40,8 @@ int HeatMap(const std::string& inFile,
     if( pModule != NULL)
     {
         // The Python function from the histogram.py script
-        // we like to call - cpandashist
-        pFunc = PyObject_GetAttrString(pModule, "cpandashist");
+        // we like to call - cheatmap
+        pFunc = PyObject_GetAttrString(pModule, "cheatmap");
 
         if(pFunc && PyCallable_Check(pFunc))
         {

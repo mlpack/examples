@@ -6,8 +6,7 @@
 #include <string>
 
 int scatter(const std::string& fname,
-            const std::string&#include "../utils/plot.hpp"
- xCol,
+            const std::string& xCol,
             const std::string& yCol,
             const std::string& dateCol = "",
             const std::string& maskCol = "",
@@ -44,43 +43,43 @@ int scatter(const std::string& fname,
   pArgs = PyTuple_New(12);
 
   // String object representing the name of the dataset to be loaded.
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the name of the feature to be plotted along X axis.
-  PyObject* pXcol = PyString_FromString(xCol.c_str());
+  PyObject* pXcol = PyUnicode_FromString(xCol.c_str());
   PyTuple_SetItem(pArgs, 1, pXcol);
 
   // String object representing the name of the feature to be plotted along Y axis.
-  PyObject* pYcol = PyString_FromString(yCol.c_str());
+  PyObject* pYcol = PyUnicode_FromString(yCol.c_str());
   PyTuple_SetItem(pArgs, 2, pYcol);
 
   // String object representing the name of the feature to be parsed as TimeStamp.
-  PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+  PyObject* pDateCol = PyUnicode_FromString(dateCol.c_str());
   PyTuple_SetItem(pArgs, 3, pDateCol);
 
   // String object representing the name of the feature to be used to mask the plot data points.
-  PyObject* pMaskCol = PyString_FromString(maskCol.c_str());
+  PyObject* pMaskCol = PyUnicode_FromString(maskCol.c_str());
   PyTuple_SetItem(pArgs, 4, pMaskCol);
 
   // String object representing the value for masking.
-  PyObject* pType = PyString_FromString(type.c_str());
+  PyObject* pType = PyUnicode_FromString(type.c_str());
   PyTuple_SetItem(pArgs, 5, pType);
 
   // String object representing the feature name to be used as color value in plot.
-  PyObject* pColor = PyString_FromString(color.c_str());
+  PyObject* pColor = PyUnicode_FromString(color.c_str());
   PyTuple_SetItem(pArgs, 6, pColor);
 
   // String object representing the X axis label.
-  PyObject* pXlabel = PyString_FromString(xLabel.c_str());
+  PyObject* pXlabel = PyUnicode_FromString(xLabel.c_str());
   PyTuple_SetItem(pArgs, 7, pXlabel);
 
   // String object representing the Y axis label.
-  PyObject* pYlabel = PyString_FromString(yLabel.c_str());
+  PyObject* pYlabel = PyUnicode_FromString(yLabel.c_str());
   PyTuple_SetItem(pArgs, 8, pYlabel);
 
   // String object representing the title of the figure.
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 9, pFigTitle);
 
   // Integer object representing the width of the figure.
@@ -130,23 +129,23 @@ int barplot(const std::string& fname,
   pArgs = PyTuple_New(7);
 
   // String object representing the name of the dataset to be loaded.
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the name of the feature to be plotted along X axis.
-  PyObject* pX = PyString_FromString(x.c_str());
+  PyObject* pX = PyUnicode_FromString(x.c_str());
   PyTuple_SetItem(pArgs, 1, pX);
 
   // String object representing the name of the feature to be plotted along Y axis.
-  PyObject* pY = PyString_FromString(y.c_str());
+  PyObject* pY = PyUnicode_FromString(y.c_str());
   PyTuple_SetItem(pArgs, 2, pY);
 
   // String object representing the name of the feature to be parsed as TimeStamp.
-  PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+  PyObject* pDateCol = PyUnicode_FromString(dateCol.c_str());
   PyTuple_SetItem(pArgs, 3, pDateCol);
 
   // String object representing the title of the figure.
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 4, pFigTitle);
 
   // Integer object representing the width of the figure.
@@ -192,11 +191,11 @@ int heatmap(const std::string& fname,
   pArgs = PyTuple_New(6);
 
   // String object representing the name of the dataset to be loaded.
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the name of color map to be used for plotting.
-  PyObject* pColorMap = PyString_FromString(colorMap.c_str());
+  PyObject* pColorMap = PyUnicode_FromString(colorMap.c_str());
   PyTuple_SetItem(pArgs, 1, pColorMap);
 
   // Boolean object indicating if correlation values must be annotated in figure.
@@ -204,7 +203,7 @@ int heatmap(const std::string& fname,
   PyTuple_SetItem(pArgs, 2, pAnnotation);
 
   // String object representing the title of the figure.
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 3, pFigTitle);
 
   // Integer object representing the width of the figure.
@@ -248,11 +247,11 @@ int lmplot(const std::string& fname,
   pArgs = PyTuple_New(4);
 
   // String object representing the name of the dataset to be loaded.
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the title of the figure.
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 1, pFigTitle);
 
   // Integer object representing the width of the figure.
@@ -296,11 +295,11 @@ int histplot(const std::string& fname,
   pArgs = PyTuple_New(4);
 
   // String object representing the name of the dataset to be loaded.
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the title of the figure.
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 1, pFigTitle);
 
   // Integer object representing the width of the figure.
