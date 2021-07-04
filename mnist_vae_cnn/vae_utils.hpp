@@ -21,7 +21,7 @@ using namespace mlpack::ann;
 // Calculates mean loss over batches.
 template<typename NetworkType = FFN<MeanSquaredError<>, HeInitialization>,
          typename DataType = arma::mat>
-double MeanTestLoss(NetworkType model, DataType testSet, size_t batchSize)
+double MeanTestLoss(NetworkType& model, DataType& testSet, size_t batchSize)
 {
   double loss = 0;
   size_t nofPoints = testSet.n_cols;
@@ -49,7 +49,7 @@ double MeanTestLoss(NetworkType model, DataType testSet, size_t batchSize)
 // Sample from the output distribution and post-process the outputs(because
 // we pre-processed it before passing it to the model).
 template<typename DataType = arma::mat>
-void GetSample(DataType input, DataType& samples, bool isBinary)
+void GetSample(DataType &input, DataType& samples, bool isBinary)
 {
   if (isBinary)
   {
