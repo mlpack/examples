@@ -72,9 +72,4 @@ def cresample(fname: str,
         features, targets = os.fit_resample(df.iloc[:, :-1], df.iloc[:,-1])
         smoteSampled = pd.concat([pd.DataFrame(features), pd.DataFrame(targets)], axis=1)
         smoteSampled.to_csv(f"{fname[:-4]}_smotesampled.csv", index=False)
-    
-        
-print("check")
-cresample("smote_in.csv", "RainTomorrow", "No", "Yes", "smote", "Date", 123);
-print("postcheck")
         
