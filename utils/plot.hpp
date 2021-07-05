@@ -429,4 +429,36 @@ int countplot(const std::string& fname,
 
 }
 
+int plotRocAUC(const std::string& yTrue,
+               const std::string& probs,
+               const std::string& outfile = "roc_auc")
+{
+    PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
+    
+    Py_Initialize();
+    
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
+    
+    pName = PyUnicode_DecodeFSDefault("plot");
+    pModule = PyImport_Import(pName);
+    
+    pFunc = PyObject_GetAttrString(pModule, "cplotRocAUC");
+    
+    pArgs = PyTuple_New(3);
+    
+    PyObject* pYtrue = PyUnicode_FromString(yTrue.c_str());
+    PyTuple_SetItem(pArgs, 0, pYtrue);
+    
+    PyObject* pProbs = PyUnicode_FromString(probs.c_str());
+    PyTuple_SetItem(pArgs, 1, pProbs);
+    
+    PyObject* pOutFile = PyUnicode_FromString(outfile.c_str());
+    PyTuple_SetItem(pArgs, 2, pOutFile);
+    
+    pValue = PyObject_CallObject(pFunc, pArgs);
+    
+    return 0;
+}
+
 #endif
