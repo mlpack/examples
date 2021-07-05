@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import roc_curve
 
 def cscatter(filename: str, 
              xCol: str, 
@@ -96,8 +97,8 @@ def cheatmap(filename: str,
              cmap: str, 
              annotate: bool, 
              figTitle: str, 
-             figWidth: int = 12, 
-             figHeight: int = 6) -> None:
+             figWidth: int = 15, 
+             figHeight: int = 15) -> None:
     """
     Creates a heatmap (correlation map) of the dataset and saves it.
     
@@ -114,12 +115,14 @@ def cheatmap(filename: str,
     """
     sns.set(color_codes=True)
     df = pd.read_csv(filename)
-    df = df.drop("Unnamed: 0", axis=1)
+    if "Unnamed: 0" in df.columns:
+        df = df.drop("Unnamed: 0", axis=1)
     fig = plt.figure(figsize=(figWidth, figHeight))
-    ax = sns.heatmap(df.corr(), cmap=cmap, annot=annotate)
+    ax = sns.heatmap(df.corr(), cmap=cmap, annot=annotate, square=True, fmt=".2f")
     plt.title(figTitle)
     plt.savefig(f"{figTitle}.png")
     plt.close()
+    
     
 def clmplot(filename: str, 
             figTitle: str = None, 
@@ -168,5 +171,84 @@ def chistplot(filename: str,
     ax = sns.histplot(df.Y_Test - df.Y_Preds)
     plt.title(f"{figTitle}")
     plt.savefig(f"{figTitle}.png")
+    plt.close()
+    
+    
+def cmissing(filename: str, 
+             cmap: str, 
+             figTitle: str, 
+             figWidth: int = 6, 
+             figHeight: int = 4) -> None:
+    """
+    Creates a heatmap of missing values in each feature of the dataset and saves it.
+    
+        Parameters:
+                filename (str): Name of the dataset to load.
+                cmap (str): Name of the color map to be used for plotting.
+                figTitle (str): Title for the figure to be save; defaults to None.
+                figWidth (int): Width of the figure; defaults to 12.
+                figHeight (int): Height of the figure; defaults to 6.
+
+            Returns:
+                (None): Function does not return anything.
+    """
+    sns.set(color_codes=True)
+    df = pd.read_csv(filename)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = sns.heatmap(df.isnull(), cmap=cmap, cbar=False)
+    plt.title(figTitle)
+    plt.savefig(f"{figTitle}.png")
+    plt.close() 
+    
+    
+def ccountplot(filename: str,
+               xCol: str,
+               figTitle: str = None,
+               hue: str = None,
+               figWidth: int = 6, 
+               figHeight: int = 4) -> None:
+    
+    """
+    Creates a countplot of feature (xCol) in the dataset and saves it.
+    
+        Parameters:
+                filename (str): Name of the dataset to load.
+                xCol (str): Name of the feature to count 
+                hhue (str):
+                figTitle (str): Title for the figure to be save; defaults to None.
+                figWidth (int): Width of the figure; defaults to 12.
+                figHeight (int): Height of the figure; defaults to 6.
+
+            Returns:
+                (None): Function does not return anything.
+    """
+    
+    sns.set(color_codes=True)
+    df = pd.read_csv(filename)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    if hue != "":
+        ax = sns.countplot(x=xCol, hue=hue, data=df)
+    else:
+        ax = sns.countplot(x=xCol, data=df)
+    plt.title(f"{figTitle}")
+    plt.savefig(f"{figTitle}.png")
+    plt.close()
+    
+
+def cplotRocAUC(yTest: str,
+                probs: str,
+                outfile: str = "roc_auc") -> None:
+    
+    yTest = pd.read_csv(yTest)
+    prob = pd.read_csv(probs)
+    pbs = prob.iloc[:,1]
+    fper, tper, thresh = roc_curve(yTest, pbs)
+    plt.plot(fper, tper, color="orange", label="ROC")
+    plt.plot([0,1], [0,1], color="darkblue", linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve")
+    plt.legend()
+    plt.savefig(f"{outfile}.png")
     plt.close()
     
