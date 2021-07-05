@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.metrics import roc_curve
 
 def cscatter(filename: str, 
              xCol: str, 
@@ -233,3 +234,19 @@ def ccountplot(filename: str,
     plt.savefig(f"{figTitle}.png")
     plt.close()
     
+def cplotRocAUC(yTest: str,
+                probs: str,
+                outfile: str = "roc_auc") -> None:
+    
+    yTest = pd.read_csv(yTest)
+    prob = pd.read_csv(probs)
+    pbs = prob.iloc[:,1]
+    fper, tper, thresh = roc_curve(yTest, pbs)
+    plt.plot(fper, tper, color="orange", label="ROC")
+    plt.plot([0,1], [0,1], color="darkblue", linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("ROC Curve")
+    plt.legend()
+    plt.savefig(f"{outfile}.png")
+    plt.close()
