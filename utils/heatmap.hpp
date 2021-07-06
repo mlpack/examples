@@ -15,7 +15,6 @@ int HeatMap(const std::string& inFile,
             const std::string& outFile = "histogram.png",
             const int width = 15,
             const int height = 10)
-
 {
     // Calls python function cpandahist and plots the heatmap
 
