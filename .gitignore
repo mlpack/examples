@@ -13,3 +13,4 @@ cmake-build-*
 data
 california_housing_price_prediction_with_linear_regression/.ipynb_checkpoints
 utils/__pycache__
+.vscode
