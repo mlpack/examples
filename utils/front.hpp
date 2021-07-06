@@ -29,7 +29,7 @@ int Front(const std::string& nsga2DataX,
 
     if (pFunc && PyCallable_Check(pFunc))
     {
-      pArgs = PyTuple_New(11);
+      pArgs = PyTuple_New(5);
 
       PyObject* pValueNSGA2X = PyUnicode_FromString(nsga2DataX.c_str());
       PyTuple_SetItem(pArgs, 0, pValueNSGA2X);
