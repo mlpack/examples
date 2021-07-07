@@ -23,11 +23,11 @@ int Hist(const std::string& inFile,
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue;
 
-  // This has to be adapted if you run this on your local system,
-  // so whenever you call the python script it can find the correct
-  // module -> PYTHONPATH, on lab.mlpack.org we put all the utility
-  // functions in the utils folder so we add that path
-  // to the Python search path.
+    // This has to be adapted if you run this on your local system,
+    // so whenever you call the python script it can find the correct
+    // module -> PYTHONPATH, on lab.mlpack.org we put all the utility
+    // functions in the utils folder so we add that path
+    // to the Python search path.
     Py_Initialize();
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append(\"../utils/\")");
@@ -38,13 +38,13 @@ int Hist(const std::string& inFile,
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
-    if( pModule != NULL)
+    if (pModule != NULL)
     {
         // The Python function from the histogram.py script
         // we like to call - cpandashist
         pFunc = PyObject_GetAttrString(pModule, "cpandashist");
 
-        if(pFunc && PyCallable_Check(pFunc))
+        if (pFunc && PyCallable_Check(pFunc))
         {
             // The number of arguments we pass to the python script.
             // inFile, outFile, kind
@@ -74,14 +74,15 @@ int Hist(const std::string& inFile,
             // The rest of the c++ part can remain same.
 
             pValue = PyObject_CallObject(pFunc, pArgs);
-            // We call the object with function name and arguments provided in c++ notebook
+            // We call the object with function name and arguments provided in c++ notebook.
             Py_DECREF(pArgs);
 
-            if( pValue != NULL)
+            if (pValue != NULL)
             {
                 Py_DECREF(pValue);
             }
-            else{
+            else
+            {
                 Py_DECREF(pFunc);
                 Py_DECREF(pModule);
                 PyErr_Print();
@@ -89,15 +90,17 @@ int Hist(const std::string& inFile,
                 return 1;
             }
         }
-        else{
-            if( PyErr_Occurred())
+        else
+        {
+            if (PyErr_Occurred())
               PyErr_Print();
         }
 
         Py_XDECREF(pFunc);
         Py_DECREF(pModule);
         }
-        else{
+        else
+        {
             PyErr_Print();
             return -1;
         }

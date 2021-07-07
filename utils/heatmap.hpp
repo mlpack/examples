@@ -9,7 +9,7 @@
 #include <string>
 
 // Here, we will use the same argument as used in python script heatmap.py
-// since this is what passed from the C++ notebook to python script
+// since this is what passed from the C++ notebook to python script.
 
 int HeatMap(const std::string& inFile,
             const std::string& outFile = "histogram.png",
@@ -21,11 +21,11 @@ int HeatMap(const std::string& inFile,
     PyObject *pName, *pModule, *pFunc;
     PyObject *pArgs, *pValue;
 
-  // This has to be adapted if you run this on your local system,
-  // so whenever you call the python script it can find the correct
-  // module -> PYTHONPATH, on lab.mlpack.org we put all the utility
-  // functions in the utils folder so we add that path
-  // to the Python search path.
+    // This has to be adapted if you run this on your local system,
+    // so whenever you call the python script it can find the correct
+    // module -> PYTHONPATH, on lab.mlpack.org we put all the utility
+    // functions in the utils folder so we add that path
+    // to the Python search path.
     Py_Initialize();
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.append(\"../utils/\")");
@@ -36,7 +36,7 @@ int HeatMap(const std::string& inFile,
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
-    if( pModule != NULL)
+    if (pModule != NULL)
     {
         // The Python function from the histogram.py script
         // we like to call - cheatmap
@@ -51,7 +51,7 @@ int HeatMap(const std::string& inFile,
 
             // Now we have to encode the argument to the correct type
             // We can use PyLong_FromLong for width and height as they are integers
-            // As for rest, we can use PyString_FromString
+            // As for rest, we can use PyString_FromString.
 
             PyObject* pValueinFile = PyUnicode_FromString(inFile.c_str());
             //Here we just set the index of the argument.
@@ -66,18 +66,18 @@ int HeatMap(const std::string& inFile,
             PyObject* pValueheight = PyLong_FromLong(height);
             PyTuple_SetItem(pArgs, 3, pValueheight);
 
-
             // The rest of the c++ part can remain same.
-
+            
             pValue = PyObject_CallObject(pFunc, pArgs);
-            // We call the object with function name and arguments provided in c++ notebook
+            // We call the object with function name and arguments provided in c++ notebook.
             Py_DECREF(pArgs);
 
-            if( pValue != NULL)
+            if (pValue != NULL)
             {
                 Py_DECREF(pValue);
             }
-            else{
+            else
+            {
                 Py_DECREF(pFunc);
                 Py_DECREF(pModule);
                 PyErr_Print();
@@ -85,15 +85,17 @@ int HeatMap(const std::string& inFile,
                 return 1;
             }
         }
-        else{
-            if( PyErr_Occurred())
+        else
+        {
+            if (PyErr_Occurred())
               PyErr_Print();
         }
 
         Py_XDECREF(pFunc);
         Py_DECREF(pModule);
         }
-        else{
+        else
+        {
             PyErr_Print();
             return -1;
         }

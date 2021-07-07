@@ -128,7 +128,8 @@ int PandasScatterColor(const std::string& inFile,
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
-  if(pModule != NULL){
+  if (pModule != NULL)
+  {
     pFunc = PyObject_GetAttrString(pModule, "cpandasscattercolor");
     if( pFunc && PyCallable_Check(pFunc))
     {
@@ -172,11 +173,10 @@ int PandasScatterColor(const std::string& inFile,
         fprintf(stderr,"Call Failed.\n");
         return 1;
       }
-
     }
     else
     {
-      if(PyErr_Occurred())
+      if (PyErr_Occurred())
         PyErr_Print();
     }
 
@@ -191,14 +191,14 @@ int PandasScatterColor(const std::string& inFile,
   return 0;
 }
 int PandasScatterMap(const std::string& inFile,
-                      const std::string& imgFile,
-                       const std::string& x,
-                       const std::string& y,
-                       const std::string& label,
-                       const std::string& c,
-                       const std::string& outFile,
-                       const int width = 10,
-                       const int height= 10)
+                     const std::string& imgFile,
+                     const std::string& x,
+                     const std::string& y,
+                     const std::string& label,
+                     const std::string& c,
+                     const std::string& outFile,
+                     const int width = 10,
+                     const int height= 10)
 {
   PyObject *pName, *pModule, *pFunc;
   PyObject *pArgs, *pValue;
@@ -211,9 +211,10 @@ int PandasScatterMap(const std::string& inFile,
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
-  if(pModule != NULL){
+  if (pModule != NULL)
+  {
     pFunc = PyObject_GetAttrString(pModule, "cpandasscattermap");
-    if( pFunc && PyCallable_Check(pFunc))
+    if(pFunc && PyCallable_Check(pFunc))
     {
       pArgs = PyTuple_New(9);
 
@@ -222,7 +223,6 @@ int PandasScatterMap(const std::string& inFile,
 
       PyObject* pValueimgFile = PyUnicode_FromString(imgFile.c_str());
       PyTuple_SetItem(pArgs, 1, pValueimgFile);
-
 
       PyObject* pValueX = PyUnicode_FromString(x.c_str());
       PyTuple_SetItem(pArgs, 2, pValueX);
@@ -233,7 +233,7 @@ int PandasScatterMap(const std::string& inFile,
       PyObject* pValueLabel = PyUnicode_FromString(label.c_str());
       PyTuple_SetItem(pArgs, 4, pValueLabel);
 
-       PyObject* pValueC = PyUnicode_FromString(c.c_str());
+      PyObject* pValueC = PyUnicode_FromString(c.c_str());
       PyTuple_SetItem(pArgs, 5, pValueC);
 
       PyObject* pValueoutFile = PyUnicode_FromString(outFile.c_str());
@@ -263,7 +263,7 @@ int PandasScatterMap(const std::string& inFile,
     }
     else
     {
-      if(PyErr_Occurred())
+      if (PyErr_Occurred())
         PyErr_Print();
     }
 
