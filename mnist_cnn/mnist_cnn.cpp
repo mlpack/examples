@@ -49,8 +49,8 @@ int main()
   // and training parts with following ratio.
   constexpr double RATIO = 0.1;
 
-  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss
-  constexpr int MAX_ITERATIONS = 0;
+  // Allow at max 10 iterations.
+  constexpr int MAX_ITERATIONS = 10;
 
   // Step size of the optimizer.
   constexpr double STEP_SIZE = 1.2e-3;
@@ -74,8 +74,10 @@ int main()
 
   // The train and valid datasets contain both - the features as well as the
   // class labels. Split these into separate mats.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) / 255;
+  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255;
+
+  
 
   // Labels should specify the class of a data point and be in the interval [0,
   // numClasses).
@@ -120,6 +122,9 @@ int main()
                            28  // Input height.
   );
 
+  // Add BatchNorm layer.
+  model.Add<BatchNorm<>>(6, 1e-8, false);
+
   // Add first ReLU.
   model.Add<LeakyReLU<>>();
 
@@ -143,6 +148,9 @@ int main()
                            12  // Input height.
   );
 
+  // Add BatchNorm layer.
+  model.Add<BatchNorm<>>(16, 1e-8, false);
+
   // Add the second ReLU.
   model.Add<LeakyReLU<>>();
 
@@ -163,7 +171,7 @@ int main()
       0.9,        // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
       1e-8,  // Value used to initialise the mean squared gradient parameter.
-      MAX_ITERATIONS, // Max number of iterations.
+      MAX_ITERATIONS * trainY.n_cols, // Max number of iterations.
       1e-8,           // Tolerance.
       true);
 
