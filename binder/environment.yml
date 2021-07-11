@@ -51,3 +51,7 @@ dependencies:
 - gxx_linux-64
 - mlpack
 - ensmallen
+# SoS
+- sos-notebook
+- jupyterlab-sos
+- sos-papermill
