@@ -1,7 +1,6 @@
 set -ex
 
 # Install IJavascript kernel.
-conda install nodejs
 npm install -g ijavascript
 
 jupyter kernelspec remove -f xcpp11
