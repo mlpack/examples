@@ -11,3 +11,4 @@ cmake-build-*
 *.a
 *.so
 data
+utils/__pycache__

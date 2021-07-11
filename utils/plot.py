@@ -2,21 +2,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def cscatter(filename: str, 
-             xCol: str, 
+def cscatter(filename: str,
+             xCol: str,
              yCol: str,
-             dateCol:str = None, 
-             maskCol: str = None, 
-             type_: str = None, 
+             dateCol:str = None,
+             maskCol: str = None,
+             type_: str = None,
              color: str = None,
-             xLabel: str = None, 
-             yLabel: str = None, 
-             figTitle: str = None, 
-             figWidth: int = 26, 
+             xLabel: str = None,
+             yLabel: str = None,
+             figTitle: str = None,
+             figWidth: int = 26,
              figHeight: int = 7) -> None:
     """
     Creates a scatter plot of size figWidth & figHeight, named figTitle and saves it.
-    
+
         Parameters:
             filename (str): Name of the dataset to load.
             xCol (str): Name of the feature in dataset to plot against X axis.
@@ -31,7 +31,7 @@ def cscatter(filename: str,
             figTitle (str): Title for the figure to be save; defaults to None.
             figWidth (int): Width of the figure; defaults to 26.
             figHeight (int): Height of the figure; defaults to 7.
-            
+
         Returns:
              (None): Function does not return anything.
     """
@@ -58,16 +58,16 @@ def cscatter(filename: str,
     plt.savefig(f"{figTitle}.png")
     plt.close()
 
-def cbarplot(filename: str, 
-             x: str, 
-             y: str, 
-             dateCol: str = None, 
-             figTitle: str = None, 
-             figWidth: int = 5, 
+def cbarplot(filename: str,
+             x: str,
+             y: str,
+             dateCol: str = None,
+             figTitle: str = None,
+             figWidth: int = 5,
              figHeight: int = 7) -> None:
     """
     Creates a bar plot of size figWidth & figHeight, named figTitle between x & y.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 x (str): Name of the feature in dataset to plot against X axis.
@@ -91,16 +91,16 @@ def cbarplot(filename: str,
     plt.title(figTitle)
     plt.savefig(f"{figTitle}.png")
     plt.close()
-    
-def cheatmap(filename: str, 
-             cmap: str, 
-             annotate: bool, 
-             figTitle: str, 
-             figWidth: int = 12, 
+
+def cheatmap(filename: str,
+             cmap: str,
+             annotate: bool,
+             figTitle: str,
+             figWidth: int = 12,
              figHeight: int = 6) -> None:
     """
     Creates a heatmap (correlation map) of the dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 cmap (str): Name of the color map to be used for plotting.
@@ -120,14 +120,14 @@ def cheatmap(filename: str,
     plt.title(figTitle)
     plt.savefig(f"{figTitle}.png")
     plt.close()
-    
-def clmplot(filename: str, 
-            figTitle: str = None, 
-            figWidth: int = 6, 
+
+def clmplot(filename: str,
+            figTitle: str = None,
+            figWidth: int = 6,
             figHeight: int = 7) -> None:
     """
     Generates a regression plot on the given dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 figTitle (str): Title for the figure to be save; defaults to None.
@@ -144,14 +144,14 @@ def clmplot(filename: str,
     ax = sns.lmplot(x="Y_Test", y="Y_Preds", data=df)
     plt.savefig(f"{figTitle}.png")
     plt.close()
-    
-def chistplot(filename: str, 
-              figTitle: str = None, 
-              figWidth: int = 6, 
+
+def chistplot(filename: str,
+              figTitle: str = None,
+              figWidth: int = 6,
               figHeight: int = 4) -> None:
     """
     Generated a histogram on the given dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 figTitle (str): Title for the figure to be save; defaults to None.
@@ -169,4 +169,4 @@ def chistplot(filename: str,
     plt.title(f"{figTitle}")
     plt.savefig(f"{figTitle}.png")
     plt.close()
-    
+
