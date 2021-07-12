@@ -4,6 +4,10 @@ set -ex
 npm install -g ijavascript
 ijsinstall
 
+# Install SoS kernels.
+pip install sos-xeus-cling sos-javascript sos-python sos-r sos-julia
+
+
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
 
