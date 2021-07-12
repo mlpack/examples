@@ -2,6 +2,7 @@ set -ex
 
 # Install IJavascript kernel.
 npm install -g ijavascript
+ijsinstall
 
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
