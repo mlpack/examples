@@ -5,7 +5,7 @@ dependencies:
 # Jupyter
 - jupyterlab=3
 - jupyter-offlinenotebook=0.2
-- nodejs=12
+- nodejs
 - nbconvert=6
 # Python Kernel
 - ipykernel=5.1
@@ -19,10 +19,9 @@ dependencies:
 - matplotlib=3.1
 - pandas=1
 - python=3.7
-- scikit-image=0.15
-- scikit-learn=0.21
-- seaborn=0.11
-- tensorflow=1.13
+- scikit-image
+- scikit-learn
+- seaborn
 - sympy=1.4
 - pyyaml
 - traittypes==0.2.1
@@ -51,3 +50,7 @@ dependencies:
 - gxx_linux-64
 - mlpack
 - ensmallen
+# SoS
+- sos-notebook
+- jupyterlab-sos
+- sos-papermill
