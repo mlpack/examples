@@ -11,3 +11,5 @@ cmake-build-*
 *.a
 *.so
 data
+plots
+*__pycache__*
