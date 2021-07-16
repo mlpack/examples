@@ -16,8 +16,7 @@ int WordCloud(const std::string& words,
 
   Py_Initialize();
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString("sys.path.append(\".\")");
-  PyRun_SimpleString("sys.path.append(\"/srv/conda/envs/notebook/include/\")");
+  PyRun_SimpleString("sys.path.append(\"../utils/\")");
   pName = PyUnicode_DecodeFSDefault("wordcloud");
 
   pModule = PyImport_Import(pName);
