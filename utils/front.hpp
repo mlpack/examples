@@ -1,15 +1,15 @@
-#ifndef CPORTFOLIO_HPP
-#define CPORTFOLIO_HPP
+#ifndef CFRONT_HPP
+#define CFRONT_HPP
 
 #define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <string>
 
-int Portfolio(const std::string& stocks,
-              const std::string& dataSource,
-              const std::string& start,
-              const std::string& end,
-              const std::string& filePath = "portfolio.csv")
+int Front(const std::string& nsga2DataX,
+          const std::string& nsga2DataY,
+          const std::string& moeadDataX,
+          const std::string& moeadDataY,
+          const std::string& filePath = "fronts.gif")
 {
   PyObject *pName, *pModule, *pFunc;
   PyObject *pArgs, *pValue;
@@ -18,30 +18,30 @@ int Portfolio(const std::string& stocks,
   Py_Initialize();
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
-  pName = PyUnicode_DecodeFSDefault("portfolio");
+  pName = PyUnicode_DecodeFSDefault("front");
 
   pModule = PyImport_Import(pName);
   Py_DECREF(pName);
 
   if (pModule != NULL)
   {
-    pFunc = PyObject_GetAttrString(pModule, "cportfolio");
+    pFunc = PyObject_GetAttrString(pModule, "cfront");
+
     if (pFunc && PyCallable_Check(pFunc))
     {
       pArgs = PyTuple_New(5);
 
-      //! Comma separated stocks.
-      PyObject* pValueStocks = PyUnicode_FromString(stocks.c_str());
-      PyTuple_SetItem(pArgs, 0, pValueStocks);
+      PyObject* pValueNSGA2X = PyUnicode_FromString(nsga2DataX.c_str());
+      PyTuple_SetItem(pArgs, 0, pValueNSGA2X);
 
-      PyObject* pValueSource = PyUnicode_FromString(dataSource.c_str());
-      PyTuple_SetItem(pArgs, 1, pValueSource);
+      PyObject* pValueNSGA2Y = PyUnicode_FromString(nsga2DataY.c_str());
+      PyTuple_SetItem(pArgs, 1, pValueNSGA2Y);
 
-      PyObject* pValueStart = PyUnicode_FromString(start.c_str());
-      PyTuple_SetItem(pArgs, 2, pValueStart);
+      PyObject* pValueMOEADX = PyUnicode_FromString(moeadDataX.c_str());
+      PyTuple_SetItem(pArgs, 2, pValueMOEADX);
 
-      PyObject* pValueEnd = PyUnicode_FromString(end.c_str());
-      PyTuple_SetItem(pArgs, 3, pValueEnd);
+      PyObject* pValueMOEADY = PyUnicode_FromString(moeadDataY.c_str());
+      PyTuple_SetItem(pArgs, 3, pValueMOEADY);
 
       PyObject* pValueFilePath = PyUnicode_FromString(filePath.c_str());
       PyTuple_SetItem(pArgs, 4, pValueFilePath);
