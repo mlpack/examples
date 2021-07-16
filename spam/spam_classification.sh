@@ -297,15 +297,15 @@ You should get output similar to
 which indicates a reasonable level of classification.
 Other methods you can try in mlpack for this problem include:
 * Naive Bayes
-https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#nbc
+https://mlpack.org/doc/stable/cli_documentation.html#nbc
 * Random forest
-https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#random_forest
+https://mlpack.org/doc/stable/cli_documentation.html#random_forest
 * Decision tree
-https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#decision_tree
+https://mlpack.org/doc/stable/cli_documentation.html#decision_tree
 * AdaBoost
-https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#adaboost
+https://mlpack.org/doc/stable/cli_documentation.html#adaboost
 * Perceptron
-https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#perceptron
+https://mlpack.org/doc/stable/cli_documentation.html#perceptron
 
 To improve the error rating, you can try other pre-processing methods 
 on the initial data set.  Neural networks can give up to 99.95% 
