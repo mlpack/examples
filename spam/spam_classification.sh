@@ -11,7 +11,7 @@ successfully installed on your machine. The tutorial has
 been tested in a linux environment. It is written in
 bash - https://www.gnu.org/software/bash/
 
-Download the dataset using the python script in the 
+Download the dataset using the `download_data_set.py` python script in the 
 tools directory.
 
 Then run this example script using
