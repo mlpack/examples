@@ -54,7 +54,7 @@ rm dataset.txt
 <<COMMENT
 Machine learning works on numeric data, so we will use labels of 
 1 for ham and 0 for spam. The dataset contains three labels, 0, 
-normal sms (ham), 1, fraud (spam) and  2, promotion (spam). We will 
+normal sms (ham), 1, fraud (spam) and 2, promotion (spam). We will 
 label all spam as 1, so promotions and fraud will be labelled as 1.
 COMMENT
 
