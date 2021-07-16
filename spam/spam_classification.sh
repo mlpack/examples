@@ -187,7 +187,7 @@ mlpack_preprocess_split                        \
 
 <<COMMENT
 Now train a Logistic regression model
-(https://mlpack.org/doc/mlpack-3.3.1/cli_documentation.html#logistic_regression):
+(https://mlpack.org/doc/stable/cli_documentation.html#logistic_regression):
 COMMENT
 
 mlpack_logistic_regression --training_file train.data.csv    \
