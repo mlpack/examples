@@ -14,7 +14,7 @@ bash - https://www.gnu.org/software/bash/
 Download the dataset using the python script in the 
 tools directory.
 
-The run this example script using
+Then run this example script using
 
   bash spam_classification.sh
 
