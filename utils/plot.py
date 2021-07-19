@@ -4,12 +4,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import roc_curve
 
-def cscatter(filename: str, 
-             xCol: str, 
+def cscatter(filename: str,
+             xCol: str,
              yCol: str,
-             dateCol:str = None, 
-             maskCol: str = None, 
-             type_: str = None, 
+             dateCol:str = None,
+             maskCol: str = None,
+             type_: str = None,
              color: str = None,
              xLabel: str = None, 
              yLabel: str = None, 
@@ -19,7 +19,7 @@ def cscatter(filename: str,
              plotDir: str = "plots") -> None:
     """
     Creates a scatter plot of size figWidth & figHeight, named figTitle and saves it.
-    
+
         Parameters:
             filename (str): Name of the dataset to load.
             xCol (str): Name of the feature in dataset to plot against X axis.
@@ -35,7 +35,7 @@ def cscatter(filename: str,
             figWidth (int): Width of the figure; defaults to 26.
             figHeight (int): Height of the figure; defaults to 7.
             plotDir (str): Name of the directory to save the generated plot; defaults to plots.
-            
+
         Returns:
              (None): Function does not return anything.
     """
@@ -74,7 +74,7 @@ def cbarplot(filename: str,
              plotDir: str = "plots") -> None:
     """
     Creates a bar plot of size figWidth & figHeight, named figTitle between x & y.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 x (str): Name of the feature in dataset to plot against X axis.
@@ -101,7 +101,7 @@ def cbarplot(filename: str,
     plt.title(figTitle)
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-    
+
 def cheatmap(filename: str, 
              cmap: str, 
              annotate: bool, 
@@ -111,7 +111,7 @@ def cheatmap(filename: str,
              plotDir: str = "plots") -> None:
     """
     Creates a heatmap (correlation map) of the dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 cmap (str): Name of the color map to be used for plotting.
@@ -143,7 +143,7 @@ def clmplot(filename: str,
             plotDir: str = "plots") -> None:
     """
     Generates a regression plot on the given dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 figTitle (str): Title for the figure to be save; defaults to None.
@@ -163,7 +163,7 @@ def clmplot(filename: str,
     ax = sns.lmplot(x="Y_Test", y="Y_Preds", data=df)
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-    
+  
 def chistplot(filename: str, 
               figTitle: str = None, 
               figWidth: int = 6, 
@@ -171,7 +171,7 @@ def chistplot(filename: str,
               plotDir: str = "plots") -> None:
     """
     Generated a histogram on the given dataset and saves it.
-    
+
         Parameters:
                 filename (str): Name of the dataset to load.
                 figTitle (str): Title for the figure to be save; defaults to None.
@@ -192,7 +192,7 @@ def chistplot(filename: str,
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-    
+ 
 def cmissing(filename: str, 
              cmap: str, 
              figTitle: str, 

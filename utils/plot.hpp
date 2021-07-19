@@ -21,11 +21,11 @@ int ScatterPlot(const std::string& fname,
 {
   // Calls Python function cscatter and generates a scatter plot of Xcol and yCol and saves it,
   // so the plot can later be imported in C++ notebook using xwidget.
-    
+
   // PyObject contains info Python needs to treat a pointer to an object as an object.
   // It contains object's reference count and pointer to corresponding object type.
   PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
-    
+
   // Initialize Python Interpreter.
   Py_Initialize();
   // Import sys module in Interpreter and add current path to python search path.
@@ -45,19 +45,19 @@ int ScatterPlot(const std::string& fname,
   // String object representing the name of the dataset to be loaded.
   PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
-    
+
   // String object representing the name of the feature to be plotted along X axis.
   PyObject* pXcol = PyUnicode_FromString(xCol.c_str());
   PyTuple_SetItem(pArgs, 1, pXcol);
-    
+
   // String object representing the name of the feature to be plotted along Y axis.
   PyObject* pYcol = PyUnicode_FromString(yCol.c_str());
   PyTuple_SetItem(pArgs, 2, pYcol);
-    
+
   // String object representing the name of the feature to be parsed as TimeStamp.
   PyObject* pDateCol = PyUnicode_FromString(dateCol.c_str());
   PyTuple_SetItem(pArgs, 3, pDateCol);
-  
+
   // String object representing the name of the feature to be used to mask the plot data points.
   PyObject* pMaskCol = PyUnicode_FromString(maskCol.c_str());
   PyTuple_SetItem(pArgs, 4, pMaskCol);  
@@ -65,15 +65,15 @@ int ScatterPlot(const std::string& fname,
   // String object representing the value for masking.
   PyObject* pType = PyUnicode_FromString(type.c_str());
   PyTuple_SetItem(pArgs, 5, pType);
-  
+
   // String object representing the feature name to be used as color value in plot.
   PyObject* pColor = PyUnicode_FromString(color.c_str());
   PyTuple_SetItem(pArgs, 6, pColor);
-    
+
   // String object representing the X axis label.
   PyObject* pXlabel = PyUnicode_FromString(xLabel.c_str());
   PyTuple_SetItem(pArgs, 7, pXlabel);
-    
+
   // String object representing the Y axis label.
   PyObject* pYlabel = PyUnicode_FromString(yLabel.c_str());
   PyTuple_SetItem(pArgs, 8, pYlabel);
@@ -110,7 +110,7 @@ int BarPlot(const std::string& fname,
             const std::string& plotDir = "plots")
 {
   // Calls Python function cbarplot and generates a barplot plot of x and y and saves it,
-  // so the plot can later be imported in C++ notebook using xwidget.  
+  // so the plot can later be imported in C++ notebook using xwidget.
 
   // PyObject contains info Python needs to treat a pointer to an object as an object.
   // It contains object's reference count and pointer to corresponding object type.
@@ -122,41 +122,41 @@ int BarPlot(const std::string& fname,
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
 
-  // Import the Python module.  
+  // Import the Python module.
   pName = PyUnicode_DecodeFSDefault("plot");
   pModule = PyImport_Import(pName);
 
-  // Get the reference to Python Function to call.  
+  // Get the reference to Python Function to call.
   pFunc = PyObject_GetAttrString(pModule, "cbarplot");
 
   // Create a tuple object to hold the arguments for function call.  
   pArgs = PyTuple_New(8);
 
-  // String object representing the name of the dataset to be loaded.  
-  PyObject* pFname = PyString_FromString(fname.c_str());
+  // String object representing the name of the dataset to be loaded.
+  PyObject* pFname = PyUnicode_FromString(fname.c_str());
   PyTuple_SetItem(pArgs, 0, pFname);
 
   // String object representing the name of the feature to be plotted along X axis.
-  PyObject* pX = PyString_FromString(x.c_str());
+  PyObject* pX = PyUnicode_FromString(x.c_str());
   PyTuple_SetItem(pArgs, 1, pX);
 
   // String object representing the name of the feature to be plotted along Y axis.
-  PyObject* pY = PyString_FromString(y.c_str());
+  PyObject* pY = PyUnicode_FromString(y.c_str());
   PyTuple_SetItem(pArgs, 2, pY);
-    
+
   // String object representing the name of the feature to be parsed as TimeStamp.
-  PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+  PyObject* pDateCol = PyUnicode_FromString(dateCol.c_str());
   PyTuple_SetItem(pArgs, 3, pDateCol);
 
-  // String object representing the title of the figure.  
-  PyObject* pFigTitle = PyString_FromString(figTitle.c_str());
+  // String object representing the title of the figure.
+  PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 4, pFigTitle);
 
-  // Integer object representing the width of the figure.  
+  // Integer object representing the width of the figure.
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
   PyTuple_SetItem(pArgs, 5, pFigWidth);
 
-  // Integer object representing the height of the figure.  
+  // Integer object representing the height of the figure.
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
   PyTuple_SetItem(pArgs, 6, pFigHeight);
     
@@ -179,20 +179,20 @@ int HeatMapPlot(const std::string& fname,
             const std::string& plotDir = "plots")
 {
   // PyObject contains info Python needs to treat a pointer to an object as an object.
-  // It contains object's reference count and pointer to corresponding object type.  
+  // It contains object's reference count and pointer to corresponding object type.
   PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
-  // Initialize Python Interpreter.  
+  // Initialize Python Interpreter.
   Py_Initialize();
-  // Import sys module in Interpreter and add current path to python search path.  
+  // Import sys module in Interpreter and add current path to python search path.
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
 
-  // Import the Python module.  
+  // Import the Python module.
   pName = PyUnicode_DecodeFSDefault("plot");
   pModule = PyImport_Import(pName);
 
-  // Get the reference to Python Function to call.  
+  // Get the reference to Python Function to call.
   pFunc = PyObject_GetAttrString(pModule, "cheatmap");
 
   // Create a tuple object to hold the arguments for function call.  
@@ -206,7 +206,7 @@ int HeatMapPlot(const std::string& fname,
   PyObject* pColorMap = PyUnicode_FromString(colorMap.c_str());
   PyTuple_SetItem(pArgs, 1, pColorMap);
 
-  // Boolean object indicating if correlation values must be annotated in figure.  
+  // Boolean object indicating if correlation values must be annotated in figure.
   PyObject* pAnnotation = PyBool_FromLong(annotation);
   PyTuple_SetItem(pArgs, 2, pAnnotation);
 
@@ -214,11 +214,11 @@ int HeatMapPlot(const std::string& fname,
   PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 3, pFigTitle);
 
-  // Integer object representing the width of the figure.  
+  // Integer object representing the width of the figure.
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
   PyTuple_SetItem(pArgs, 4, pFigWidth);
 
-  // Integer object representing the height of the figure.  
+  // Integer object representing the height of the figure.
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
   PyTuple_SetItem(pArgs, 5, pFigHeight);
     
@@ -226,7 +226,7 @@ int HeatMapPlot(const std::string& fname,
   PyObject* pPlotDir = PyUnicode_FromString(plotDir.c_str());
   PyTuple_SetItem(pArgs, 6, pPlotDir);
 
-  // Call the function by passing the reference to function & tuple holding arguments.  
+  // Call the function by passing the reference to function & tuple holding arguments.
   pValue = PyObject_CallObject(pFunc, pArgs);
 
   return 0;
@@ -239,20 +239,20 @@ int LmPlot(const std::string& fname,
            const std::string& plotDir = "plots")
 {
   // PyObject contains info Python needs to treat a pointer to an object as an object.
-  // It contains object's reference count and pointer to corresponding object type.  
+  // It contains object's reference count and pointer to corresponding object type.
   PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
-  // Initialize Python Interpreter.  
+  // Initialize Python Interpreter.
   Py_Initialize();
   // Import sys module in Interpreter and add current path to python search path.
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
 
-  // Import the Python module.  
+  // Import the Python module.
   pName = PyUnicode_DecodeFSDefault("plot");
   pModule = PyImport_Import(pName);
 
-  // Get the reference to Python Function to call.  
+  // Get the reference to Python Function to call.
   pFunc = PyObject_GetAttrString(pModule, "clmplot");
 
   // Create a tuple object to hold the arguments for function call.  
@@ -266,11 +266,11 @@ int LmPlot(const std::string& fname,
   PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 1, pFigTitle);
 
-  // Integer object representing the width of the figure.  
+  // Integer object representing the width of the figure.
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
   PyTuple_SetItem(pArgs, 2, pFigWidth);
 
-  // Integer object representing the height of the figure.  
+  // Integer object representing the height of the figure.
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
   PyTuple_SetItem(pArgs, 3, pFigHeight);
     
@@ -278,7 +278,7 @@ int LmPlot(const std::string& fname,
   PyObject* pPlotDir = PyUnicode_FromString(plotDir.c_str());
   PyTuple_SetItem(pArgs, 4, pPlotDir);
 
-  // Call the function by passing the reference to function & tuple holding arguments.  
+  // Call the function by passing the reference to function & tuple holding arguments.
   pValue = PyObject_CallObject(pFunc, pArgs);
 
   return 0;
@@ -291,20 +291,20 @@ int HistPlot(const std::string& fname,
              const std::string& plotDir = "plots")
 {
   // PyObject contains info Python needs to treat a pointer to an object as an object.
-  // It contains object's reference count and pointer to corresponding object type.  
+  // It contains object's reference count and pointer to corresponding object type.
   PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
 
-  // Initialize Python Interpreter.  
+  // Initialize Python Interpreter.
   Py_Initialize();
   // Import sys module in Interpreter and add current path to python search path.
   PyRun_SimpleString("import sys");
   PyRun_SimpleString("sys.path.append(\"../utils/\")");
 
-  // Import the Python module.  
+  // Import the Python module.
   pName = PyUnicode_DecodeFSDefault("plot");
   pModule = PyImport_Import(pName);
 
-  // Get the reference to Python Function to call.  
+  // Get the reference to Python Function to call.
   pFunc = PyObject_GetAttrString(pModule, "chistplot");
 
   // Create a tuple object to hold the arguments for function call.  
@@ -318,11 +318,11 @@ int HistPlot(const std::string& fname,
   PyObject* pFigTitle = PyUnicode_FromString(figTitle.c_str());
   PyTuple_SetItem(pArgs, 1, pFigTitle);
 
-  // Integer object representing the width of the figure.  
+  // Integer object representing the width of the figure.
   PyObject* pFigWidth = PyLong_FromLong(figWidth);
   PyTuple_SetItem(pArgs, 2, pFigWidth);
 
-  // Integer object representing the height of the figure.  
+  // Integer object representing the height of the figure.
   PyObject* pFigHeight = PyLong_FromLong(figHeight);
   PyTuple_SetItem(pArgs, 3, pFigHeight);
     
@@ -330,7 +330,7 @@ int HistPlot(const std::string& fname,
   PyObject* pPlotDir = PyUnicode_FromString(plotDir.c_str());
   PyTuple_SetItem(pArgs, 4, pPlotDir);
 
-  // Call the function by passing the reference to function & tuple holding arguments.  
+  // Call the function by passing the reference to function & tuple holding arguments.
   pValue = PyObject_CallObject(pFunc, pArgs);
 
   return 0;
