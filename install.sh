@@ -19,6 +19,16 @@ function cleanUp() {
 }
 
 function installDeps() {
+    wget --version > /dev/null
+    WGET_IS_AVIALABLE=$?
+    if [[ $WGET_IS_AVAILABLE -ne 0 ]]; then
+        conda install -c conda-forge wget
+    fi
+    git --version > /dev/null
+    GIT_IS_AVAILABLE=$?
+    if [[ $GIT_IS_AVAILABLE -ne 0 ]]; then
+        conda install -c conda-forge git
+    fi
     echo "*********************************"
     echo "Upgrading environment using mamba"
     echo "*********************************"
