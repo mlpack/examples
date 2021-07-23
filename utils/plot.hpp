@@ -6,18 +6,18 @@
 #include <string>
 
 int ScatterPlot(const std::string& fname,
-            const std::string& xCol,
-            const std::string& yCol,
-            const std::string& dateCol = "",
-            const std::string& maskCol = "",
-            const std::string& type = "",
-            const std::string& color = "",
-            const std::string& xLabel = "",
-            const std::string& yLabel = "",
-            const std::string& figTitle = "",
-            const int figWidth = 26,
-            const int figHeight = 7,
-            const std::string& plotDir = "plots")
+                const std::string& xCol,
+                const std::string& yCol,
+                const std::string& dateCol = "",
+                const std::string& maskCol = "",
+                const std::string& type = "",
+                const std::string& color = "",
+                const std::string& xLabel = "",
+                const std::string& yLabel = "",
+                const std::string& figTitle = "",
+                const int figWidth = 26,
+                const int figHeight = 7,
+                const std::string& plotDir = "plots")
 {
   // Calls Python function cscatter and generates a scatter plot of Xcol and yCol and saves it,
   // so the plot can later be imported in C++ notebook using xwidget.
@@ -171,12 +171,12 @@ int BarPlot(const std::string& fname,
 }
 
 int HeatMapPlot(const std::string& fname,
-            const std::string& colorMap,
-            const std::string& figTitle = "",
-            const int annotation = false,
-            const int figWidth = 15,
-            const int figHeight = 15,
-            const std::string& plotDir = "plots")
+                const std::string& colorMap,
+                const std::string& figTitle = "",
+                const int annotation = false,
+                const int figWidth = 15,
+                const int figHeight = 15,
+                const std::string& plotDir = "plots")
 {
   // PyObject contains info Python needs to treat a pointer to an object as an object.
   // It contains object's reference count and pointer to corresponding object type.
@@ -337,11 +337,11 @@ int HistPlot(const std::string& fname,
 }
 
 int MissingPlot(const std::string& fname,
-            const std::string& colorMap,
-            const std::string& figTitle = "",
-            const int figWidth = 6,
-            const int figHeight = 4,
-            const std::string& plotDir = "plots")
+                const std::string& colorMap,
+                const std::string& figTitle = "",
+                const int figWidth = 6,
+                const int figHeight = 4,
+                const std::string& plotDir = "plots")
 {
   // PyObject contains info Python needs to treat a pointer to an object as an object.
   // It contains object's reference count and pointer to corresponding object type.  
