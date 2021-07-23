@@ -34,15 +34,15 @@ int Impute(const std::string& fname,
     pArgs = PyTuple_New(4);
     
     // String object representing the name of the dataset to be loaded.
-    PyObject* pFname = PyString_FromString(fname.c_str());
+    PyObject* pFname = PyUnicode_FromString(fname.c_str());
     PyTuple_SetItem(pArgs, 0, pFname);
     
     // String object representing the type of method used for imputation, defaults to mean.
-    PyObject* pKind = PyString_FromString(kind.c_str());
+    PyObject* pKind = PyUnicode_FromString(kind.c_str());
     PyTuple_SetItem(pArgs, 1, pKind);
     
     // String object representing the name of the feature to be parsed as TimeStamp.
-    PyObject* pDatecol = PyString_FromString(dateCol.c_str());
+    PyObject* pDatecol = PyUnicode_FromString(dateCol.c_str());
     PyTuple_SetItem(pArgs, 2, pDatecol);
     
     // String object representing the directory in which Data is saved.
@@ -89,27 +89,27 @@ int Resample(const std::string& fname,
     pArgs = PyTuple_New(8);
     
     // String object representing the name of the dataset to be loaded.
-    PyObject* pFname = PyString_FromString(fname.c_str());
+    PyObject* pFname = PyUnicode_FromString(fname.c_str());
     PyTuple_SetItem(pArgs, 0, pFname);
     
     // String object representing the target column.
-    PyObject* pTarget = PyString_FromString(target.c_str());
+    PyObject* pTarget = PyUnicode_FromString(target.c_str());
     PyTuple_SetItem(pArgs, 1, pTarget);
     
     // String object representing the negative class.
-    PyObject* pNegValue = PyString_FromString(negValue.c_str());
+    PyObject* pNegValue = PyUnicode_FromString(negValue.c_str());
     PyTuple_SetItem(pArgs, 2, pNegValue);
     
     // String object representing the positive class.
-    PyObject* pPosValue = PyString_FromString(posValue.c_str());
+    PyObject* pPosValue = PyUnicode_FromString(posValue.c_str());
     PyTuple_SetItem(pArgs, 3, pPosValue);
     
     // String object representing the kind of resampling.
-    PyObject* pKind = PyString_FromString(kind.c_str());
+    PyObject* pKind = PyUnicode_FromString(kind.c_str());
     PyTuple_SetItem(pArgs, 4, pKind);
     
     // String object representing the name of the feature to be parsed as TimeStamp.
-    PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+    PyObject* pDateCol = PyUnicode_FromString(dateCol.c_str());
     PyTuple_SetItem(pArgs, 5, pDateCol);
     
     // Integer object for random state.
