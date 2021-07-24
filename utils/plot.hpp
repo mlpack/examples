@@ -60,8 +60,8 @@ int ScatterPlot(const std::string& fname,
 
   // String object representing the name of the feature to be used to mask the plot data points.
   PyObject* pMaskCol = PyUnicode_FromString(maskCol.c_str());
-  PyTuple_SetItem(pArgs, 4, pMaskCol); 
-  
+  PyTuple_SetItem(pArgs, 4, pMaskCol);
+
   // String object representing the value for masking.
   PyObject* pType = PyUnicode_FromString(type.c_str());
   PyTuple_SetItem(pArgs, 5, pType);
