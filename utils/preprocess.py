@@ -30,7 +30,10 @@ def cimputer(fname: str,
     else:
         df = pd.read_csv(fname)
     dfImp = Imputer(df, kind)
-    dfImp.to_csv(f"./{dataDir}/{fname[:-4]}_{kind}_imputed.csv", index=False)
+    if fname.find(f"{dataDir}/") != -1:
+        dfImp.to_csv(f"./{fname[:-4]}_{kind}_imputed.csv", index=False)
+    else:
+        dfImp.to_csv(f"./{dataDir}/{fname[:-4]}_{kind}_imputed.csv", index=False)
     
     
 def Resample(data, replace, n_samples):
@@ -66,14 +69,22 @@ def cresample(fname: str,
     if kind == "oversample":
         posOverSampled = Resample(data=posClass, replace=True, n_samples=len(negClass))
         overSampled = pd.concat([negClass, posOverSampled])
-        overSampled.to_csv(f"./{dataDir}/{fname[:-4]}_oversampled.csv", index=False)
+        if fname.find(f"{dataDir}/") != -1:
+            overSampled.to_csv(f"./{fname[:-4]}_oversampled.csv", index=False)
+        else:
+            overSampled.to_csv(f"./{dataDir}/{fname[:-4]}_oversampled.csv", index=False)
     if kind == "undersample":
         negUnderSampled = Resample(data=negClass, replace=False, n_samples=len(posClass))
         underSampled = pd.concat([negUnderSampled, posClass])
-        underSampled.to_csv(f"./{dataDir}/{fname[:-4]}_undersampled.csv", index=False)
+        if fname.find(f"{dataDir}/") != -1:
+            underSampled.to_csv(f"./{fname[:-4]}_undersampled.csv", index=False)
+        else:
+            underSampled.to_csv(f"./{dataDir}/{fname[:-4]}_undersampled.csv", index=False)
     if kind == "smote":
-        os = SMOTE()
-        features, targets = os.fit_resample(df.iloc[:, :-1], df.iloc[:,-1])
+        so = SMOTE()
+        features, targets = so.fit_resample(df.iloc[:, :-1], df.iloc[:,-1])
         smoteSampled = pd.concat([pd.DataFrame(features), pd.DataFrame(targets)], axis=1)
-        smoteSampled.to_csv(f"./{dataDir}/{fname[:-4]}_smotesampled.csv", index=False)
-        
+        if fname.find(f"{dataDir}/") != -1:
+            smoteSampled.to_csv(f"./{fname[:-4]}_smotesampled.csv", index=False)
+        else:
+            smoteSampled.to_csv(f"./{dataDir}/{fname[:-4]}_smotesampled.csv", index=False)
