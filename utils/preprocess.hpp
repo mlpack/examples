@@ -126,4 +126,57 @@ int Resample(const std::string& fname,
     return 0;
 }
 
+int Resample(const std::string& fname,
+             const std::string& target,
+             const int negValue = 0,
+             const int posValue = 1,
+             const std::string& kind = "oversample",
+             const std::string& dateCol = "",
+             const int& randomState = 123,
+             const std::string& dataDir = "data")
+
+{
+    PyObject *pName, *pModule, *pFunc, *pArgs, *pValue;
+
+    Py_Initialize();
+    PyRun_SimpleString("import sys");
+    PyRun_SimpleString("sys.path.append(\"../utils/\")");
+
+    pName = PyUnicode_DecodeFSDefault("preprocess");
+    pModule = PyImport_Import(pName);
+
+    pFunc = PyObject_GetAttrString(pModule, "cresamplenum");
+
+    pArgs = PyTuple_New(8);
+
+    PyObject* pFname = PyString_FromString(fname.c_str());
+    PyTuple_SetItem(pArgs, 0, pFname);
+
+    PyObject* pTarget = PyString_FromString(target.c_str());
+    PyTuple_SetItem(pArgs, 1, pTarget);
+
+    PyObject* pNegValue = PyLong_FromLong(negValue);
+    PyTuple_SetItem(pArgs, 2, pNegValue);
+
+    PyObject* pPosValue = PyLong_FromLong(posValue);
+    PyTuple_SetItem(pArgs, 3, pPosValue);
+
+    PyObject* pKind = PyString_FromString(kind.c_str());
+    PyTuple_SetItem(pArgs, 4, pKind);
+
+    PyObject* pDateCol = PyString_FromString(dateCol.c_str());
+    PyTuple_SetItem(pArgs, 5, pDateCol);
+
+    PyObject* pRandState = PyLong_FromLong(randomState);
+    PyTuple_SetItem(pArgs, 6, pRandState);
+    
+    // String object representing the directory in which Data is saved.
+    PyObject* pDataDir = PyUnicode_FromString(dataDir.c_str());
+    PyTuple_SetItem(pArgs, 7, pDataDir);
+
+    pValue = PyObject_CallObject(pFunc, pArgs);
+
+    return 0;
+}
+
 #endif
