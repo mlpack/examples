@@ -135,7 +135,7 @@ def cheatmap(filename: str,
     plt.title(figTitle)
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-    
+
 def clmplot(filename: str, 
             figTitle: str = None, 
             figWidth: int = 6, 
@@ -192,7 +192,7 @@ def chistplot(filename: str,
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
- 
+
 def cmissing(filename: str, 
              cmap: str, 
              figTitle: str, 

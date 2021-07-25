@@ -112,22 +112,22 @@ def mnist_dataset():
 
 def electricity_consumption_dataset():
   print("Download the electricty consumption example datasets")
-  electricity = requests.get("https://www.mlpack.org/datasets/examples/electricity-usage.csv")
+  electricity = requests.get("https://datasets.mlpack.org/examples/electricity-usage.csv")
   progress_bar("electricity-usage.csv", electricity)
 
 def stock_exchange_dataset():
   print("Download the stock exchange example datasets")
-  stock = requests.get("https://www.mlpack.org/datasets/examples/Google2016-2019.csv")
+  stock = requests.get("https://datasets.mlpack.org/examples/Google2016-2019.csv")
   progress_bar("Google2016-2019.csv", stock)
 
 def body_fat_dataset():
   print("Download the body fat datasets")
-  bodyFat = requests.get("https://www.mlpack.org/datasets/examples/bodyfat.tsv")
+  bodyFat = requests.get("https://datasets.mlpack.org/examples/bodyfat.tsv")
   progress_bar("BodyFat.tsv", bodyFat)
 
 def iris_dataset():
   print("Downloading iris datasets...")
-  iris = requests.get("https://www.mlpack.org/datasets/iris.tar.gz")
+  iris = requests.get("https://datasets.mlpack.org/iris.tar.gz")
   progress_bar("iris.tar.gz", iris)
   tar = tarfile.open("iris.tar.gz", "r:gz")
   tar.extractall()
@@ -136,7 +136,7 @@ def iris_dataset():
 
 def salary_dataset():
   print("Downloading salary dataset...")
-  salary = requests.get("http://mlpack.org/datasets/Salary_Data.csv")
+  salary = requests.get("http://datasets.mlpack.org/Salary_Data.csv")
   progress_bar("Salary_Data.csv", salary)
   
 def all_datasets():
