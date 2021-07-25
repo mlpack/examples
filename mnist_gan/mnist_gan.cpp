@@ -1,6 +1,6 @@
 #include <mlpack/core.hpp>
-
 #include <mlpack/core/data/split_data.hpp>
+
 #include <mlpack/methods/ann/init_rules/gaussian_init.hpp>
 #include <mlpack/methods/ann/loss_functions/sigmoid_cross_entropy_error.hpp>
 #include <mlpack/methods/ann/gan/gan.hpp>
@@ -15,6 +15,7 @@ using namespace mlpack::ann;
 using namespace mlpack::math;
 using namespace mlpack::regression;
 using namespace std::placeholders;
+
 
 int main()
 {
@@ -52,7 +53,7 @@ int main()
     mnistDataset /= 255.0;
 
     arma::mat trainDataset, valDataset;
-    data::Split(mnistDataset, valDataset, trainDataset, trainRatio);
+    data::Split(mnistDataset, trainDataset, valDataset, trainRatio);
 
     std::cout << " Dataset Loaded " << std::endl;
     std::cout << " Train Dataset Size : (" << trainDataset.n_rows << ", " << trainDataset.n_cols << ")" << std::endl;
@@ -68,7 +69,20 @@ int main()
      * @brief Model Architecture:
      *
      * Discriminator:
-     * 28x28x1---->Convolution layer(32 filters of size 5x5, stride = 1, padding = 2)----->
+     * 28x28x1-----------> conv (32 filters of size 5x5,
+     *                     stride = 1, padding = 2)----------> 28x28x32
+     * 28x28x32----------> ReLU -----------------------------> 28x28x32
+     * 28x28x32----------> Mean pooling ---------------------> 14x14x32
+     * 14x14x32----------> conv (64 filters of size 5x5,
+     *                         stride = 1, padding = 2)------> 14x14x64
+     * 14x14x64----------> ReLU -----------------------------> 14x14x64
+     * 14x14x64----------> Mean pooling ---------------------> 7x7x64
+     * 7x7x64------------> Linear Layer ---------------------> 1024
+     * 1024--------------> ReLU -----------------------------> 1024
+     * 1024 -------------> Linear ---------------------------> 1
+     *
+     *
+     * Generator:
      *
      *
      * Note: Output of a Convolution layer = [(W-K+2P)/S + 1]
@@ -78,7 +92,6 @@ int main()
      *        S : Stride
      */
 
-    // Discriminator network
 
   // Creating the Discriminator network.
     FFN<SigmoidCrossEntropyError<> > discriminator;
@@ -178,9 +191,10 @@ int main()
                   ens::Report());
 
         optimizer.ResetPolicy() = false;
-
-        std::cout << " Loss after cycle  " << i << " -> " <<
-                  MeanTestLoss<MeanSModel>(gan, trainTest, batchSize) << std::endl;
+        std::cout << " Model Performance " <<
+                  gan.Evaluate(gan.Parameters(), // Parameters of the network.
+                               i, // Index of current input.
+                               batchSize); // Batch size.
     }
 
     std::cout << " Time taken to train -> " << float(clock()-beginTime) / CLOCKS_PER_SEC << "seconds" << std::endl;

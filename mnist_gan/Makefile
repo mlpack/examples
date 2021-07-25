@@ -4,10 +4,10 @@ SRC := mnist_gan.cpp
 LIBS_NAME := armadillo mlpack
 
 CXX := g++
-# CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
+CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and
 # without optimizations.
-CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
+# CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
 LDFLAGS += -lboost_serialization
 LDFLAGS += -larmadillo
