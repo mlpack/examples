@@ -27,7 +27,7 @@ dependencies:
 - traittypes==0.2.1
 - invoke=1.2
 - pandas-datareader
-- bokeh
+- plotly
 # C++ Kernel
 - xeus-cling
 - xtensor
