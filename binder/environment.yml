@@ -54,3 +54,4 @@ dependencies:
 - sos-notebook
 - jupyterlab-sos
 - sos-papermill
+- xframe
