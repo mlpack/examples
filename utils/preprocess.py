@@ -17,11 +17,10 @@ def Imputer(data, kind = "mean"):
             df[feature] = df[feature].fillna(df[feature].mode()[0])
     return df
     
-
 def cimputer(fname: str,
-            kind: str = "mean",
-            dateCol: str = None,
-            dataDir: str = "data") -> None:
+             kind: str = "mean",
+             dateCol: str = None,
+             dataDir: str = "data") -> None:
     
     if not os.path.isdir(dataDir):
         os.mkdir(dataDir)
@@ -90,13 +89,13 @@ def cresample(fname: str,
             smoteSampled.to_csv(f"./{dataDir}/{fname[:-4]}_smotesampled.csv", index=False)
 
 def cresamplenum(fname: str,
-              target: str,
-              neg_value: int,
-              pos_value: int,
-              kind: str = "oversample",
-              dateCol: str = None,
-              random_state = 123,
-              dataDir: str = "data") -> None:
+                 target: str,
+                 neg_value: int,
+                 pos_value: int,
+                 kind: str = "oversample",
+                 dateCol: str = None,
+                 random_state = 123,
+                 dataDir: str = "data") -> None:
 
     if kind == "smote":
         df = pd.read_csv(fname, skiprows=1)
@@ -108,7 +107,6 @@ def cresamplenum(fname: str,
             df = pd.read_csv(fname)
         negClass = df[df[target] == neg_value]
         posClass = df[df[target] == pos_value]
-
 
     if kind == "oversample":
         posOverSampled = Resample(data=posClass, replace=True, n_samples=len(negClass))
