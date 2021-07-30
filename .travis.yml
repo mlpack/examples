@@ -107,7 +107,10 @@ script:
       cat faillog;
       exit 1;
     fi
-
+  # Make sure the spam tutorial runs correctly.
+  - cd spam/
+  - ./spam_classification.sh
+  - cd ../
 
 notifications:
   email:
