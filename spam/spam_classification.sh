@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Spam Classification with mlpack on the command line
 
 ## Introduction
