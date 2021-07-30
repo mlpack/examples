@@ -1,10 +1,11 @@
 sudo: required
-dist: xenial
+dist: focal
 language: cpp
 
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev g++-multilib
+  - sudo sh python_interpreter.sh
 
   - mkdir deps/
   - cd deps/
