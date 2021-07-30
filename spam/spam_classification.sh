@@ -3,7 +3,7 @@
 
 ## Introduction
 
-<<COMMENT
+: <<'COMMENT'
 In this tutorial, the mlpack command line interface will
 be used to train a machine learning model to classify
 SMS spam. It will be assumed that mlpack has been
@@ -28,7 +28,7 @@ COMMENT
 
 ## Example
 
-<<COMMENT
+: <<'COMMENT'
 As an example, we will train a machine learning model to classify 
 spam SMS messages. We will use an example spam dataset in Indonesian 
 provided by Yudi Wibisono.
@@ -51,7 +51,7 @@ rm dataset.csv
 rm dataset1.csv
 rm dataset.txt
 
-<<COMMENT
+: <<'COMMENT'
 Machine learning works on numeric data, so we will use labels of 
 1 for ham and 0 for spam. The dataset contains three labels, 0, 
 normal sms (ham), 1, fraud (spam) and 2, promotion (spam). We will 
@@ -61,7 +61,7 @@ COMMENT
 tr '2' '1' < labels.txt > labels.csv
 rm labels.txt
 
-<<COMMENT
+: <<'COMMENT'
 The next step is to convert all text in the messages to lower case 
 and for simplicity remove punctuation and any symbols that are not 
 spaces, line endings or in the range a-z (one would need expand 
@@ -72,7 +72,7 @@ tr '[:upper:]' '[:lower:]' < messages.txt > messagesLower.txt
 tr -Cd 'abcdefghijklmnopqrstuvwxyz \n' < messagesLower.txt > messagesLetters.txt
 rm messagesLower.txt
 
-<<COMMENT
+: <<'COMMENT'
 We now obtain a sorted list of unique words used (this step may take 
 a few minutes).
 COMMENT
@@ -83,7 +83,7 @@ uniq temp2.txt > words.txt
 rm temp.txt
 rm temp2.txt
 
-<<COMMENT
+: <<'COMMENT'
 We then create a matrix, where for each message, the frequency of word 
 occurrences is counted (more on this on Wikipedia, 
 https://en.wikipedia.org/wiki/Tf–idf and 
@@ -165,12 +165,12 @@ done < messagesLetters.txt
 # Create csv file
 tr ' '  ',' < wordfrequency.txt > data.csv
 
-<<COMMENT
+: <<'COMMENT'
 Since Bash is an interpreted language, this simple implementation can 
 take up to 30 minutes to complete.
 COMMENT
 
-<<COMMENT
+: <<'COMMENT'
 Once the script has finished running, split the data into testing (30%) 
 and training (70%) sets:
 COMMENT
@@ -185,7 +185,7 @@ mlpack_preprocess_split                        \
     --test_ratio 0.3                           \
     --verbose
 
-<<COMMENT
+: <<'COMMENT'
 Now train a Logistic regression model
 (https://mlpack.org/doc/stable/cli_documentation.html#logistic_regression):
 COMMENT
@@ -195,7 +195,7 @@ mlpack_logistic_regression --training_file train.data.csv    \
                            --lambda 0.1                      \
                            --output_model_file lr_model.bin
 
-<<COMMENT
+: <<'COMMENT'
 Finally we test our model by producing predictions,
 COMMENT
 
@@ -203,7 +203,7 @@ mlpack_logistic_regression --input_model_file lr_model.bin    \
                            --test_file test.data.csv          \
                            --output_file lr_predictions.csv
 
-<<COMMENT
+: <<'COMMENT'
 and comparing the predictions with the exact results,
 COMMENT
 
@@ -211,7 +211,7 @@ export incorrect=$(diff -U 0 lr_predictions.csv test.labels.csv | grep '^@@' | w
 export tests=$(wc -l < lr_predictions.csv)
 echo "scale=2;  100 * ( 1 - $((incorrect)) / $((tests)))"  | bc
 
-<<COMMENT
+: <<'COMMENT'
 This gives approximately 90% validation rate, similar to that 
 obtained at 
 https://towardsdatascience.com/spam-detection-with-logistic-regression-23e3709e522
@@ -281,7 +281,7 @@ echo " Actual| Ham  | " $TrueZeroLR "|" $FalseZeroLR
 echo " class | Spam | " $FalsePositiveLR " |" $TruePositiveLR
 echo ""
 
-<<COMMENT
+: <<'COMMENT'
 You should get output similar to
 
  Logistic Regression
