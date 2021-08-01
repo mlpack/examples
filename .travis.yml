@@ -111,7 +111,7 @@ script:
   # remove data pre-processing steps as these
   # cause testing to timeout
   - cd spam/
-  - sed -ei '5,175d' spam_classification.sh
+  - sed -ie '5,175d' spam_classification.sh
   - ./spam_classification.sh
   - cd ../
 
