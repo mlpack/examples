@@ -58,16 +58,16 @@ install:
   # Download datasets.
   - pwd
   - pip install tqdm
-  - cd tools/
+    #- cd tools/
     #- ./download_data_set.py
-  - cd ../
-  - ls data/
+    #- cd ../
+    #- ls data/
 
 script:
   # Finally, build all the examples.
   - pwd
-  - ls
-  - ls data/
+    #- ls
+    #- ls data/
     # Comment these out for now and just run spam example due to time constraints
     #- |
     #for f in */Makefile; do

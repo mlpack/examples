@@ -44,7 +44,7 @@ are then placed in another file.
 COMMENT
 
 tr '\r' '\n' < ../data/dataset_sms_spam_bhs_indonesia_v1/dataset_sms_spam_v1.csv > dataset.txt
-sed '243{N;s/\n//;}' dataset.txt > dataset1.csv
+sed '485{N;s/\n//;}' dataset.txt > dataset1.csv
 sed '1d' dataset1.csv > dataset2.csv
 sed '/^$/d' dataset2.csv > dataset.csv
 rev dataset.csv | cut -c1  | rev > labels.txt
