@@ -33,22 +33,25 @@ As an example, we will train a machine learning model to classify
 spam SMS messages. We will use an example spam dataset in Indonesian 
 provided by Yudi Wibisono.
 
-We will try to classify a message as spam or ham by the number of 
-occurences of a word in a message. We first change the file line 
-endings, remove line 243 which is missing a label and then remove the 
-header from the dataset. Then, we split our data into two files, labels 
-and messages. Since the labels are at the end of the message, the message 
-is reversed and then the label removed and placed in one file. The 
-message is then removed and placed in another file.
+We will try to classify a message as spam or ham by the number of
+occurences of a word in a message. We first change the file line
+endings, merge lines 243 and 244 which should not be separated
+and then remove the header from the dataset. We then remove any
+blank lines and split our data into two files, labels and messages.
+Since the labels are at the end of the message, the message is
+reversed and then the labels are placed in one file. The messages
+are then placed in another file.
 COMMENT
 
 tr '\r' '\n' < ../data/dataset_sms_spam_bhs_indonesia_v1/dataset_sms_spam_v1.csv > dataset.txt
-sed '243d' dataset.txt > dataset1.csv
-sed '1d' dataset1.csv > dataset.csv
+sed '243{N;s/\n//;}' dataset.txt > dataset1.csv
+sed '1d' dataset1.csv > dataset2.csv
+sed '/^$/d' dataset2.csv > dataset.csv
 rev dataset.csv | cut -c1  | rev > labels.txt
 rev dataset.csv | cut -c2- | rev > messages.txt
 rm dataset.csv
 rm dataset1.csv
+rm dataset2.csv
 rm dataset.txt
 
 : <<'COMMENT'
