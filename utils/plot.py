@@ -311,4 +311,3 @@ def clineplot(fname: str,
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-
