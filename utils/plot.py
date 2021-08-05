@@ -137,7 +137,9 @@ def cheatmap(filename: str,
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
 
-def clmplot(filename: str, 
+def clmplot(filename: str,
+            xCol: str,
+            yCol: str,
             figTitle: str = None, 
             figWidth: int = 6, 
             figHeight: int = 7,
@@ -159,13 +161,14 @@ def clmplot(filename: str,
     if not os.path.isdir(plotDir):
         os.mkdir(plotDir)
     df = pd.read_csv(filename)
-    df.columns = ["Y_Test", "Y_Preds"]
+    # df.columns = ["Y_Test", "Y_Preds"]
     fig = plt.figure(figsize=(figWidth, figHeight))
-    ax = sns.lmplot(x="Y_Test", y="Y_Preds", data=df)
+    ax = sns.lmplot(x=xCol, y=yCol, data=df)
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-  
-def chistplot(filename: str, 
+
+def chistplot(filename: str,
+              xCol: str,
               figTitle: str = None, 
               figWidth: int = 6, 
               figHeight: int = 4,
@@ -187,9 +190,9 @@ def chistplot(filename: str,
     if not os.path.isdir(plotDir):
         os.mkdir(plotDir)
     df = pd.read_csv(filename)
-    df.columns = ["Y_Test", "Y_Preds"]
+    # df.columns = ["Y_Test", "Y_Preds"]
     fig = plt.figure(figsize=(figWidth, figHeight))
-    ax = sns.histplot(df.Y_Test - df.Y_Preds)
+    ax = sns.histplot(x=xCol, data=df)
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
@@ -291,6 +294,24 @@ def cplotRocAUC(yTest: str,
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
     
+def clineplot(fname: str,
+              xCol: str,
+              yCol: str,
+              figTitle: str = None,
+              figWidth: int = 16,
+              figHeight: int = 6,
+              plotDir: str = "plots") -> None:
+    
+    sns.set(color_codes=True)
+    if not os.path.isdir(plotDir):
+        os.mkdir(plotDir)
+    df = pd.read_csv(fname)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = sns.lineplot(x=xCol, y=yCol, data=df)
+    plt.title(f"{figTitle}")
+    plt.savefig(f"./{plotDir}/{figTitle}.png")
+    plt.close()
+
 def cplotCatData(fName: str,
                 targetCol: int,
                 xLabel: str,
@@ -333,5 +354,3 @@ def cplotCatData(fName: str,
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-    
-cplotCatData("microChip.csv", 2, "Microchip Test 1", "Mircochip Test 2", "MCQA");
