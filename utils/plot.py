@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -289,3 +290,48 @@ def cplotRocAUC(yTest: str,
     plt.legend()
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
+    
+def cplotCatData(fName: str,
+                targetCol: int,
+                xLabel: str,
+                yLabel: str,
+                figTitle: str = None,
+                figWidth: int = 8, 
+                figHeight: int = 6,
+                plotDir: str = "plots") -> None:
+
+    """
+    Generates a categorical plot.
+    
+        Parameters:
+                fName (str): Name of the dataset to load.
+                targetCol (int): Numeric value representing the target column.
+                xlabel (str): Label for X axis; defaults to None.
+                ylabel (str): Label for Y axis; defaults to None.
+                figTitle (str): Title for the figure to be save; defaults to None.
+                figWidth (int): Width of the figure; defaults to 8.
+                figHeight (int): Height of the figure; defaults to 6.
+                plotDir (str): Name of the directory to save the generated plot; defaults to plots.
+
+            Returns:
+                (None): Function does not return anything.
+    """
+    microChipData = pd.read_csv(fName)
+    X = microChipData.iloc[:, :targetCol].values
+    y = microChipData.iloc[:, targetCol].values
+    pos = np.argwhere(y == 1)
+    neg = np.argwhere(y == 0)
+    if not os.path.isdir(plotDir):
+        os.mkdir(plotDir)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = fig.add_subplot()
+    ax.scatter(X[neg, 0], X[neg, 1], c="yellow", marker='o', edgecolor="black", linewidth=0.5)
+    ax.scatter(X[pos, 0], X[pos, 1], c="black", marker='+')
+    ax.set_xlabel(f"{xLabel}")
+    ax.set_ylabel(f"{yLabel}")
+    plt.legend(["y = 0", "y = 1"])
+    plt.title(f"{figTitle}")
+    plt.savefig(f"./{plotDir}/{figTitle}.png")
+    plt.close()
+    
+cplotCatData("microChip.csv", 2, "Microchip Test 1", "Mircochip Test 2", "MCQA");
