@@ -27,10 +27,12 @@ dependencies:
 - traittypes==0.2.1
 - invoke=1.2
 - pandas-datareader
+- plotly
 # C++ Kernel
 - xeus-cling
 - xtensor
 - xwidgets
+- xframe
 # R Kernel
 - r-ggplot2
 - r-irkernel=1.0
