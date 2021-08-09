@@ -1,6 +1,6 @@
 
-TARGET := mnist_gan
-SRC := mnist_gan.cpp
+TARGET := mnist_gan_generate
+SRC := mnist_gan_generate.cpp
 LIBS_NAME := armadillo mlpack
 
 CXX := g++

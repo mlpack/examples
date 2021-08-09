@@ -62,24 +62,33 @@ int main()
 
     arma::arma_rng::set_seed_random();
 
-    GAN<FFN<SigmoidCrossEntropyError<> >, GaussianInitialization,
-      std::function<double()> > ganModel();
+    std::function<double ()> noiseFunction = [](){ return math::Random(-8, 8) +
+    math::RandNormal(0, 1) * 0.01;};
 
-    data::Load("./saved_models/ganMnist.bin", "ganMnist", ganModel);
+    FFN<SigmoidCrossEntropyError<> > generator;
+
+    FFN<SigmoidCrossEntropyError<> > discriminator;
+
+    GaussianInitialization gaussian(0,1);
+
+    GAN<FFN<SigmoidCrossEntropyError<> >, GaussianInitialization,
+    std::function<double()> > gan(generator, discriminator,
+    gaussian, noiseFunction, noiseDim, batchSize, generatorUpdateStep,
+    discriminatorPreTrain, multiplier);
+
+    data::Load("./saved_models/ganMnist.bin", "ganMnist", gan);
 
     std::cout << "Sampling...." << std::endl;
     arma::mat noise(noiseDim, batchSize);
     size_t dim = std::sqrt(trainData.n_rows);
     arma::mat generatedData(2 * dim, dim * numSamples);
 
-    std::function<double ()> noiseFunction = [](){ return math::Random(-8, 8) +
-    math::RandNormal(0, 1) * 0.01;};
 
     for (size_t i = 0; i < numSamples; ++i)
     {
     arma::mat samples;
     noise.imbue( [&]() { return noiseFunction(); } );
-    ganModel.Generator().Forward(noise, samples);
+    gan.Generator().Forward(noise, samples);
     samples.reshape(dim, dim);
     samples = samples.t();
 
@@ -94,7 +103,7 @@ int main()
     }
     // arma::mat output;
     // GetSample(generatedData, output, false);
-    data::Save("./saved_csv_files/ouput_mnist.csv", generatedData, false, false);
+    data::Save("./samples_csv_files/ouput_mnist_1.csv", generatedData, false, false);
 
     std::cout << "Output generated!" << std::endl;
 
