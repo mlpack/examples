@@ -1,0 +1,9 @@
+.ipynb_checkpoints
+saved_models
+samples_posterior
+samples_csv_files
+mnist_first250_training_4s_and_9s.arm
+mnist_gan
+mnist_gan_generate
+mnist_gan_generate.o
+mnist_gan.o

@@ -19,20 +19,22 @@ using namespace std::placeholders;
 
 int main()
 {
-    size_t trainRatio = 0.8;
+    double trainRatio = 0.8;
     size_t dNumKernels = 32;
     size_t discriminatorPreTrain = 5;
-    size_t batchSize = 64;
+    size_t batchSize = 5;
     size_t noiseDim = 100;
     size_t generatorUpdateStep = 1;
     size_t numSamples = 10;
     size_t cycles = 10;
     double stepSize = 0.0003;
     double eps = 1e-8;
-    size_t numEpochs = 1;
+    size_t numEpoches = 1;
     double tolerance = 1e-5;
     bool shuffle = true;
     double multiplier = 10;
+
+    int datasetMaxCols = 10;
 
     std::cout << std::boolalpha
               << " batchSize = " << batchSize << std::endl
@@ -40,30 +42,43 @@ int main()
               << " noiseDim = " << noiseDim << std::endl
               << " numSamples = " << numSamples << std::endl
               << " stepSize = " << stepSize << std::endl
-              << " numEpochs = " << numEpochs << std::endl
+              << " numEpochs = " << numEpoches << std::endl
               << " shuffle = " << shuffle << std::endl;
 
 
     arma::mat mnistDataset;
-    data::Load("/home/viole/Documents/datasets/digit-recognizer/train.csv", mnistDataset, true);
+    // data::Load("/home/viole/Documents/datasets/digit-recognizer/train.csv", mnistDataset, true);
+    mnistDataset.load("./mnist_first250_training_4s_and_9s.arm");
 
     std::cout << arma::size(mnistDataset) << std::endl;
 
-    mnistDataset = mnistDataset.submat(1, 0, mnistDataset.n_rows-1, mnistDataset.n_cols-1);
-    mnistDataset /= 255.0;
+    mnistDataset = mnistDataset.cols(0, datasetMaxCols-1);
+    size_t numIterations = mnistDataset.n_cols * numEpoches;
+    numIterations /= batchSize;
 
-    arma::mat trainDataset, valDataset;
-    data::Split(mnistDataset, trainDataset, valDataset, trainRatio);
+    std::cout << "MnistDataset No. of rows: " << mnistDataset.n_rows << std::endl;
 
-    std::cout << " Dataset Loaded " << std::endl;
-    std::cout << " Train Dataset Size : (" << trainDataset.n_rows << ", " << trainDataset.n_cols << ")" << std::endl;
+    // mnistDataset = mnistDataset.submat(1, 0, mnistDataset.n_rows-1, mnistDataset.n_cols-1);
+    // mnistDataset /= 255.0;
 
-    std::cout << " Validation Dataset Size : (" << valDataset.n_rows << ", " << valDataset.n_cols << ")" << std::endl;
+    // arma::mat trainDataset, valDataset;
+    // data::Split(mnistDataset, trainDataset, valDataset, trainRatio);
 
-    arma::mat trainTest, dump;
-    data::Split(trainDataset, dump, trainTest, 0.045);
+    // std::cout << " Dataset Loaded " << std::endl;
+    // std::cout << " Train Dataset Size : (" << trainDataset.n_rows << ", " << trainDataset.n_cols << ")" << std::endl;
 
-    size_t iterPerCycle = (numEpochs * trainDataset.n_cols);
+    // std::cout << " Validation Dataset Size : (" << valDataset.n_rows << ", " << valDataset.n_cols << ")" << std::endl;
+
+    // const size_t testSize = static_cast<size_t>(mnistDataset.n_cols * trainRatio);
+    // std::cout << "After Split: " << std::endl;
+    // std::cout << " testSize" << testSize <<  std::endl;
+    // std::cout << " Mnist_Dataset cols:  " << mnistDataset.n_cols << std::endl;
+    // std::cout << " TrainRatio: " << trainRatio << std::endl;
+
+    // // arma::mat trainTest, dump;
+    // data::Split(trainDataset, dump, trainTest, 0.045);
+
+    // size_t iterPerCycle = (numEpochs * trainDataset.n_cols);
 
     /**
      * @brief Model Architecture:
@@ -166,7 +181,7 @@ int main()
                         0.9,       // Exponential decay rate for first moment estimates.
                         0.999,     // Exponential decay rate for weighted norm estimates.
                         eps,       // Value used to initialize the mean squared gradient parameter.
-                        iterPerCycle, // Maximum number of iterations.
+                        numIterations,  // iterPerCycle// Maximum number of iterations.
                         tolerance,    // Tolerance.
                         shuffle);     // Shuffle.
     std::function<double()> noiseFunction = [] () {
@@ -184,7 +199,7 @@ int main()
     {
         // Training the neural network. For first iteration, weights are random,
         // thus using current values as starting point.
-        gan.Train(trainDataset,
+        gan.Train(mnistDataset,  //trainDataset
                   optimizer,
                   ens::PrintLoss(),
                   ens::ProgressBar(),
@@ -201,5 +216,35 @@ int main()
 
     data::Save("./saved_models/ganMnist.bin", "ganMnist", gan);
     std::cout << "Model saved in mnist_gan/saved_models." << std::endl;
+
+    // -----------------------------Sampling -----------------//
+    // Generate samples.
+  std::cout << "Sampling..." << std::endl;
+  arma::mat noise(noiseDim, batchSize);
+  size_t dim = std::sqrt(mnistDataset.n_rows);
+  arma::mat generatedData(2 * dim, dim * numSamples);
+
+  for (size_t i = 0; i < numSamples; ++i)
+  {
+    arma::mat samples;
+    noise.imbue( [&]() { return noiseFunction(); } );
+
+    gan.Generator().Forward(noise, samples);
+    samples.reshape(dim, dim);
+    samples = samples.t();
+
+    generatedData.submat(0, i * dim, dim - 1, i * dim + dim - 1) = samples;
+
+    samples = mnistDataset.col(math::RandInt(0, mnistDataset.n_cols));
+    samples.reshape(dim, dim);
+    samples = samples.t();
+
+    generatedData.submat(dim,
+        i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
+  }
+
+  data::Save("./saved_csv_files/ouput_mnist.csv", generatedData, false, false);
+
+  std::cout << "Output generated!" << std::endl;
 
 }
