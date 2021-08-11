@@ -3,7 +3,6 @@
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <ensmallen.hpp>
-#include <ensmallen_bits/callbacks/callbacks.hpp>
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -25,17 +24,19 @@ int main() {
 
     const double RATIO = 0.2;
     constexpr int MAX_ITERATIONS = 0;
-    constexpr double STEP_SIZE = 0.002;
-    constexpr int BATCH_SIZE = 5;
+    constexpr double STEP_SIZE = 0.03;
+    constexpr int BATCH_SIZE = 256;
 
     mat trainData;
     data::Load("./cifar-10_train.csv", trainData, true);
 
+    trainData.shed_col(0);
+
     mat train, valid;
     data::Split(trainData, train, valid, RATIO);
 
-    const mat trainX = train.submat(0, 0, train.n_rows - 2, train.n_cols - 2);
-    const mat validX = valid.submat(0, 0, valid.n_rows - 2, valid.n_cols - 2);
+    const mat trainX = train.submat(0, 0, train.n_rows - 2, train.n_cols - 1);
+    const mat validX = valid.submat(0, 0, valid.n_rows - 2, valid.n_cols - 1);
 
     const mat trainY = train.row(train.n_rows - 1);
     const mat validY = valid.row(valid.n_rows - 1);
@@ -69,11 +70,7 @@ int main() {
     model.Add<MaxPooling<>>(2, 2, 2, 2, true);
     model.Add<Dropout<>>(0.4);
 
-
     model.Add<Linear<>>(4*4*128, 10);
-    //model.Add<LeakyReLU<>>();
-    //model.Add<Dropout<>>(0.5);
-    //model.Add<Linear<>>(512, 10);
     model.Add<LogSoftMax<>>();
 
     cout << "Start training ..." << endl;
@@ -84,15 +81,15 @@ int main() {
             optimizer,
             ens::PrintLoss(),
             ens::ProgressBar(),
-            ens::EarlyStopAtMinLoss());
-    mlpack::data::Save("model.bin", "model", model, false);
-                /*[&](const arma::mat&) 
+            ens::EarlyStopAtMinLoss(
+                [&](const arma::mat&) 
                 {
                     double validationLoss = model.Evaluate(validX, validY);
-                    cout << "Validation Loss:" << validationLoss << "." << endl;
+                    cout << "Validation Loss: " << validationLoss << "." << endl;
                     return validationLoss;
-                }));*/
-    /*mat yPreds;
+                }));
+
+    mat yPreds;
 
     model.Predict(trainX, yPreds);
 
@@ -109,6 +106,7 @@ int main() {
     cout << "Accuracy: train = " << trainAccuracy << "%," 
          << "\t valid = " << validAccuracy <<"%" << endl;
 
-    */
+    mlpack::data::Save("model.bin", "model", model, false);
+
     return 0;
 }
