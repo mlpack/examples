@@ -1,3 +1,10 @@
+/**
+ * Simple Convolutional Neural Network for 
+ * object classification using CIFAR-10 dataset.
+ *
+ * @author David Port Louis
+ */
+
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
@@ -11,6 +18,8 @@ using namespace arma;
 using namespace std;
 using namespace ens;
 
+// Utility function to generate class labels
+// from probabilities.
 arma::Row<size_t> getLabels(arma::mat yPreds) 
 {
     arma::Row<size_t> yLabels(yPreds.n_cols);
@@ -24,22 +33,30 @@ arma::Row<size_t> getLabels(arma::mat yPreds)
 int main() {
 
     // Hyperparameters for optimizer (Feel free to tweak these).
+
+    // Dataset train & validation split ratio.
     const double RATIO = 0.1;
+
+    // Maximum number of iterations to train.
     constexpr int MAX_ITERATIONS = 200;
+
+    // Step size of the optimizer.
     constexpr double STEP_SIZE = 0.002;
+
+    // Number of data points in each iteration of SGD.
     constexpr int BATCH_SIZE = 64;
 
     // Cifar 10 Dataset containing 3072 features (32 * 32) + labels
     // is loaded from CSV file.
-    mat trainData;
-    data::Load("./cifar-10_train.csv", trainData, true);
+    mat dataset;
+    data::Load("./cifar-10_train.csv", dataset, true);
 
     // Header column is dropped.
-    trainData.shed_col(0);
+    dataset.shed_col(0);
 
     // Split the dataset into training and validation sets.
     mat train, valid;
-    data::Split(trainData, train, valid, RATIO);
+    data::Split(dataset, train, valid, RATIO);
 
     // Split the features and labels
     const mat trainX = train.submat(0, 0, train.n_rows - 2, train.n_cols - 1);
@@ -80,8 +97,8 @@ int main() {
 
     cout << "Start training ..." << endl;
 
+    // Train the CNN model using Adam Optimizer and above hyperparameters.
     ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-8, numIterations, 1e-8, true);
-    // ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, numIterations, 1e-5, true, MomentumUpdate(0.9));
     model.Train(trainX,
             trainY,
             optimizer,
@@ -92,42 +109,57 @@ int main() {
 
     cout << "Starting evalutation on trainset ..." << endl;
 
-    mat yPreds;
+    // Matrix to store prediction on train and validation datasets.
+    mat predProbs;
 
-    model.Predict(trainX, yPreds);
+    // Make predictions on training data points.
+    model.Predict(trainX, predProbs);
 
-    arma::Row<size_t> yLabels = getLabels(yPreds);
+    // Convert the predicted probalities into labels.
+    arma::Row<size_t> predLabels = getLabels(predProbs);
 
-    double trainAccuracy = arma::accu(yLabels == trainY) / (double) trainY.n_elem * 100;
+    // Calculate accuracy on training data points.
+    double trainAccuracy = arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
 
     cout << "Starting evalutation on validset ..." << endl;
     
+    // Make predictions on validation data points.
     model.Predict(validX, yPreds);
     
+    // Convert the predicted probabilities into labels.
     yLabels = getLabels(yPreds);
 
+    // Calculate accuracy on validation data points.
     double validAccuracy = arma::accu(yLabels == validY) / (double) validY.n_elem * 100;
 
     cout << "Accuracy: train = " << trainAccuracy << "%," 
          << "\t valid = " << validAccuracy <<"%" << endl;
 
+    // Save trained model.
     mlpack::data::Save("model.bin", "model", model, false);
 
+    // Matrix for storing test feeature & labels.
     mat testData;
     mat testY;
 
     cout << "Starting Prediction on testset ..." << endl;
 
+    // Load the test data.
     data::Load("./cifar10_test.csv", testData, true);
+    // Drop the header column.
     testData.shed_col(0);
+    // Remove labels before predicting.
     testY = testData.row(testData.n_rows - 1);
     testData.shed_row(testData.n_rows - 1);
 
+    // Get predictions on test data points.
     mat testPredProbs;
     model.Predict(testData, testPredProbs);
 
+    // Generate labels for the test dataset.
     arma::Row<size_t> testPreds = getLabels(testPredProbs);
 
+    // Calculate accuracy on test dataset using the labels.
     double testAccuracy = arma::accu(testPreds == testY) / (double) testY.n_elem * 100;
 
     cout << "Accuracy: test = " << testAccuracy << "%" << endl;
