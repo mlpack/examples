@@ -3,6 +3,7 @@
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <ensmallen.hpp>
+#include "periodic_save.hpp"
 
 using namespace mlpack;
 using namespace mlpack::ann;
@@ -22,72 +23,74 @@ arma::Row<size_t> getLabels(arma::mat yPreds)
 
 int main() {
 
-    const double RATIO = 0.2;
-    constexpr int MAX_ITERATIONS = 0;
-    constexpr double STEP_SIZE = 0.03;
-    constexpr int BATCH_SIZE = 256;
+    // Hyperparameters for optimizer (Feel free to tweak these).
+    const double RATIO = 0.1;
+    constexpr int MAX_ITERATIONS = 200;
+    constexpr double STEP_SIZE = 0.002;
+    constexpr int BATCH_SIZE = 64;
 
+    // Cifar 10 Dataset containing 3072 features (32 * 32) + labels
+    // is loaded from CSV file.
     mat trainData;
     data::Load("./cifar-10_train.csv", trainData, true);
 
+    // Header column is dropped.
     trainData.shed_col(0);
 
+    // Split the dataset into training and validation sets.
     mat train, valid;
     data::Split(trainData, train, valid, RATIO);
 
+    // Split the features and labels
     const mat trainX = train.submat(0, 0, train.n_rows - 2, train.n_cols - 1);
     const mat validX = valid.submat(0, 0, valid.n_rows - 2, valid.n_cols - 1);
 
     const mat trainY = train.row(train.n_rows - 1);
     const mat validY = valid.row(valid.n_rows - 1);
 
+    // Number of iterations, should be equal to the No. of 
+    // Datapoints seen times the MAX_ITERATIONS
+    size_t numIterations = trainX.n_cols * MAX_ITERATIONS;
+
+    // Create the Feed Forward Neural Network with Random weight
+    // initalization and NegativeLogLikelihood Loss (NLLLoss).
     FFN<NegativeLogLikelihood<>, RandomInitialization> model;
 
-    model.Add<Convolution<>>(3, 32, 3, 3, 1, 1, 1, 1, 32, 32);
-    model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(32);
-    model.Add<Convolution<>>(32, 32, 3, 3, 1, 1, 1, 1, 32, 32);
-    model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(32);
-    model.Add<MaxPooling<>>(2, 2, 2, 2, true);
-    model.Add<Dropout<>>(0.2);
+    // @model architecture.
+    // 32 x 32 x 3 --- conv (6 feature maps of kernel size 5 x 5 with stride = 1) ---> 28 x 28 x 6
+    // 28 x 28 x 6 ------------------------ Leaky ReLU ------------------------------> 28 x 28 x 6
+    // 28 x 28 x 6 ------- max pooling (kernel size of 2 x 2 with stride = 2) -------> 14 x 14 x 6
+    // 14 x 14 x 6 --- conv (16 feature maps of kernel size 5 x 5 and stride = 1) ---> 10 x 10 x 16
+    // 10 x 10 x 16 ----------------------- Leaky ReLU ------------------------------> 10 x 10 x 16
+    // 10 x 10 x 16 ------ max pooling (kernel size of 2 x 2 with stride = 2) -------> 5 x 5 x 16
+    // 5 x 5 x 16  ------------------------- Linear ---------------------------------> 10
 
-    model.Add<Convolution<>>(32, 64, 3, 3, 1, 1, 1, 1, 16, 16);
-    model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(64);
-    model.Add<Convolution<>>(64, 64, 3, 3, 1, 1, 1, 1, 16, 16);
-    model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(64);
+    model.Add<Convolution<>>(3, 6, 5, 5, 1, 1, 0, 0, 32, 32); 
+    model.Add<LeakyReLU<>>(); 
     model.Add<MaxPooling<>>(2, 2, 2, 2, true);
-    model.Add<Dropout<>>(0.3);
-
-    model.Add<Convolution<>>(64, 128, 3, 3, 1, 1, 1, 1, 8, 8);
+    model.Add<Convolution<>>(6, 16, 5, 5, 1, 1, 0, 0, 14, 14);
     model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(128);
-    model.Add<Convolution<>>(128, 128, 3, 3, 1, 1, 1, 1, 8, 8);
-    model.Add<LeakyReLU<>>();
-    model.Add<BatchNorm<>>(128);
     model.Add<MaxPooling<>>(2, 2, 2, 2, true);
-    model.Add<Dropout<>>(0.4);
-
-    model.Add<Linear<>>(4*4*128, 10);
+    model.Add<Linear<>>(5*5*16, 120);
+    model.Add<LeakyReLU<>>();
+    model.Add<Linear<>>(120, 84);
+    model.Add<LeakyReLU<>>();
+    model.Add<Linear<>>(84, 10);
     model.Add<LogSoftMax<>>();
 
     cout << "Start training ..." << endl;
 
-    ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-6, MAX_ITERATIONS, 1e-8, true);
+    ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-8, numIterations, 1e-8, true);
+    // ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, numIterations, 1e-5, true, MomentumUpdate(0.9));
     model.Train(trainX,
             trainY,
             optimizer,
             ens::PrintLoss(),
             ens::ProgressBar(),
-            ens::EarlyStopAtMinLoss(
-                [&](const arma::mat&) 
-                {
-                    double validationLoss = model.Evaluate(validX, validY);
-                    cout << "Validation Loss: " << validationLoss << "." << endl;
-                    return validationLoss;
-                }));
+            ens::EarlyStopAtMinLoss(),
+            ens::PeriodicSave<FFN<NegativeLogLikelihood<>, RandomInitialization>>(model, "./new_models/"));
+
+    cout << "Starting evalutation on trainset ..." << endl;
 
     mat yPreds;
 
@@ -96,6 +99,8 @@ int main() {
     arma::Row<size_t> yLabels = getLabels(yPreds);
 
     double trainAccuracy = arma::accu(yLabels == trainY) / (double) trainY.n_elem * 100;
+
+    cout << "Starting evalutation on validset ..." << endl;
     
     model.Predict(validX, yPreds);
     
@@ -107,6 +112,25 @@ int main() {
          << "\t valid = " << validAccuracy <<"%" << endl;
 
     mlpack::data::Save("model.bin", "model", model, false);
+
+    mat testData;
+    mat testY;
+
+    cout << "Starting Prediction on testset ..." << endl;
+
+    data::Load("./cifar10_test.csv", testData, true);
+    testData.shed_col(0);
+    testY = testData.row(testData.n_rows - 1);
+    testData.shed_row(testData.n_rows - 1);
+
+    mat testPredProbs;
+    model.Predict(testData, testPredProbs);
+
+    arma::Row<size_t> testPreds = getLabels(testPredProbs);
+
+    double testAccuracy = arma::accu(testPreds == testY) / (double) testY.n_elem * 100;
+
+    cout << "Accuracy: test = " << testAccuracy << "%" << endl;
 
     return 0;
 }
