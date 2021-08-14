@@ -124,13 +124,13 @@ int main() {
     cout << "Starting evalutation on validset ..." << endl;
     
     // Make predictions on validation data points.
-    model.Predict(validX, yPreds);
+    model.Predict(validX, predProbs);
     
     // Convert the predicted probabilities into labels.
-    yLabels = getLabels(yPreds);
+    predLabels = getLabels(predProbs);
 
     // Calculate accuracy on validation data points.
-    double validAccuracy = arma::accu(yLabels == validY) / (double) validY.n_elem * 100;
+    double validAccuracy = arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
     cout << "Accuracy: train = " << trainAccuracy << "%," 
          << "\t valid = " << validAccuracy <<"%" << endl;
