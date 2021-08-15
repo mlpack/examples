@@ -38,7 +38,10 @@ int main() {
     const double RATIO = 0.1;
 
     // Maximum number of iterations to train.
-    constexpr int MAX_ITERATIONS = 200;
+    // MAX_ITERATIONS is set to 10 for reducing
+    // CI build time, consider setting it to
+    // 100 or more for obtaining fruitful models.
+    constexpr int MAX_ITERATIONS = 10;
 
     // Step size of the optimizer.
     constexpr double STEP_SIZE = 0.002;
