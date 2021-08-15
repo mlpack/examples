@@ -141,7 +141,7 @@ def salary_dataset():
 
 def cifar10_dataset():
     print("Downloading CIFAR10 dataset...")
-    cifar = request.get("")
+    cifar = request.get("http://datasets.mlpack.org/cifar-10.tar.xz")
     progress_bar("cifar-10.tar.xz", "r:xz")
     tar.extractall()
     tar.close()
