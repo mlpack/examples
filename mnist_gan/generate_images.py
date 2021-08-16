@@ -13,79 +13,84 @@ import numpy as np
 import cv2
 import os
 
-def ImagesFromCSV(filename,
-                  imgShape = (28, 28),
-                  destination = 'samples',
-                  saveIndividual = False):
+# def ImagesFromCSV(filename,
+#                   imgShape = (28, 28),
+#                   destination = 'samples',
+#                   saveIndividual = False):
 
-  # Import the data into a numpy matrix.
-  samples = np.genfromtxt(filename, delimiter = ',', dtype = np.uint8)
+#   # Import the data into a numpy matrix.
+#   samples = np.genfromtxt(filename, delimiter = ',', dtype = np.uint8)
 
-  # Reshape and save it as an image in the destination.
-  tempImage = Image.fromarray(np.reshape(samples[:, 0], imgShape), 'L')
-  if saveIndividual:
-    tempImage.save(destination + '/sample0.jpg')
+#   # Reshape and save it as an image in the destination.
+#   tempImage = Image.fromarray(np.reshape(samples[:, 0], imgShape), 'L')
+#   if saveIndividual:
+#     tempImage.save(destination + '/sample0.jpg')
 
-  # All the images will be concatenated to this for a combined image.
-  allSamples = tempImage
+#   # All the images will be concatenated to this for a combined image.
+#   allSamples = tempImage
 
-  for i in range(1, samples.shape[1]):
-    tempImage = np.reshape(samples[:, i], imgShape)
+#   for i in range(1, samples.shape[1]):
+#     tempImage = np.reshape(samples[:, i], imgShape)
 
-    allSamples = np.concatenate((allSamples, tempImage), axis = 1)
+#     allSamples = np.concatenate((allSamples, tempImage), axis = 1)
 
-    tempImage = Image.fromarray(tempImage, 'L')
-    if saveIndividual:
-      tempImage.save(destination + '/sample' + str(i) + '.jpg')
+#     tempImage = Image.fromarray(tempImage, 'L')
+#     if saveIndividual:
+#       tempImage.save(destination + '/sample' + str(i) + '.jpg')
 
-  tempImage = allSamples
-  allSamples = Image.fromarray(allSamples, 'L')
-  allSamples.save(destination + '/allSamples' + '.jpg')
+#   tempImage = allSamples
+#   allSamples = Image.fromarray(allSamples, 'L')
+#   allSamples.save(destination + '/allSamples' + '.jpg')
 
-  print ('Samples saved in ' + destination + '/.')
+#   print ('Samples saved in ' + destination + '/.')
 
-  return tempImage
+#   return tempImage
 
-# Save posterior samples.
-ImagesFromCSV('./samples_csv_files/samples_posterior.csv', destination =
-    'samples_posterior')
+# # Save posterior samples.
+# ImagesFromCSV('./samples_csv_files/samples_posterior.csv', destination =
+#     'samples_posterior')
 
-# Save prior samples with individual latent varying.
-latentSize = 10
-allLatent = ImagesFromCSV('./samples_csv_files/samples_prior_latent0.csv',
-    destination = 'samples_prior')
+# # Save prior samples with individual latent varying.
+# latentSize = 10
+# allLatent = ImagesFromCSV('./samples_csv_files/samples_prior_latent0.csv',
+#     destination = 'samples_prior')
 
-for i in range(1, latentSize):
-  allLatent = np.concatenate((allLatent,
-      (ImagesFromCSV('./samples_csv_files/samples_prior_latent' + str(i) + '.csv',
-      destination = 'samples_prior'))), axis = 0)
+# for i in range(1, latentSize):
+#   allLatent = np.concatenate((allLatent,
+#       (ImagesFromCSV('./samples_csv_files/samples_prior_latent' + str(i) + '.csv',
+#       destination = 'samples_prior'))), axis = 0)
 
-saved = Image.fromarray(allLatent, 'L')
-saved.save('./samples_prior/allLatent.jpg')
+# saved = Image.fromarray(allLatent, 'L')
+# saved.save('./samples_prior/allLatent.jpg')
 
-# Save prior samples with 2d latent varying.
-nofSamples = 20
-allLatent = ImagesFromCSV('./samples_csv_files/samples_prior_latent_2d0.csv',
-    destination = 'latent')
+# # Save prior samples with 2d latent varying.
+# nofSamples = 20
+# allLatent = ImagesFromCSV('./samples_csv_files/samples_prior_latent_2d0.csv',
+#     destination = 'latent')
 
-for i in range(1, nofSamples):
-  allLatent = np.concatenate((allLatent,
-      (ImagesFromCSV('./samples_csv_files/samples_prior_latent_2d' + str(i) +
-      '.csv', destination = 'samples_prior'))), axis = 0)
+# for i in range(1, nofSamples):
+#   allLatent = np.concatenate((allLatent,
+#       (ImagesFromCSV('./samples_csv_files/samples_prior_latent_2d' + str(i) +
+#       '.csv', destination = 'samples_prior'))), axis = 0)
 
-saved = Image.fromarray(allLatent, 'L')
-saved.save('./samples_prior/2dLatent.jpg')
+# saved = Image.fromarray(allLatent, 'L')
+# saved.save('./samples_prior/2dLatent.jpg')
 
-# AVI file
-vid_fname = 'gans_celebface_training1.avi'
-sample_dir = " "
+# # AVI file
+# vid_fname = 'gans_celebface_training1.avi'
+# sample_dir = " "
 
-files = [os.path.join(sample_dir, f) for f in os.listdir(sample_dir) if 'generated' in f]
-files.sort()
+# files = [os.path.join(sample_dir, f) for f in os.listdir(sample_dir) if 'generated' in f]
+# files.sort()
 
-out = cv2.VideoWriter(vid_fname, cv2.VideoWriter_fourcc(*'MP4V'), 1, (530, 530))
-[out.write(cv2.imread(fname)) for fname in files]
-out.release()
+# out = cv2.VideoWriter(vid_fname, cv2.VideoWriter_fourcc(*'MP4V'), 1, (530, 530))
+# [out.write(cv2.imread(fname)) for fname in files]
+# out.release()
 
 
-###Output###
+# ###Output###
+
+samples = np.genfromtxt("./samples_csv_files/output_mnist_1.csv", delimiter = ',', dtype = np.uint8)
+
+im = Image.fromarray(samples)
+im.save("./samples_posterior/output_mnist_1.jpeg")

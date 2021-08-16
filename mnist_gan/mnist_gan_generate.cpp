@@ -42,12 +42,13 @@ int main()
   bool loadData = false;
 
     arma::mat inputData, trainData, validData;
-
     trainData.load("./mnist_first250_training_4s_and_9s.arm");
 
     if(loadData)
     {
-        data::Load(" ", inputData, true, false);
+
+        inputData.load("./mnist_first250_training_4s_and_9s.arm");
+
         // Removing the headers
         inputData = inputData.submat(0, 1, inputData.n_rows - 1, inputData.n_cols - 1);
         inputData /= 255.0;
@@ -103,7 +104,7 @@ int main()
     }
     // arma::mat output;
     // GetSample(generatedData, output, false);
-    data::Save("./samples_csv_files/ouput_mnist_1.csv", generatedData, false, false);
+    data::Save("./samples_csv_files/ouput_mnist_2.csv", generatedData, false, false);
 
     std::cout << "Output generated!" << std::endl;
 
