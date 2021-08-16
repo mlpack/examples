@@ -40,7 +40,7 @@ int main() {
     // Maximum number of iterations to train.
     // MAX_ITERATIONS is set to 10 for reducing
     // CI build time, consider setting it to
-    // 100 or more for obtaining fruitful models.
+    // 200 or more for obtaining fruitful models.
     constexpr int MAX_ITERATIONS = 10;
 
     // Step size of the optimizer.
