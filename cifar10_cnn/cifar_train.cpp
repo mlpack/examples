@@ -20,7 +20,7 @@ using namespace ens;
 
 // Utility function to generate class labels
 // from probabilities.
-arma::Row<size_t> getLabels(arma::mat yPreds) 
+arma::Row<size_t> getLabels(const arma::mat& yPreds) 
 {
     arma::Row<size_t> yLabels(yPreds.n_cols);
     for (arma::uword i = 0; i < yPreds.n_cols; ++i)
