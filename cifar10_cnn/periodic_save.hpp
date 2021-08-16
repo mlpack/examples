@@ -33,10 +33,10 @@ class PeriodicSave
    * @param network Network type which will be saved periodically.
    * @param filePath Base path / folder where weights will be saved.
    * @param modelPrefix Weights will be stored as
-   *    modelPrefix_epoch_loss.bin.
+   *      modelPrefix_epoch_loss.bin.
    * @param period Period after which the model will be saved.
    * @param silent Boolean to determine whether or not to print saving
-   *    of model.
+   *      of model.
    * @param output Outputstream where output will be directed.
    */
   PeriodicSave(AnnType& network,
