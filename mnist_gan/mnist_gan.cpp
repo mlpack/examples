@@ -19,7 +19,6 @@ using namespace std::placeholders;
 
 int main()
 {
-    double trainRatio = 0.8;
     size_t dNumKernels = 32;
     size_t discriminatorPreTrain = 5;
     size_t batchSize = 5;
@@ -27,9 +26,10 @@ int main()
     size_t generatorUpdateStep = 1;
     size_t numSamples = 10;
     size_t cycles = 10;
-    double stepSize = 0.0003;
-    double eps = 1e-8;
     size_t numEpoches = 1;
+    double stepSize = 0.0003;
+    double trainRatio = 0.8;
+    double eps = 1e-8;
     double tolerance = 1e-5;
     bool shuffle = true;
     double multiplier = 10;
@@ -47,7 +47,6 @@ int main()
 
 
     arma::mat mnistDataset;
-    // data::Load("/home/viole/Documents/datasets/digit-recognizer/train.csv", mnistDataset, true);
     mnistDataset.load("./mnist_first250_training_4s_and_9s.arm");
 
     std::cout << arma::size(mnistDataset) << std::endl;
@@ -98,6 +97,24 @@ int main()
      *
      *
      * Generator:
+     * noiseDim---------> Linear ---------------------------> 3136
+     * 3136 ------------> BatchNormalizaton ----------------> 3136
+     * 3136 ------------> ReLu Layer -----------------------> 3136
+     * 56x56x1 ---------> conv(1 filter of size 3x3,
+     *                          stride = 1, padding = 2)----> 28x28x(noiseDim/2)
+     * 28x28x(noiseDim/2)----> BatchNormalizaton -----------> 28x28x(noiseDim/2)
+     * 28x28x(noiseDim/2)----> ReLu Layer-------------------> 28x28x(noiseDim/2)
+     * 28x28x(noiseDim/2) ----> BilinearInterpolation ------> 56x56x(noiseDim/2)
+     * 56x56x(noiseDim/2) -----> conv((noiseDim/2) filters
+     *                               of size 3x3,stride = 2,
+     *                                padding = 1)----------> 28x28x(noiseDim/4)
+     * 28x28x(noiseDim/4) ----->BatchNormalization----------> 28x28x(noiseDim/4)
+     * 28x28x(noiseDim/4) ------> ReLu Layer ---------------> 28x28x(noiseDim/4)
+     * 28x28x(noiseDim/4) ------> BilinearInterpolation ----> 56x56x(noiseDim/4)
+     * 56x56x(noiseDim/4) ------> conv((noiseDim/4) filters
+     *                               of size 3x3, stride = 2,
+     *                                   padding = 1)-------> 28x28x1
+     * 28x28x1 ----------> tanh layer ----------------------> 28x28x1
      *
      *
      * Note: Output of a Convolution layer = [(W-K+2P)/S + 1]
