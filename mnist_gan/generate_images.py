@@ -90,7 +90,6 @@ import os
 
 # ###Output###
 
-samples = np.genfromtxt("./samples_csv_files/output_mnist_1.csv", delimiter = ',', dtype = np.uint8)
-
+samples = np.genfromtxt("./samples_csv_files/ouput_mnist_25_without_normalization.csv", delimiter = ',', dtype = np.uint8)
 im = Image.fromarray(samples)
-im.save("./samples_posterior/output_mnist_1.jpeg")
+im.save("./samples_posterior/output_mnist_25_without_normalization.jpeg")

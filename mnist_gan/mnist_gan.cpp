@@ -26,14 +26,13 @@ int main()
     size_t generatorUpdateStep = 1;
     size_t numSamples = 10;
     size_t cycles = 10;
-    size_t numEpoches = 1;
+    size_t numEpoches = 25;
     double stepSize = 0.0003;
     double trainRatio = 0.8;
     double eps = 1e-8;
     double tolerance = 1e-5;
     bool shuffle = true;
     double multiplier = 10;
-
     int datasetMaxCols = 10;
 
     std::cout << std::boolalpha
@@ -231,37 +230,37 @@ int main()
 
     std::cout << " Time taken to train -> " << float(clock()-beginTime) / CLOCKS_PER_SEC << "seconds" << std::endl;
 
-    data::Save("./saved_models/ganMnist.bin", "ganMnist", gan);
+    data::Save("./saved_models/ganMnist_25epochs.bin", "ganMnist", gan);
     std::cout << "Model saved in mnist_gan/saved_models." << std::endl;
 
-    // -----------------------------Sampling -----------------//
-    // Generate samples.
-  std::cout << "Sampling..." << std::endl;
-  arma::mat noise(noiseDim, batchSize);
-  size_t dim = std::sqrt(mnistDataset.n_rows);
-  arma::mat generatedData(2 * dim, dim * numSamples);
+  //   // -----------------------------Sampling -----------------//
+  //   // Generate samples.
+  // std::cout << "Sampling..." << std::endl;
+  // arma::mat noise(noiseDim, batchSize);
+  // size_t dim = std::sqrt(mnistDataset.n_rows);
+  // arma::mat generatedData(2 * dim, dim * numSamples);
 
-  for (size_t i = 0; i < numSamples; ++i)
-  {
-    arma::mat samples;
-    noise.imbue( [&]() { return noiseFunction(); } );
+  // for (size_t i = 0; i < numSamples; ++i)
+  // {
+  //   arma::mat samples;
+  //   noise.imbue( [&]() { return noiseFunction(); } );
 
-    gan.Generator().Forward(noise, samples);
-    samples.reshape(dim, dim);
-    samples = samples.t();
+  //   gan.Generator().Forward(noise, samples);
+  //   samples.reshape(dim, dim);
+  //   samples = samples.t();
 
-    generatedData.submat(0, i * dim, dim - 1, i * dim + dim - 1) = samples;
+  //   generatedData.submat(0, i * dim, dim - 1, i * dim + dim - 1) = samples;
 
-    samples = mnistDataset.col(math::RandInt(0, mnistDataset.n_cols));
-    samples.reshape(dim, dim);
-    samples = samples.t();
+  //   samples = mnistDataset.col(math::RandInt(0, mnistDataset.n_cols));
+  //   samples.reshape(dim, dim);
+  //   samples = samples.t();
 
-    generatedData.submat(dim,
-        i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
-  }
+  //   generatedData.submat(dim,
+  //       i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
+  // }
 
-  data::Save("./saved_csv_files/ouput_mnist.csv", generatedData, false, false);
+  // data::Save("./saved_csv_files/ouput_mnist.csv", generatedData, false, false);
 
-  std::cout << "Output generated!" << std::endl;
+  // std::cout << "Output generated!" << std::endl;
 
 }
