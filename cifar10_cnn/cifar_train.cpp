@@ -30,8 +30,8 @@ arma::Row<size_t> getLabels(const arma::mat& yPreds)
     return yLabels;
 }
 
-int main() {
-
+int main() 
+{
     // Hyperparameters for optimizer (Feel free to tweak these).
 
     // Dataset train & validation split ratio.
