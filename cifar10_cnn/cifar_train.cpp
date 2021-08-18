@@ -76,13 +76,13 @@ int main()
     // initalization and NegativeLogLikelihood Loss (NLLLoss).
     FFN<NegativeLogLikelihood<>, RandomInitialization> model;
 
-    // @model architecture.
-    // 32 x 32 x 3 --- conv (6 feature maps of kernel size 5 x 5 with stride = 1) ---> 28 x 28 x 6
+    // @Model architecture.
+    // 32 x 32 x 3 --- Conv (6 feature maps of kernel size 5 x 5 with stride = 1) ---> 28 x 28 x 6
     // 28 x 28 x 6 ------------------------ Leaky ReLU ------------------------------> 28 x 28 x 6
-    // 28 x 28 x 6 ------- max pooling (kernel size of 2 x 2 with stride = 2) -------> 14 x 14 x 6
-    // 14 x 14 x 6 --- conv (16 feature maps of kernel size 5 x 5 and stride = 1) ---> 10 x 10 x 16
+    // 28 x 28 x 6 ------- Max Pooling (kernel size of 2 x 2 with stride = 2) -------> 14 x 14 x 6
+    // 14 x 14 x 6 --- Conv (16 feature maps of kernel size 5 x 5 and stride = 1) ---> 10 x 10 x 16
     // 10 x 10 x 16 ----------------------- Leaky ReLU ------------------------------> 10 x 10 x 16
-    // 10 x 10 x 16 ------ max pooling (kernel size of 2 x 2 with stride = 2) -------> 5 x 5 x 16
+    // 10 x 10 x 16 ------ Max Pooling (kernel size of 2 x 2 with stride = 2) -------> 5 x 5 x 16
     // 5 x 5 x 16  ------------------------- Linear ---------------------------------> 10
 
     model.Add<Convolution<>>(3, 6, 5, 5, 1, 1, 0, 0, 32, 32); 
@@ -108,7 +108,7 @@ int main()
             ens::PrintLoss(),
             ens::ProgressBar(),
             ens::EarlyStopAtMinLoss(),
-            ens::PeriodicSave<FFN<NegativeLogLikelihood<>, RandomInitialization>>(model, "./new_models/"));
+            ens::PeriodicSave<decltype(model)>(model, "./new_models2/"));
 
     cout << "Starting evalutation on trainset ..." << endl;
 
@@ -148,7 +148,7 @@ int main()
     cout << "Starting Prediction on testset ..." << endl;
 
     // Load the test data.
-    data::Load("../data/cifar10_test.csv", testData, true);
+    data::Load("../data/cifar-10_test.csv", testData, true);
     // Drop the header column.
     testData.shed_col(0);
     // Remove labels before predicting.
