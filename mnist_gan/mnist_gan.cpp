@@ -56,28 +56,6 @@ int main()
 
     std::cout << "MnistDataset No. of rows: " << mnistDataset.n_rows << std::endl;
 
-    // mnistDataset = mnistDataset.submat(1, 0, mnistDataset.n_rows-1, mnistDataset.n_cols-1);
-    // mnistDataset /= 255.0;
-
-    // arma::mat trainDataset, valDataset;
-    // data::Split(mnistDataset, trainDataset, valDataset, trainRatio);
-
-    // std::cout << " Dataset Loaded " << std::endl;
-    // std::cout << " Train Dataset Size : (" << trainDataset.n_rows << ", " << trainDataset.n_cols << ")" << std::endl;
-
-    // std::cout << " Validation Dataset Size : (" << valDataset.n_rows << ", " << valDataset.n_cols << ")" << std::endl;
-
-    // const size_t testSize = static_cast<size_t>(mnistDataset.n_cols * trainRatio);
-    // std::cout << "After Split: " << std::endl;
-    // std::cout << " testSize" << testSize <<  std::endl;
-    // std::cout << " Mnist_Dataset cols:  " << mnistDataset.n_cols << std::endl;
-    // std::cout << " TrainRatio: " << trainRatio << std::endl;
-
-    // // arma::mat trainTest, dump;
-    // data::Split(trainDataset, dump, trainTest, 0.045);
-
-    // size_t iterPerCycle = (numEpochs * trainDataset.n_cols);
-
     /**
      * @brief Model Architecture:
      *
@@ -100,7 +78,7 @@ int main()
      * 3136 ------------> BatchNormalizaton ----------------> 3136
      * 3136 ------------> ReLu Layer -----------------------> 3136
      * 56x56x1 ---------> conv(1 filter of size 3x3,
-     *                          stride = 1, padding = 2)----> 28x28x(noiseDim/2)
+     *                          stride = 2, padding = 1)----> 28x28x(noiseDim/2)
      * 28x28x(noiseDim/2)----> BatchNormalizaton -----------> 28x28x(noiseDim/2)
      * 28x28x(noiseDim/2)----> ReLu Layer-------------------> 28x28x(noiseDim/2)
      * 28x28x(noiseDim/2) ----> BilinearInterpolation ------> 56x56x(noiseDim/2)
@@ -232,35 +210,4 @@ int main()
 
     data::Save("./saved_models/ganMnist_25epochs.bin", "ganMnist", gan);
     std::cout << "Model saved in mnist_gan/saved_models." << std::endl;
-
-  //   // -----------------------------Sampling -----------------//
-  //   // Generate samples.
-  // std::cout << "Sampling..." << std::endl;
-  // arma::mat noise(noiseDim, batchSize);
-  // size_t dim = std::sqrt(mnistDataset.n_rows);
-  // arma::mat generatedData(2 * dim, dim * numSamples);
-
-  // for (size_t i = 0; i < numSamples; ++i)
-  // {
-  //   arma::mat samples;
-  //   noise.imbue( [&]() { return noiseFunction(); } );
-
-  //   gan.Generator().Forward(noise, samples);
-  //   samples.reshape(dim, dim);
-  //   samples = samples.t();
-
-  //   generatedData.submat(0, i * dim, dim - 1, i * dim + dim - 1) = samples;
-
-  //   samples = mnistDataset.col(math::RandInt(0, mnistDataset.n_cols));
-  //   samples.reshape(dim, dim);
-  //   samples = samples.t();
-
-  //   generatedData.submat(dim,
-  //       i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
-  // }
-
-  // data::Save("./saved_csv_files/ouput_mnist.csv", generatedData, false, false);
-
-  // std::cout << "Output generated!" << std::endl;
-
 }
