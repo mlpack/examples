@@ -12,8 +12,6 @@
 
 #include <ensmallen.hpp>
 
-#include "gan_utils.hpp"
-
 using namespace mlpack;
 using namespace mlpack::ann;
 
@@ -30,22 +28,23 @@ int main()
   arma::mat trainData,inputData, validData;
   trainData.load("./mnist_first250_training_4s_and_9s.arm");
 
-  if(loadData)
-  {
+  // If you want to load other mnist data, then uncomment the below lines in the "if" statement to remove and prepare the data for your test.
+  // if(loadData)
+  // {
 
-    inputData.load("./mnist_first250_training_4s_and_9s.arm");
+  //   inputData.load("File Path");
 
-    // Removing the headers.
-    inputData = inputData.submat(0, 1, inputData.n_rows - 1, inputData.n_cols - 1);
-    inputData /= 255.0;
+  //   // Removing the headers.
+  //   inputData = inputData.submat(0, 1, inputData.n_rows - 1, inputData.n_cols - 1);
+  //   inputData /= 255.0; // Note that if you are bringing all the values to 0-1, then in the output csv, you have to multiply all values by 255.0
 
-    // Removing the labels.
-    inputData = inputData.submat(1, 0, inputData.n_rows - 1, inputData.n_cols - 1);
+  //   // Removing the labels.
+  //   inputData = inputData.submat(1, 0, inputData.n_rows - 1, inputData.n_cols - 1);
 
-    inputData = (inputData - 0.5) * 2;
+  //   inputData = (inputData - 0.5) * 2;
 
-    data::Split(inputData, trainData, validData, 0.8);
-  }
+  //   data::Split(inputData, trainData, validData, 0.8);
+  // }
 
     arma::arma_rng::set_seed_random();
 
