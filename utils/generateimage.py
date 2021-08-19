@@ -12,8 +12,7 @@ from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 
-def cgenerateimage(inFile, outFile = 'output.png'):
+def cgenerateimage(inFile, outFile = "output.png"):
     dataset = np.genfromtxt(inFile, delimiter = ',', dtype = np.uint8)
     im = Image.fromarray(dataset)
     im.save(outFile)
-
