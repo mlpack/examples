@@ -26,7 +26,7 @@ int main()
   bool loadData = false;
 
   arma::mat trainData,inputData, validData;
-  trainData.load("./mnist_first250_training_4s_and_9s.arm");
+  trainData.load("./dataset/mnist_first250_training_4s_and_9s.arm");
 
   // If you want to load other mnist data, then uncomment the below lines in the "if" statement to remove and prepare the data for your test.
   // if(loadData)
@@ -109,7 +109,7 @@ int main()
         i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
     }
     // Save the output as csv.
-    data::Save("./samples_csv_files/ouput_mnist_25_without_normalization.csv", generatedData, false, false);
+    data::Save("./samples_csv_files/sample.csv", generatedData, false, false);
 
     std::cout << "Output generated!" << std::endl;
 

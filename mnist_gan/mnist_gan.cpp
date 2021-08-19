@@ -46,7 +46,7 @@ int main()
 
 
     arma::mat mnistDataset;
-    mnistDataset.load("./mnist_first250_training_4s_and_9s.arm");
+    mnistDataset.load("./dataset/mnist_first250_training_4s_and_9s.arm");
 
     std::cout << arma::size(mnistDataset) << std::endl;
 
@@ -208,6 +208,7 @@ int main()
 
     std::cout << " Time taken to train -> " << float(clock()-beginTime) / CLOCKS_PER_SEC << "seconds" << std::endl;
 
+    // Let's save the model.
     data::Save("./saved_models/ganMnist_25epochs.bin", "ganMnist", gan);
     std::cout << "Model saved in mnist_gan/saved_models." << std::endl;
 }
