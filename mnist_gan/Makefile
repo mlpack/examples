@@ -11,7 +11,8 @@ CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG
 LDFLAGS  += -fopenmp
 LDFLAGS += -lboost_serialization
 LDFLAGS += -larmadillo
-LDFLAGS += -L /home/viole/mlpack/build/lib/ # /path/to/mlpack/library/  # if installed locally.
+LDFLAGS += -L. # /path to mlpack library if installed locally.
+# path: mlpack/build/lib.
 # Add header directories for any includes that aren't on the
 # default compiler search path.
 INCLFLAGS := -I /home/viole/mlpac/build/include/
