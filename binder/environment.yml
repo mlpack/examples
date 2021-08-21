@@ -28,6 +28,7 @@ dependencies:
 - invoke=1.2
 - pandas-datareader
 - plotly
+- imbalanced-learn=0.8.0
 # C++ Kernel
 - xeus-cling
 - xtensor
