@@ -7,6 +7,7 @@
 #include <boost/foreach.hpp>
 #include <mlpack/core/data/scaler_methods/standard_scaler.hpp>
 #include <mlpack/methods/ann/loss_functions/sigmoid_cross_entropy_error.hpp> 
+#include <mlpack/methods/ann/layer/base_layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 
 using namespace mlpack;
@@ -198,7 +199,7 @@ int main()
 
   // classifier
   model.Add<Convolution<>>(64, 1, 3, 3, 1, 1, 1, 1, 28, 28);
-  //model.Add<Sigmoid<>>(); //NEW_Q: Can I use Sigmoid(), I don't see a Sigmoid Implementation in ann namespace, my python model using sigmoid in the output layer ?
+  model.Add<SigmoidLayer<>>();
 
 
   model.ResetParameters();
