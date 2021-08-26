@@ -139,33 +139,7 @@ int main()
          << "\t valid = " << validAccuracy <<"%" << endl;
 
     // Save trained model.
-    mlpack::data::Save("model.bin", "model", model, false);
-
-    // Matrix for storing test feeature & labels.
-    mat testData;
-    mat testY;
-
-    cout << "Starting Prediction on testset ..." << endl;
-
-    // Load the test data.
-    data::Load("../data/cifar-10_test.csv", testData, true);
-    // Drop the header column.
-    testData.shed_col(0);
-    // Remove labels before predicting.
-    testY = testData.row(testData.n_rows - 1);
-    testData.shed_row(testData.n_rows - 1);
-
-    // Get predictions on test data points.
-    mat testPredProbs;
-    model.Predict(testData, testPredProbs);
-
-    // Generate labels for the test dataset.
-    arma::Row<size_t> testPreds = getLabels(testPredProbs);
-
-    // Calculate accuracy on test dataset using the labels.
-    double testAccuracy = arma::accu(testPreds == testY) / (double) testY.n_elem * 100;
-
-    cout << "Accuracy: test = " << testAccuracy << "%" << endl;
+    mlpack::data::Save("cifarNet.xml", "model", model, false);
 
     return 0;
 }
