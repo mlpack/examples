@@ -46,7 +46,6 @@ int main()
   //   data::Split(inputData, trainData, validData, 0.8);
   // }
 
-<<<<<<< HEAD
   arma::arma_rng::set_seed_random();
 
   // Define noise function.
@@ -91,52 +90,6 @@ int main()
 
     // Create random noise using noise function.
     noise.imbue([&]() { return noiseFunction(); });
-=======
-    arma::arma_rng::set_seed_random();
-
-    // Define noise function.
-    std::function<double ()> noiseFunction = [](){ return math::Random(-8, 8) +
-    math::RandNormal(0, 1) * 0.01;};
-
-    // Define generator.
-    FFN<SigmoidCrossEntropyError<> > generator;
-
-    // Define discriminator.
-    FFN<SigmoidCrossEntropyError<> > discriminator;
-
-    // Define GaussinaInitialization.
-    GaussianInitialization gaussian(0,1);
-
-    // Define GAN class.
-    GAN<FFN<SigmoidCrossEntropyError<> >, GaussianInitialization,
-    std::function<double()> > gan(generator, discriminator,
-    gaussian, noiseFunction, noiseDim, batchSize, generatorUpdateStep,
-    discriminatorPreTrain, multiplier);
-
-    // Load the saved model.
-    data::Load("./saved_models/ganMnist_25epochs.bin", "ganMnist", gan);
-
-    /*--------------Sampling-----------------------------------------*/
-
-    std::cout << "Sampling...." << std::endl;
-
-    // Noise matrix.
-    arma::mat noise(noiseDim, batchSize);
-
-    // Dimensions of the image.
-    size_t dim = std::sqrt(trainData.n_rows);
-
-    // Matrix to store the generated data.
-    arma::mat generatedData(2 * dim, dim * numSamples);
-
-
-    for (size_t i = 0; i < numSamples; ++i)
-    {
-    arma::mat samples;
-
-    // Create random noise using noise function.
-    noise.imbue( [&]() { return noiseFunction(); } );
->>>>>>> a9d50116a0cfb320e464071d8b6b19e8754b996a
 
     // Pass noise through generator and store output in samples.
     gan.Generator().Forward(noise, samples);
@@ -154,18 +107,10 @@ int main()
     samples = samples.t();
     generatedData.submat(dim,
         i * dim, 2 * dim - 1, i * dim + dim - 1) = samples;
-<<<<<<< HEAD
   }
   // Save the output as csv.
   data::Save("./samples_csv_files/sample.csv", generatedData, false, false);
 
   std::cout << "Output generated!" << std::endl;
-=======
-    }
-    // Save the output as csv.
-    data::Save("./samples_csv_files/sample.csv", generatedData, false, false);
-
-    std::cout << "Output generated!" << std::endl;
->>>>>>> a9d50116a0cfb320e464071d8b6b19e8754b996a
 
 }
