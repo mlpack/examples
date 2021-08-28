@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> a9d50116a0cfb320e464071d8b6b19e8754b996a
 TARGET := mnist_gan_generate
 SRC := mnist_gan_generate.cpp
 LIBS_NAME := armadillo mlpack
@@ -14,7 +18,11 @@ LDFLAGS += -L. # /path to mlpack library if installed locally.
 # path: mlpack/build/lib.
 # Add header directories for any includes that aren't on the
 # default compiler search path.
+<<<<<<< HEAD
 INCLFLAGS := -I.
+=======
+INCLFLAGS := -I /home/viole/mlpac/build/include/
+>>>>>>> a9d50116a0cfb320e464071d8b6b19e8754b996a
 CXXFLAGS  += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
