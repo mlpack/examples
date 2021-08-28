@@ -209,4 +209,5 @@ int main()
   // Let's save the model.
   data::Save("./saved_models/ganMnist_25epochs.bin", "ganMnist", gan);
   std::cout << "Model saved in mnist_gan/saved_models." << std::endl;
+  std::cout << "\n";
 }

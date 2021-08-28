@@ -112,5 +112,5 @@ int main()
   data::Save("./samples_csv_files/sample.csv", generatedData, false, false);
 
   std::cout << "Output generated!" << std::endl;
-
+  std::cout << "\n";
 }
