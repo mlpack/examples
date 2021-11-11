@@ -178,6 +178,7 @@ int main()
   // https://www.kaggle.com/c/digit-recognizer/data
 
   mlpack::data::Load("../data/mnist_test.csv", dataset, true);
+  arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Remove labels.
 
   mat testPredOut;
@@ -185,8 +186,13 @@ int main()
   model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
+
+  double testAccuracy = arma::accu(testPred == testY) / (double) testY.n_elem * 100;
+  cout << "Accuracy: test = " << testAccuracy << "%" << endl;
+
   std::cout << "Saving predicted labels to \"results.csv\"" << endl;
   testPred.save("results.csv", arma::csv_ascii);
+
   std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
   std::cout << "Finished" << endl;
 }
