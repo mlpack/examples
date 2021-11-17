@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -136,7 +137,9 @@ def cheatmap(filename: str,
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
 
-def clmplot(filename: str, 
+def clmplot(filename: str,
+            xCol: str,
+            yCol: str,
             figTitle: str = None, 
             figWidth: int = 6, 
             figHeight: int = 7,
@@ -158,13 +161,14 @@ def clmplot(filename: str,
     if not os.path.isdir(plotDir):
         os.mkdir(plotDir)
     df = pd.read_csv(filename)
-    df.columns = ["Y_Test", "Y_Preds"]
+    # df.columns = ["Y_Test", "Y_Preds"]
     fig = plt.figure(figsize=(figWidth, figHeight))
-    ax = sns.lmplot(x="Y_Test", y="Y_Preds", data=df)
+    ax = sns.lmplot(x=xCol, y=yCol, data=df)
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
-  
-def chistplot(filename: str, 
+
+def chistplot(filename: str,
+              xCol: str,
               figTitle: str = None, 
               figWidth: int = 6, 
               figHeight: int = 4,
@@ -186,9 +190,9 @@ def chistplot(filename: str,
     if not os.path.isdir(plotDir):
         os.mkdir(plotDir)
     df = pd.read_csv(filename)
-    df.columns = ["Y_Test", "Y_Preds"]
+    # df.columns = ["Y_Test", "Y_Preds"]
     fig = plt.figure(figsize=(figWidth, figHeight))
-    ax = sns.histplot(df.Y_Test - df.Y_Preds)
+    ax = sns.histplot(x=xCol, data=df)
     plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()
@@ -287,5 +291,66 @@ def cplotRocAUC(yTest: str,
     plt.ylabel("True Positive Rate")
     plt.title(f"{figTitle}")
     plt.legend()
+    plt.savefig(f"./{plotDir}/{figTitle}.png")
+    plt.close()
+    
+def clineplot(fname: str,
+              xCol: str,
+              yCol: str,
+              figTitle: str = None,
+              figWidth: int = 16,
+              figHeight: int = 6,
+              plotDir: str = "plots") -> None:
+    
+    sns.set(color_codes=True)
+    if not os.path.isdir(plotDir):
+        os.mkdir(plotDir)
+    df = pd.read_csv(fname)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = sns.lineplot(x=xCol, y=yCol, data=df)
+    plt.title(f"{figTitle}")
+    plt.savefig(f"./{plotDir}/{figTitle}.png")
+    plt.close()
+
+def cplotCatData(fName: str,
+                targetCol: int,
+                xLabel: str,
+                yLabel: str,
+                figTitle: str = None,
+                figWidth: int = 8, 
+                figHeight: int = 6,
+                plotDir: str = "plots") -> None:
+
+    """
+    Generates a categorical plot.
+    
+        Parameters:
+                fName (str): Name of the dataset to load.
+                targetCol (int): Numeric value representing the target column.
+                xlabel (str): Label for X axis; defaults to None.
+                ylabel (str): Label for Y axis; defaults to None.
+                figTitle (str): Title for the figure to be save; defaults to None.
+                figWidth (int): Width of the figure; defaults to 8.
+                figHeight (int): Height of the figure; defaults to 6.
+                plotDir (str): Name of the directory to save the generated plot; defaults to plots.
+
+            Returns:
+                (None): Function does not return anything.
+    """
+    microChipData = pd.read_csv(fName)
+    X = microChipData.iloc[:, :targetCol].values
+    y = microChipData.iloc[:, targetCol].values
+    pos = np.argwhere(y == 1)
+    neg = np.argwhere(y == 0)
+    if not os.path.isdir(plotDir):
+        os.mkdir(plotDir)
+    fig = plt.figure(figsize=(figWidth, figHeight))
+    ax = fig.add_subplot()
+    ax.scatter(X[neg, 0], X[neg, 1], c="yellow", marker='o', edgecolor="black", linewidth=0.5)
+    ax.scatter(X[pos, 0], X[pos, 1], c="black", marker='+')
+    ax.set_xlabel(f"{xLabel}")
+    ax.set_ylabel(f"{yLabel}")
+    plt.legend(["y = 0", "y = 1"])
+    plt.title(f"{figTitle}")
     plt.savefig(f"./{plotDir}/{figTitle}.png")
     plt.close()

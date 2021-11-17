@@ -17,7 +17,7 @@ dependencies:
 - bqplot=0.12.20
 - dask=2020.12
 - matplotlib=3.1
-- pandas=1
+- pandas
 - python=3.7
 - scikit-image
 - scikit-learn
@@ -27,10 +27,13 @@ dependencies:
 - traittypes==0.2.1
 - invoke=1.2
 - pandas-datareader
+- plotly
+- imbalanced-learn=0.8.0
 # C++ Kernel
 - xeus-cling
 - xtensor
 - xwidgets
+- xframe
 # R Kernel
 - r-ggplot2
 - r-irkernel=1.0
