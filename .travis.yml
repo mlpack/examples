@@ -58,63 +58,61 @@ install:
   # Download datasets.
   - pwd
   - pip install tqdm
-    #- cd tools/
-    #- ./download_data_set.py
-    #- cd ../
-    #- ls data/
+    - cd tools/
+    - ./download_data_set.py
+    - cd ../
+    - ls data/
 
 script:
   # Finally, build all the examples.
   - pwd
-    #- ls
-    #- ls data/
-    # Comment these out for now and just run spam example due to time constraints
-    #- |
-    #for f in */Makefile; do
-    #  dir=`dirname $f`;
-    #
-    #  # TODO: this takes too long right now.
-    #  if [ "$dir" == "mnist_cnn" ];
-    #  then
-    #    continue;
-    #  fi
-    #
-    #  # TODO: the dataset cannot be loaded.	
-    #  if [ "$dir" == "mnist_vae_cnn" ];	
-    #  then	
-    #    continue;	
-    #  fi	
-    #
-    #  cd $dir;
-    #  target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
-    #  echo "Make target $target_name in directory $dir.";
-    #  make;
-    #  # Filter out "epoch in progress" lines.
-    #  ./$target_name | grep -v -- '\.] ';
-    #  if [ "${PIPESTATUS[0]}" != "0" ]; then
-    #      echo "Example failed: $dir"
-    #      echo "Example failed: $dir" >> ../faillog;
-    #  else
-    #      echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
-    #  fi
-    #  cd ../;
-    #done
-    #  # Print any failures.
-    #- ls
-    #- |
-    #if [ -f faillog ]; then
-    #  echo "Some examples failed!";
-    #  echo "";
-    #  cat faillog;
-    #  exit 1;
-    #fi
-  # Make sure the spam tutorial runs correctly.
-  # remove data pre-processing steps as these
-  # cause testing to timeout
-  - cd spam/
-  - sed -ie '5,175d' spam_classification.sh
-  - ./spam_classification.sh
-  - cd ../
+    - ls
+    - ls data/
+    - |
+    for f in */Makefile; do
+      dir=`dirname $f`;
+    
+      # TODO: this takes too long right now.
+      if [ "$dir" == "mnist_cnn" ];
+      then
+        continue;
+      fi
+    
+      # TODO: the dataset cannot be loaded.	
+      if [ "$dir" == "mnist_vae_cnn" ];	
+      then	
+        continue;	
+      fi	
+    
+      # TODO: the dataset cannot be loaded.	
+      if [ "$dir" == "spam" ];	
+      then	
+        continue;	
+      fi
+      
+      cd $dir;
+      target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
+      echo "Make target $target_name in directory $dir.";
+      make;
+      # Filter out "epoch in progress" lines.
+      ./$target_name | grep -v -- '\.] ';
+      if [ "${PIPESTATUS[0]}" != "0" ]; then
+          echo "Example failed: $dir"
+          echo "Example failed: $dir" >> ../faillog;
+      else
+          echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
+      fi
+      cd ../;
+    done
+      # Print any failures.
+    - ls
+    - |
+    if [ -f faillog ]; then
+      echo "Some examples failed!";
+      echo "";
+      cat faillog;
+      exit 1;
+    fi
 
 notifications:
   email:
