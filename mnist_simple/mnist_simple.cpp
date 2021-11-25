@@ -172,6 +172,7 @@ int main()
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
   mlpack::data::Load("../data/mnist_test.csv", dataset, true);
+  arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 
   std::cout << "Predicting ..." << endl;
@@ -180,9 +181,13 @@ int main()
   model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
-  std::cout << "Saving predicted labels to \"results.csv\" ..." << std::endl;
 
+  double testAccuracy = arma::accu(testPred == testY) / (double) testY.n_elem * 100;
+  cout << "Accuracy: test = " << testAccuracy << "%" << endl;
+
+  std::cout << "Saving predicted labels to \"results.csv\" ..." << std::endl;
   testPred.save("results.csv", arma::csv_ascii);
+
   std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
   std::cout << "Finished" << std::endl;
 }
