@@ -61,6 +61,9 @@ description (just a little bit more than the title):
  - `lstm_stock_prediction`: predict Google's historical stock price (daily high
    _and_ low) using an LSTM-based recurrent neural network
 
+ - `spam`: predict whether a mobile phone text message in Indonesian is spam 
+    or not using logistic regression
+
  - `mnist_batch_norm`: use batch normalization in a simple feedforward neural
    network to recognize the MNIST digits
 

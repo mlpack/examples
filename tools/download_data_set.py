@@ -134,6 +134,15 @@ def iris_dataset():
   tar.close()
   clean()
 
+def spam_dataset():
+    print("Downloading spam dataset...")
+    spam = requests.get("https://www.mlpack.org/datasets/dataset_sms_spam_bhs_indonesia_v1.tar.gz")
+    progress_bar("dataset_sms_spam_bhs_indonesia_v1.tar.gz", spam)
+    tar = tarfile.open("dataset_sms_spam_bhs_indonesia_v1.tar.gz", "r:gz")
+    tar.extractall()
+    tar.close()
+    clean()
+
 def salary_dataset():
   print("Downloading salary dataset...")
   salary = requests.get("http://datasets.mlpack.org/Salary_Data.csv")
@@ -154,6 +163,7 @@ def all_datasets():
   iris_dataset()
   salary_dataset()
   body_fat_dataset()
+  spam_dataset()
   cifar10_dataset()
   
 
@@ -177,6 +187,7 @@ if __name__ == '__main__':
         stock : will download stock_exchange dataset
         iris : will downlaod the iris dataset
         bodyFat : will download the bodyFat dataset
+        spam : will download the spam dataset
         salary: will download the salary dataset
         cifar10: will download the cifar10 dataset
         all : will download all datasets for all examples
@@ -205,6 +216,9 @@ if __name__ == '__main__':
       elif args.dataset_name == "bodyFat":
         create_dataset_dir()
         body_fat_dataset()
+      elif args.dataset_name == "spam":
+        create_dataset_dir()
+        spam_dataset()
       elif args.dataset_name == "salary":
         create_dataset_dir()
         salary_dataset()
