@@ -52,7 +52,6 @@ steps:
     rm -rf cereal-1.3.0
 
     # Build mlpack.
-    cd $TRAVIS_BUILD_DIR
     git clone https://github.com/mlpack/mlpack.git --depth 1
     cd mlpack
     mkdir build
