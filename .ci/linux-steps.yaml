@@ -64,6 +64,8 @@ steps:
   # Leave deps/.
   cd ../
 
+  displayName: "Install build dependencies"
+
 # Download datasets.
 - script: |
   pip install tqdm
@@ -71,6 +73,8 @@ steps:
     ./download_data_set.py
     cd ../
     ls data/
+
+  displayName: "Download datasets"
 
 # Now build the examples.
 - script: |
@@ -117,3 +121,5 @@ steps:
     cat faillog;
     exit 1;
   fi
+
+  displayName: "Run examples"
