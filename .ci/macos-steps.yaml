@@ -7,7 +7,7 @@ steps:
 # Set python version.
 - task: UsePythonVersion@0
   inputs:
-    versionSpec: '3.7'
+    versionSpec: '2.7'
 
 # Install build dependencies.
 - script: |
