@@ -43,9 +43,7 @@ steps:
     wget https://github.com/USCiLab/cereal/archive/v1.3.0.tar.gz
     tar -xvzpf v1.3.0.tar.gz
     cd cereal-1.3.0
-    cmake -DCMAKE_INSTALL_PREFIX=/usr .
-    make
-    sudo make install
+    sudo cp -r include/cereal /usr/include/
     cd ../
     rm -rf cereal-1.3.0
 
