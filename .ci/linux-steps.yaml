@@ -1,0 +1,119 @@
+steps:
+# Check out repository.
+- checkout: self
+  clean: true
+  fetchDepth: 1
+
+# Set python version.
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.7'
+
+# Install build dependencies.
+- script: |
+  sudo apt-get update -qq
+  sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev g++-multilib
+
+  mkdir deps/
+  cd deps/
+
+  # Install Armadillo 8.400.0 (the oldest supported version).
+  curl -O http://www.ratml.org/misc/armadillo-8.400.0.tar.gz -o armadillo-8.400.0.tar.gz
+  tar xvzf armadillo-8.400.0.tar.gz
+  cd armadillo-8.400.0
+  cmake -DCMAKE_INSTALL_PREFIX=/usr .
+  make
+  sudo make install
+  cd ../
+  rm -rf armadillo-8.400.0/
+
+  # Build and install the latest version of ensmallen.
+  curl -O http://www.ensmallen.org/files/ensmallen-latest.tar.gz -o ensmallen-latest.tar.gz
+  tar xvzf ensmallen-latest.tar.gz
+  cd ensmallen-*/
+  mkdir build
+  cd build
+  cmake -DBUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr ../
+  make
+  sudo make install
+  cd ../
+  rm -rf ensmallen-*/
+
+  # Install cereal.
+  wget https://github.com/USCiLab/cereal/archive/v1.3.0.tar.gz
+  tar -xvzpf v1.3.0.tar.gz
+  cd cereal-1.3.0
+  cmake -DCMAKE_INSTALL_PREFIX=/usr .
+  make
+  sudo make install
+  cd ../
+  rm -rf cereal-1.3.0
+
+  # Build mlpack.
+  cd $TRAVIS_BUILD_DIR
+  git clone https://github.com/mlpack/mlpack.git --depth 1
+  cd mlpack
+  mkdir build
+  cd build
+  cmake -DCMAKE_INSTALL_PREFIX=/usr -DUSE_OPENMP=ON -DBUILD_CLI_EXECUTABLES=ON -DBUILD_JULIA_BINDINGS=OFF -DBUILD_PYTHON_BINDINGS=OFF -DBUILD_MARKDOWN_BINDINGS=OFF -DBUILD_R_BINDINGS=OFF -DBUILD_TESTS=OFF ..
+  make -j2
+  sudo make install
+  cd ../
+  rm -rf mlpack/
+
+  # Leave deps/.
+  cd ../
+
+# Download datasets.
+- script: |
+  pip install tqdm
+    cd tools/
+    ./download_data_set.py
+    cd ../
+    ls data/
+
+# Now build the examples.
+- script: |
+  for f in */Makefile; do
+    dir=`dirname $f`;
+
+    # TODO: this takes too long right now.
+    if [ "$dir" == "mnist_cnn" ];
+    then
+      continue;
+    fi
+
+    # TODO: the dataset cannot be loaded.
+    if [ "$dir" == "mnist_vae_cnn" ];
+    then
+      continue;
+    fi
+
+    # TODO: the dataset cannot be loaded.
+    if [ "$dir" == "spam" ];
+    then
+      continue;
+    fi
+
+    cd $dir;
+    target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
+    echo "Make target $target_name in directory $dir.";
+    make;
+    # Filter out "epoch in progress" lines.
+    ./$target_name | grep -v -- '\.] ';
+    if [ "${PIPESTATUS[0]}" != "0" ]; then
+      echo "Example failed: $dir"
+      echo "Example failed: $dir" >> ../faillog;
+    else
+      echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
+    fi
+    cd ../;
+  done
+
+  # Print any failures.
+  if [ -f faillog ]; then
+    echo "Some examples failed!";
+    echo "";
+    cat faillog;
+    exit 1;
+  fi
