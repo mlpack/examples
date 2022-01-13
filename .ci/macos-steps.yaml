@@ -16,7 +16,7 @@ steps:
     unset BOOST_ROOT
     brew install libomp openblas boost cereal
 
-    pip install --upgrade pip
+    sudo python -m pip install --upgrade pip
 
     mkdir deps/
     cd deps/
@@ -69,7 +69,7 @@ steps:
 
 # Download datasets.
 - script: |
-    pip install tqdm
+    sudo python -m pip install tqdm
     cd tools/
     ./download_data_set.py
     cd ../
