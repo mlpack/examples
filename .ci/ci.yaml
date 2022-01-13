@@ -1,0 +1,23 @@
+trigger:
+  branches:
+    include:
+    - '*'
+pr:
+  branches:
+    include:
+    - '*'
+
+jobs:
+- job: Linux
+  timeoutInMinutes: 360
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+  - template: linux-steps.yaml
+
+- job: macOS
+  timeoutInMinutes: 360
+  pool:
+    vmImage: macOS-latest
+  steps:
+  - template: macos-steps.yaml
