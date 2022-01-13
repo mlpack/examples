@@ -12,7 +12,7 @@ steps:
 # Install build dependencies.
 - script: |
     sudo apt-get update -qq
-    sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev g++-multilib
+    sudo apt-get install -qq --no-install-recommends cmake binutils-dev libopenblas-dev liblapack-dev build-essential libboost-all-dev g++-multilib python3-tqdm
 
     mkdir deps/
     cd deps/
@@ -68,10 +68,6 @@ steps:
 
 # Download datasets.
 - script: |
-    python --version
-    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-    python --version
-    pip3 install tqdm
     cd tools/
     ./download_data_set.py
     cd ../
