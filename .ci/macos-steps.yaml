@@ -81,6 +81,8 @@ steps:
 - script: |
     for f in */Makefile; do
       dir=`dirname $f`;
+      # Remove the -fopenmp flag from the Makefile.
+      sed -i 's/ -fopenmp//' $f;
 
       # TODO: this takes too long right now.
       if [ "$dir" == "mnist_cnn" ];
