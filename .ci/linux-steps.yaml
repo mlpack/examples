@@ -65,7 +65,7 @@ steps:
 
 # Download datasets.
 - script: |
-    python -m pip install tqdm
+    python -m pip install tqdm requests
     cd tools/
     ./download_data_set.py
     cd ../
