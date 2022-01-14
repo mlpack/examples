@@ -69,7 +69,7 @@ steps:
 
 # Download datasets.
 - script: |
-    sudo python -m pip install tqdm
+    python -m pip install tqdm
     cd tools/
     ./download_data_set.py
     cd ../
