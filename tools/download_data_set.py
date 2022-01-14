@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Download required dataset for each example.
 # Author: Omar Shrit
 
