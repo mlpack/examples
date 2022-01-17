@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # Download required dataset for each example.
 # Author: Omar Shrit
 
@@ -62,11 +62,11 @@ def clean():
     elif f.endswith(".tar.gz"):
       os.remove(os.path.join(dataset, f))
     elif f.endswith(".ubytes"):
-      os.remove(os.path.join(dataset, f))      
+      os.remove(os.path.join(dataset, f))
 
 def ungzip(gzip_file, outputfile):
   with open(outputfile, 'wb') as f_in, gzip.open(gzip_file, 'rb') as f_out:
-    shutil.copyfileobj(f_out, f_in) 
+    shutil.copyfileobj(f_out, f_in)
 
 def progress_bar(outputfile, request):
   total_size = int(request.headers.get('content-length', 0))
@@ -86,7 +86,7 @@ def mnist_dataset():
       "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz")
   progress_bar("train_features.gz", train_features)
   ungzip("train_features.gz", "train_features.ubytes")
-  
+
   train_labels = requests.get(
       "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz")
   progress_bar("train_labels.gz", train_labels)
@@ -96,7 +96,7 @@ def mnist_dataset():
       "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz")
   progress_bar("test_features.gz", test_features)
   ungzip("test_features.gz", "test_features.ubytes")
-  
+
   test_labels = requests.get(
       "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz")
   progress_bar("test_labels.gz", test_labels)
@@ -135,13 +135,13 @@ def iris_dataset():
   clean()
 
 def spam_dataset():
-    print("Downloading spam dataset...")
-    spam = requests.get("https://www.mlpack.org/datasets/dataset_sms_spam_bhs_indonesia_v1.tar.gz")
-    progress_bar("dataset_sms_spam_bhs_indonesia_v1.tar.gz", spam)
-    tar = tarfile.open("dataset_sms_spam_bhs_indonesia_v1.tar.gz", "r:gz")
-    tar.extractall()
-    tar.close()
-    clean()
+  print("Downloading spam dataset...")
+  spam = requests.get("https://www.mlpack.org/datasets/dataset_sms_spam_bhs_indonesia_v1.tar.gz")
+  progress_bar("dataset_sms_spam_bhs_indonesia_v1.tar.gz", spam)
+  tar = tarfile.open("dataset_sms_spam_bhs_indonesia_v1.tar.gz", "r:gz")
+  tar.extractall()
+  tar.close()
+  clean()
 
 def salary_dataset():
   print("Downloading salary dataset...")
@@ -149,13 +149,14 @@ def salary_dataset():
   progress_bar("Salary_Data.csv", salary)
 
 def cifar10_dataset():
-    print("Downloading CIFAR10 dataset...")
-    cifar = request.get("http://datasets.mlpack.org/cifar-10.tar.xz")
-    progress_bar("cifar-10.tar.xz", "r:xz")
-    tar.extractall()
-    tar.close()
-    clean()
-  
+  print("Downloading CIFAR10 dataset...")
+  cifar = requests.get("http://datasets.mlpack.org/cifar-10.tar.xz")
+  progress_bar("cifar-10.tar.xz", cifar)
+  tar = tarfile.open("cifar-10.tar.xz", "r:xz")
+  tar.extractall()
+  tar.close()
+  clean()
+
 def all_datasets():
   mnist_dataset()
   electricity_consumption_dataset()
@@ -165,7 +166,7 @@ def all_datasets():
   body_fat_dataset()
   spam_dataset()
   cifar10_dataset()
-  
+
 
 if __name__ == '__main__':
 
@@ -192,7 +193,7 @@ if __name__ == '__main__':
         cifar10: will download the cifar10 dataset
         all : will download all datasets for all examples
         '''))
- 
+
     parser.add_argument('--dataset_name', metavar="dataset name", type=str, help="Enter dataset name to download")
     args = parser.parse_args()
 
@@ -228,4 +229,3 @@ if __name__ == '__main__':
       elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
- 
