@@ -37,7 +37,7 @@ dependencies:
 # R Kernel
 - r-base=4.1.0
 - r-ggplot2
-- r-irkernel=1.0
+- r-irkernel
 # mlpack
 - c-compiler
 - cxx-compiler
