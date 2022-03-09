@@ -198,11 +198,9 @@ int main()
   size_t inputSize = 5, outputSize = 2;
 
   // Split the dataset into training and validation sets.
-  arma::mat trainData =
-      dataset.submat(arma::span(), arma::span(0, (1 - RATIO) * dataset.n_cols));
-  arma::mat testData = dataset.submat(
-      arma::span(),
-      arma::span((1 - RATIO) * dataset.n_cols, dataset.n_cols - 1));
+  arma::mat trainData;
+  arma::mat testData;
+  data::Split(dataset, trainData , testData, RATIO, false);
 
   // Number of epochs for training.
   const int EPOCHS = 150;
