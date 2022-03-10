@@ -79,10 +79,10 @@ steps:
 
 # Now build the examples.
 - script: |
-    for f in */Makefile; do
-      dir=`dirname $f`;
-      # Remove the -fopenmp flag from the Makefile.
-      sed -i '' 's/ -fopenmp//' $f;
+    cd examples/
+    for f in */CPP/Makefile; do
+      makefiledir=`dirname $f`;
+      dir=`dirname $makefiledir`;
 
       # TODO: this takes too long right now.
       if [ "$dir" == "mnist_cnn" ];
@@ -103,6 +103,7 @@ steps:
       fi
 
       cd $dir;
+      cd CPP/;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";
       make;
@@ -114,7 +115,7 @@ steps:
       else
         echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
       fi
-      cd ../;
+      cd ../../;
     done
 
     # Print any failures.
