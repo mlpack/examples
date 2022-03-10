@@ -75,23 +75,23 @@ steps:
 
 # Now build the examples.
 - script: |
-    for f in */Makefile; do
+    for f in */*/*/Makefile; do
       dir=`dirname $f`;
 
       # TODO: this takes too long right now.
-      if [ "$dir" == "mnist_cnn" ];
+      if [ "$dir" == "examples/mnist_cnn/CPP" ];
       then
         continue;
       fi
 
       # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "mnist_vae_cnn" ];
+      if [ "$dir" == "examples/mnist_vae_cnn/CPP" ];
       then
         continue;
       fi
 
       # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "spam" ];
+      if [ "$dir" == "examples/spam/CLI" ];
       then
         continue;
       fi
