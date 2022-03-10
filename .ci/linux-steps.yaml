@@ -75,7 +75,7 @@ steps:
 
 # Now build the examples.
 - script: |
-    for f in */*/*/Makefile; do
+    for f in ./examples/*/CPP/Makefile; do
       dir=`dirname $f`;
 
       # TODO: this takes too long right now.
