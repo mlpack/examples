@@ -29,7 +29,7 @@ int main() {
     // Matrix for storing test feeature & labels.
     mat testData, testY;
     // Load the test data.
-    data::Load("../data/cifar-10_test.csv", testData, true);
+    data::Load("../../../../data/cifar-10_test.csv", testData, true);
     // Drop the header column.
     testData.shed_col(0);
     // Remove labels before predicting.

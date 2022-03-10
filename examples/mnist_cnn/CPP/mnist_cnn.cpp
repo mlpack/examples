@@ -66,7 +66,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_train.csv", dataset, true);
+  data::Load("../../../../data/mnist_train.csv", dataset, true);
 
   // Split the dataset into training and validation sets.
   mat train, valid;
@@ -210,7 +210,7 @@ int main()
   // Load test dataset
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../../../../data/mnist_test.csv", dataset, true);
   arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Remove labels before predicting.
 

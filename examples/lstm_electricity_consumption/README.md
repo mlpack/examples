@@ -1,0 +1,148 @@
+/*!
+@file tutorial.txt
+@author Mehul Kumar Nirala
+@author Zoltan Somogyi
+@brief Tutorial on Univariate Time Series using RNN.
+
+@page rnntutorial LSTM Univariate Time Series
+
+@section intro_lstmtut Introduction
+
+An example of using Recurrent Neural Network (RNN) to make forcasts on a time series of electricity usage (in kWh), which we aim to solve using a simple mlpack neural network with LSTM.
+
+@section toc_lstmtut Table of Contents
+
+This tutorial is split into the following sections:
+
+ - \ref intro_lstmtut
+ - \ref toc_lstmtut
+ - \ref data_lstmtut
+ - \ref model_lstmtut
+ - \ref training_lstmtut
+ - \ref results_lstmtut
+ - \ref other_results_lstmtut
+
+@section data_lstmtut Time Series data
+ We will look at the number of kilowatt-hours used in a residential home over a 3.5 month period, 25 November 2011 to 17 March 2012. Electricity usage as recorded by the local utility company on an hour-by-hour basis.
+
+ Initially we normalize the input data using MinMaxScaler so that all the input features are on the scale between 0 to 1. Normally, it is a good idea to investigate various data preparation techniques to rescale the data and to make it stationary.
+
+@code
+  template<typename DataType = arma::mat>
+  DataType MinMaxScaler(DataType& dataset)
+  {
+    arma::vec maxValues = arma::max(dataset, 1 /* for each dimension */);
+    arma::vec minValues = arma::min(dataset, 1 /* for each dimension */);
+
+    arma::vec rangeValues = maxValues - minValues;
+
+    // Add a very small value if there are any zeros.
+    rangeValues += 1e-25;
+
+    dataset -= arma::repmat(minValues , 1, dataset.n_cols);
+    dataset /= arma::repmat(rangeValues , 1, dataset.n_cols);
+    return dataset;
+  }
+  ...
+  // Scale data for increased numerical stability.
+  dataset = MinMaxScaler(dataset);
+@endcode
+
+
+The following will create a dataset where X is the electricity consumption in kWh at a given time step (t), and Y is the electricity consumption in kWh at the next time step (t + 1). The time series data for training the model (X) contains the electricity consumption in kWh for 'rho' hours in the past. The target variable (Y) we want to predict is the electricity consumption in kWh for the next hour!
+
+@code
+ template<typename InputDataType = arma::mat,
+    typename DataType = arma::cube,
+    typename LabelType = arma::cube>
+ void CreateTimeSeriesData(InputDataType dataset, DataType& X, LabelType& y, size_t rho)
+ {
+   for(size_t i = 0; i<dataset.n_cols - rho; i++)
+   {
+     X.subcube(span(), span(i), span()) = dataset.submat(span(), span(i, i+rho-1));
+     y.subcube(span(), span(i), span()) = dataset.submat(span(), span(i+1, i+rho));
+   }
+ }
+@endcode
+
+@section model_lstmtut LSTM Model
+
+We add 2 LSTM cells that will be stacked one after the other in the RNN, implementing an efficient stacked RNN. There is only one input and one output, the energy consumption in kWh.
+
+@code
+  // No of timesteps to look in RNN.
+  const int maxRho = rho = 10;
+  //number of cells in the LSTM (hidden layers in standard terms)
+  const int H1 = 10;
+  //
+  size_t inputSize = 1, outputSize = 1;
+
+  // RNN model.
+  model.Add<IdentityLayer<> >();
+  model.Add<LSTM<> >(inputSize, H1, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<LSTM<> >(H1, H1, maxRho);
+  model.Add<LeakyReLU<> >();
+  model.Add<Linear<> >(H1, outputSize);
+
+@endcode
+
+Setting the parameters for the Stochastic Gradient Descent (SGD) optimizer.
+@code
+
+  SGD<AdamUpdate> optimizer(
+    STEP_SIZE, // Step size of the optimizer.
+    BATCH_SIZE, // Batch size. Number of data points that are used in each iteration.
+    ITERATIONS_PER_EPOCH, // Max number of iterations.
+    1e-8,// Tolerance.
+    true,// Shuffle.
+    AdamUpdate(1e-8, 0.9, 0.999)// Adam update policy.
+  );
+
+@endcode
+
+@section training_lstmtut Training the model
+
+@code
+  cout << "Training ..." << endl;
+  // Run EPOCH number of cycles for optimizing the solution.
+  for (int i = 0; i < EPOCH; i++)
+  {
+    // Train neural network. If this is the first iteration, weights are
+    // random, using current values as starting point otherwise.
+    model.Train(trainX, trainY, optimizer);
+
+    // Don't reset optimizer's parameters between cycles.
+    optimizer.ResetPolicy() = false;
+
+    cube predOut;
+    // Getting predictions on test data points.
+    model.Predict(testX, predOut);
+
+    // Calculating mse on test data points.
+    double testMSE = MSE(predOut,testY);
+    cout << i+1<< " - Mean Squared Error := "<< testMSE <<   endl;
+  }
+@endcode
+
+@section results_lstmtut Results
+
+Reading data ...
+Training ...
+1 - Mean Squared Error := 0.0167553
+2 - Mean Squared Error := 0.00649447
+3 - Mean Squared Error := 0.00558209
+4 - Mean Squared Error := 0.00544844
+5 - Mean Squared Error := 0.00537431
+...
+100 - Mean Squared Error := 0.00480882
+Finished training.
+Saving Model
+Model saved in /saved_models/lstm_univar.bin
+Loading model ...
+Mean Squared Error on Prediction data points:= 0.00480062
+The predicted energy consumption for the next hour is :
+ 0.410681
+Ready!
+
+*/
