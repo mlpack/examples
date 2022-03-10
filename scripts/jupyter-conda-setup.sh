@@ -35,7 +35,7 @@ function installDeps() {
     if [[ -f "./environment.yml" ]]; then
         echo " "
     else
-        wget -q https://raw.githubusercontent.com/mlpack/examples/master/binder/environment.yml
+        wget -q https://raw.githubusercontent.com/mlpack/examples/nd/bumpVersion/binder/environment.yml
     fi
     mamba env update -f environment.yml
     npm install -g ijavascript 
@@ -59,14 +59,14 @@ function installDeps() {
     if [[ -f "./kernel.json" ]]; then
         echo " "
     else
-        wget -q https://raw.githubusercontent.com/mlpack/examples/master/binder/kernel.json
+        wget -q https://raw.githubusercontent.com/mlpack/examples/nd/bumpVersion/binder/kernel.json
     fi
     sed -i "4 s@/srv/conda/envs/notebook/bin/xcpp@$CONDA_PREFIX/bin/xcpp@g" kernel.json
     cp kernel.json $CONDA_PREFIX/share/jupyter/kernels/xcpp14/
     if [[ -f "./xeus-cling.hpp" ]]; then
         echo " "
     else
-        wget -q https://raw.githubusercontent.com/mlpack/examples/master/binder/xeus-cling.hpp
+        wget -q https://raw.githubusercontent.com/mlpack/examples/nd/bumpVersion/binder/xeus-cling.hpp
     fi
     sed -i "s@/srv/conda/envs/notebook@$CONDA_PREFIX@g" xeus-cling.hpp
     cp xeus-cling.hpp $CONDA_PREFIX/include/mlpack/
@@ -74,7 +74,7 @@ function installDeps() {
     echo "Cloning mlpack/examples repo"
     echo "*********************************"
     if [[ -d "examples" ]]; then
-        cd examples && git pull origin master && cd ..
+        cd examples && git pull origin nd/bumpVersion && cd ..
     else
         git clone https://github.com/mlpack/examples.git 
     fi
@@ -112,7 +112,7 @@ else
         echo "************************************"
         set -eE
         trap 'echo "ERROR setup unsuccessful, removing create conda environment" && conda remove -n ${envname} --all -y && cleanUp' ERR
-        conda create -n $envname -c conda-forge conda=4.9.2 python=3.7.8 mamba -y
+        conda create -n $envname -c conda-forge conda=4.11 python=3.9 mamba -y
         if [[ $? -eq 0 ]]; then
             source $CONDA_PREFIX/bin/activate $envname
             installDeps
