@@ -16,13 +16,13 @@ dependencies:
 - altair=4.1
 - bqplot=0.12.20
 - dask=2020.12
-- matplotlib=3.1
+- matplotlib=3.5
 - pandas
-- python=3.7
+- python=3.9
 - scikit-image
 - scikit-learn
 - seaborn
-- sympy=1.4
+- sympy=1.10
 - pyyaml
 - traittypes==0.2.1
 - invoke=1.2
