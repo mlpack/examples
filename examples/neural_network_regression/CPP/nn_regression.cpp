@@ -66,7 +66,7 @@ double MSE(arma::mat& pred, arma::mat& Y)
 int main()
 {
   //! Path to the dataset used for training and testing.
-  const std::string datasetPath = "../../../../data/BodyFat.tsv";
+  const std::string datasetPath = "../../../data/BodyFat.tsv";
   // File for saving the model.
   const std::string modelFile = "nn_regressor.bin";
 

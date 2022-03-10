@@ -62,7 +62,7 @@ int main()
   // Entire dataset(without labels) is loaded from a CSV file.
   // Each column represents a data point.
   arma::mat fullData;
-  data::Load("../../../../data/mnist_train.csv", fullData, true, true);
+  data::Load("../../../data/mnist_train.csv", fullData, true, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of this row, in Armadillo representation it's the first column.

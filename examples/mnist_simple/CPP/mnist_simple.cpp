@@ -63,7 +63,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  mlpack::data::Load("../../../../data/mnist_train.csv", dataset, true);
+  mlpack::data::Load("../../../data/mnist_train.csv", dataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -171,7 +171,7 @@ int main()
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  mlpack::data::Load("../../../../data/mnist_test.csv", dataset, true);
+  mlpack::data::Load("../../../data/mnist_test.csv", dataset, true);
   arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 

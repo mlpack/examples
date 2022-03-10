@@ -52,7 +52,7 @@ int main()
     // Cifar 10 Dataset containing 3072 features (32 * 32) + labels
     // is loaded from CSV file.
     mat dataset;
-    data::Load("../../../../data/cifar-10_train.csv", dataset, true);
+    data::Load("../../../data/cifar-10_train.csv", dataset, true);
 
     // Header column is dropped.
     dataset.shed_col(0);
