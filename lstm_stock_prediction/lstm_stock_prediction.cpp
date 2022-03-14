@@ -200,7 +200,7 @@ int main()
   // Split the dataset into training and validation sets.
   arma::mat trainData;
   arma::mat testData;
-  data::Split(dataset, trainData , testData, RATIO, false);
+  data::Split(dataset, trainData, testData, RATIO, false);
 
   // Number of epochs for training.
   const int EPOCHS = 150;
