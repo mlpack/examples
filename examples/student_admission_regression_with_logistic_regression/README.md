@@ -1,0 +1,1 @@
+predict whether a student gets addmitted to a particular university based on previous results using logistic regression

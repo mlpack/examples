@@ -1,0 +1,1 @@
+classify images from CIFAR-10 dataset using pretrained CNN

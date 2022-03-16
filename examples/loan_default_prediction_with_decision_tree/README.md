@@ -1,0 +1,1 @@
+predict whether a person's loan payment will be defaulted based on various features using decision tree

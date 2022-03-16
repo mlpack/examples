@@ -1,0 +1,1 @@
+classify people having diabetes using K-means clustering

@@ -1,0 +1,1 @@
+find most dominant colours in an image using K-means clustering

@@ -1,0 +1,1 @@
+use a very simple three-layer feedforward neural network with dropout to recognize the MNIST digits

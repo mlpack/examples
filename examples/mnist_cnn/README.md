@@ -1,0 +1,1 @@
+use a convolutional neural network (CNN) similar to LeNet-5 to recognize the MNIST digits

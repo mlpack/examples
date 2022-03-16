@@ -1,0 +1,1 @@
+predict California housing prices depending on various features using linear regression

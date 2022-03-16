@@ -1,0 +1,1 @@
+use a variational autoencoder with convolutional neural networks in the encoder and reparametrization networks to recognize the MNIST digits

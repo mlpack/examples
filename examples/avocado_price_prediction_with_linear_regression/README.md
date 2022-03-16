@@ -1,0 +1,1 @@
+predict the future price of avocado's depending on various features using linear regression

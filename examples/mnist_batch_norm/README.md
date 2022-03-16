@@ -1,0 +1,1 @@
+use batch normalization in a simple feedforward neural network to recognize the MNIST digits

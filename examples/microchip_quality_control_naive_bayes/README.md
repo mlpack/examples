@@ -1,0 +1,1 @@
+classify whether a micro-chip is suitable for production usage based on results of quality tests using Naive Bayes classifier

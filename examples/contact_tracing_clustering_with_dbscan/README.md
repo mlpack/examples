@@ -1,0 +1,1 @@
+identifying infected people using simple contact tracing method DBSCAN
