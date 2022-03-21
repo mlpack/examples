@@ -16,7 +16,7 @@ dependencies:
 - altair=4.1
 - bqplot=0.12.20
 - dask=2020.12
-- matplotlib=3.5
+- matplotlib
 - pandas
 - python=3.9
 - scikit-image
@@ -35,8 +35,9 @@ dependencies:
 - xwidgets
 - xframe
 # R Kernel
+- r-base=4.1.0
 - r-ggplot2
-- r-irkernel=1.0
+- r-irkernel
 # mlpack
 - c-compiler
 - cxx-compiler
