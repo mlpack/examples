@@ -41,7 +41,7 @@ dependencies:
 # mlpack
 - c-compiler
 - cxx-compiler
-- armadillo
+- armadillo=10.0
 - cereal
 - cmake
 - boost-cpp
