@@ -18,11 +18,11 @@ dependencies:
 - dask=2020.12
 - matplotlib
 - pandas
-- python=3.9
+- python
 - scikit-image
 - scikit-learn
 - seaborn
-- sympy=1.10
+- sympy
 - pyyaml
 - traittypes==0.2.1
 - invoke=1.2
@@ -41,7 +41,7 @@ dependencies:
 # mlpack
 - c-compiler
 - cxx-compiler
-- armadillo=10.0
+- armadillo=9
 - cereal
 - cmake
 - boost-cpp
