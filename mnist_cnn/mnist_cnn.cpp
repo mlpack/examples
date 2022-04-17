@@ -18,6 +18,7 @@
 
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 
 #include <ensmallen.hpp>
 
@@ -49,14 +50,15 @@ int main()
   // and training parts with following ratio.
   constexpr double RATIO = 0.1;
 
-  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss
-  constexpr int MAX_ITERATIONS = 0;
-
-  // Step size of the optimizer.
-  constexpr double STEP_SIZE = 1.2e-3;
+  // Allow 60 passes over the training data, unless we are stopped early by
+  // EarlyStopAtMinLoss.
+  const int EPOCHS = 60;
 
   // Number of data points in each iteration of SGD.
-  constexpr int BATCH_SIZE = 50;
+  const int BATCH_SIZE = 50;
+
+  // Step size of the optimizer.
+  const double STEP_SIZE = 1.2e-3;
 
   cout << "Reading data ..." << endl;
 
@@ -74,8 +76,10 @@ int main()
 
   // The train and valid datasets contain both - the features as well as the
   // class labels. Split these into separate mats.
-  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1);
-  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1);
+  const mat trainX = train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) /
+      256.0;
+  const mat validX = valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) /
+      256.0;
 
   // Labels should specify the class of a data point and be in the interval [0,
   // numClasses).
@@ -87,7 +91,7 @@ int main()
   // Specify the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. RandomInitialization means that
   // initial weights are generated randomly in the interval from -1 to 1.
-  FFN<NegativeLogLikelihood<>, RandomInitialization> model;
+  FFN<NegativeLogLikelihood, RandomInitialization> model;
 
   // Specify the model architecture.
   // In this example, the CNN architecture is chosen similar to LeNet-5.
@@ -108,50 +112,46 @@ int main()
   // 4x4x16  ------------------- Dense ----------------------> 10
 
   // Add the first convolution layer.
-  model.Add<Convolution<>>(1,  // Number of input activation maps.
-                           6,  // Number of output activation maps.
-                           5,  // Filter width.
-                           5,  // Filter height.
-                           1,  // Stride along width.
-                           1,  // Stride along height.
-                           0,  // Padding width.
-                           0,  // Padding height.
-                           28, // Input width.
-                           28  // Input height.
+  model.Add<Convolution>(6,  // Number of output activation maps.
+                         5,  // Filter width.
+                         5,  // Filter height.
+                         1,  // Stride along width.
+                         1,  // Stride along height.
+                         0,  // Padding width.
+                         0   // Padding height.
   );
 
   // Add first ReLU.
-  model.Add<LeakyReLU<>>();
+  model.Add<LeakyReLU>();
 
   // Add first pooling layer. Pools over 2x2 fields in the input.
-  model.Add<MaxPooling<>>(2, // Width of field.
-                          2, // Height of field.
-                          2, // Stride along width.
-                          2, // Stride along height.
-                          true);
+  model.Add<MaxPooling>(2, // Width of field.
+                        2, // Height of field.
+                        2, // Stride along width.
+                        2, // Stride along height.
+                        true);
 
   // Add the second convolution layer.
-  model.Add<Convolution<>>(6,  // Number of input activation maps.
-                           16, // Number of output activation maps.
-                           5,  // Filter width.
-                           5,  // Filter height.
-                           1,  // Stride along width.
-                           1,  // Stride along height.
-                           0,  // Padding width.
-                           0,  // Padding height.
-                           12, // Input width.
-                           12  // Input height.
+  model.Add<Convolution>(16, // Number of output activation maps.
+                         5,  // Filter width.
+                         5,  // Filter height.
+                         1,  // Stride along width.
+                         1,  // Stride along height.
+                         0,  // Padding width.
+                         0   // Padding height.
   );
 
   // Add the second ReLU.
-  model.Add<LeakyReLU<>>();
+  model.Add<LeakyReLU>();
 
   // Add the second pooling layer.
-  model.Add<MaxPooling<>>(2, 2, 2, 2, true);
+  model.Add<MaxPooling>(2, 2, 2, 2, true);
 
   // Add the final dense layer.
-  model.Add<Linear<>>(16 * 4 * 4, 10);
-  model.Add<LogSoftMax<>>();
+  model.Add<Linear>(10);
+  model.Add<LogSoftMax>();
+
+  model.InputDimensions() = vector<size_t>({ 28, 28 });
 
   cout << "Start training ..." << endl;
 
@@ -163,7 +163,7 @@ int main()
       0.9,        // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
       1e-8,  // Value used to initialise the mean squared gradient parameter.
-      MAX_ITERATIONS, // Max number of iterations.
+      EPOCHS * trainX.n_cols, // Max number of iterations.
       1e-8,           // Tolerance.
       true);
 
@@ -180,8 +180,8 @@ int main()
                   [&](const arma::mat& /* param */)
                   {
                     double validationLoss = model.Evaluate(validX, validY);
-                    std::cout << "Validation loss: " << validationLoss
-                        << "." << std::endl;
+                    cout << "Validation loss: " << validationLoss << "."
+                        << endl;
                     return validationLoss;
                   }));
 
@@ -193,41 +193,39 @@ int main()
   arma::Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
       arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
-  // Get predictions on validating data points.
+
+  // Get predictions on validation data points.
   model.Predict(validX, predOut);
-  // Calculate accuracy on validating data points.
-  predLabels = getLabels(predOut);
+  // Calculate accuracy on validation data points.
   double validAccuracy =
       arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
-  std::cout << "Accuracy: train = " << trainAccuracy << "%,"
-            << "\t valid = " << validAccuracy << "%" << std::endl;
+  cout << "Accuracy: train = " << trainAccuracy << "%,"
+            << "\t valid = " << validAccuracy << "%" << endl;
 
   mlpack::data::Save("model.bin", "model", model, false);
 
-  std::cout << "Predicting ..." << std::endl;
+  cout << "Predicting on test set..." << endl;
 
-  // Load test dataset
+  // Get predictions on test data points.
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
   data::Load("../data/mnist_test.csv", dataset, true);
-  arma::mat testY = dataset.row(dataset.n_rows - 1);
-  dataset.shed_row(dataset.n_rows - 1); // Remove labels before predicting.
+  const mat testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1)
+      / 256.0;
+  const mat testY = dataset.row(0);
+  model.Predict(testX, predOut);
+  // Calculate accuracy on test data points.
+  predLabels = getLabels(predOut);
+  double testAccuracy =
+      arma::accu(predLabels == testY) / (double) testY.n_elem * 100;
 
-  // Matrix to store the predictions on test dataset.
-  mat testPredOut;
-  // Get predictions on test data points.
-  model.Predict(dataset, testPredOut);
-  // Generate labels for the test dataset.
-  Row<size_t> testPred = getLabels(testPredOut);
+  cout << "Accuracy: test = " << testAccuracy << "%" << endl;
 
-  double testAccuracy = arma::accu(testPred == testY) / (double) testY.n_elem * 100;
-  cout << "Accuracy: test = " << testAccuracy << "%" << endl;  
+  cout << "Saving predicted labels to \"results.csv.\"..." << endl;
+  // Saving results into Kaggle compatible CSV file.
+  predLabels.save("results.csv", arma::csv_ascii);
 
-  std::cout << "Saving predicted labels to \"results.csv.\"..." << std::endl;
-  // Saving results into Kaggle compatibe CSV file.
-  testPred.save("results.csv", arma::csv_ascii);
-
-  std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
-  std::cout << "Finished" << std::endl;
+  cout << "Neural network model is saved to \"model.bin\"" << endl;
+  cout << "Finished" << endl;
 }

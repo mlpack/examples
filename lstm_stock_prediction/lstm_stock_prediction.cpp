@@ -33,10 +33,12 @@ date  close  volume  open  high  low
 
 #include <mlpack/core.hpp>
 #include <mlpack/prereqs.hpp>
-#include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
+#include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
+#include <mlpack/methods/ann/init_rules/const_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <ensmallen.hpp>
@@ -243,16 +245,15 @@ int main()
     else
     {
       // Model building.
-      model.Add<IdentityLayer<>>();
-      model.Add<LSTM<>>(inputSize, H1, maxRho);
-      model.Add<Dropout<>>(0.5);
-      model.Add<LeakyReLU<>>();
-      model.Add<LSTM<>>(H1, H1, maxRho);
-      model.Add<Dropout<>>(0.5);
-      model.Add<LeakyReLU<>>();
-      model.Add<LSTM<>>(H1, H1, maxRho);
-      model.Add<LeakyReLU<>>();
-      model.Add<Linear<>>(H1, outputSize);
+      model.Add<LSTM>(H1);
+      model.Add<Dropout>(0.5);
+      model.Add<LeakyReLU>();
+      model.Add<LSTM>(H1);
+      model.Add<Dropout>(0.5);
+      model.Add<LeakyReLU>();
+      model.Add<LSTM>(H1);
+      model.Add<LeakyReLU>();
+      model.Add<Linear>(outputSize);
     }
 
     // Set parameters for the Adam optimizer.

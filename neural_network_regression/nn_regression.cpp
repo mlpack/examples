@@ -41,11 +41,10 @@
  * Density determined from underwater weighing
  */
 
-#include <mlpack/prereqs.hpp>
 #include <mlpack/core.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
-#include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
@@ -142,7 +141,7 @@ int main()
   if (bTrain || bLoadAndTrain)
   {
     // Specifying the NN model.
-    FFN<MeanSquaredError<>, HeInitialization> model;
+    FFN<MeanSquaredError, HeInitialization> model;
     if (bLoadAndTrain)
     {
       // The model will be trained further.
@@ -153,22 +152,21 @@ int main()
     {
       // This intermediate layer is needed for connection between input
       // data and the next LeakyReLU layer.
-      // Parameters specify the number of input features and number of
-      // neurons in the next layer.
-      model.Add<Linear<>>(trainX.n_rows, H1);
+      // Parameters specify the number of neurons in the next layer.
+      model.Add<Linear>(H1);
       // Activation layer:
-      model.Add<LeakyReLU<>>();
+      model.Add<LeakyReLU>();
       // Connection layer between two activation layers.
-      model.Add<Linear<>>(H1, H2);
+      model.Add<Linear>(H2);
       // Activation layer.
-      model.Add<LeakyReLU<>>();
+      model.Add<LeakyReLU>();
       // Connection layer.
-      model.Add<Linear<>>(H2, H3);
+      model.Add<Linear>(H3);
       // Activation layer.
-      model.Add<LeakyReLU<>>();
+      model.Add<LeakyReLU>();
       // Connection layer => output.
       // The output of one neuron is the regression output for one record.
-      model.Add<Linear<>>(H3, 1);
+      model.Add<Linear>(1);
     }
 
     // Set parameters for the Stochastic Gradient Descent (SGD) optimizer.
@@ -204,7 +202,7 @@ int main()
   // NOTE: the code below is added in order to show how in a real application
   // the model would be saved, loaded and then used for prediction.
   // The following steps will be performed after normalizing the dataset.
-  FFN<MeanSquaredError<>, HeInitialization> modelP;
+  FFN<MeanSquaredError, HeInitialization> modelP;
   // Load weights into the model.
   data::Load(modelFile, "NNRegressor", modelP);
 

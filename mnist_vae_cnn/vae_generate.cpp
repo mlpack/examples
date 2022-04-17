@@ -26,10 +26,7 @@ using namespace mlpack;
 using namespace mlpack::ann;
 
 // Convenience typedef
-typedef FFN<ReconstructionLoss<arma::mat,
-                               arma::mat,
-                               BernoulliDistribution<arma::mat> >,
-            HeInitialization> ReconModel;
+typedef FFN<ReconstructionLoss, HeInitialization> ReconModel;
 
 int main()
 {
@@ -48,12 +45,10 @@ int main()
   {
     data::Load("../data/mnist_train.csv", fullData, true, false);
     // Get rid of the header.
-    fullData = 
-        fullData.submat(0, 1, fullData.n_rows - 1, fullData.n_cols -1);
+    fullData = fullData.submat(0, 1, fullData.n_rows - 1, fullData.n_cols - 1);
     fullData /= 255.0;
     // Get rid of the labels.
-    fullData =
-        fullData.submat(1, 0, fullData.n_rows - 1, fullData.n_cols - 1);
+    fullData = fullData.submat(1, 0, fullData.n_rows - 1, fullData.n_cols - 1);
 
     if (isBinary)
     {
@@ -76,7 +71,7 @@ int main()
   if (isBinary)
   {
     data::Load("./saved_models/vaeBinaryMS.xml", "vaeBinaryMS", vaeModel);
-    vaeModel.Add<SigmoidLayer<> >();
+    vaeModel.Add<Sigmoid>();
   }
   else
   {
@@ -90,11 +85,15 @@ int main()
    */
   gaussianSamples = arma::randn<arma::mat>(latentSize, nofSamples);
 
-  // Forward pass only through the decoder(and Sigmod layer in case of binary).
+  // Forward pass only through the decoder (and Sigmoid layer in case of
+  // binary).
+
+  // NOTE: these layer indexes are wrong and will need to be adapted once this
+  // example builds correctly.
   vaeModel.Forward(gaussianSamples,
                    outputDists,
                    3 /* Index of the decoder */,
-                   3 + (size_t)isBinary /* Index of the last layer */);
+                   3 + (size_t) isBinary /* Index of the last layer */);
 
   GetSample(outputDists, samples, isBinary);
   // Save the prior samples as csv.
@@ -116,12 +115,12 @@ int main()
       gaussianVaried.col(j)(i) = -1.5 + j * (3.0 / nofSamples);
     }
 
-    // Forward pass only through the decoder
-    // (and Sigmod layer in case of binary).
+    // Forward pass only through the decoder (and Sigmoid layer in case of
+    // binary).
     vaeModel.Forward(gaussianVaried,
                      outputDists,
                      3 /* Index of the decoder */,
-                     3 + (size_t)isBinary /* Index of the last layer */);
+                     3 + (size_t) isBinary /* Index of the last layer */);
 
     GetSample(outputDists, samples, isBinary);
     // Save the prior samples as csv.

@@ -20,19 +20,21 @@
 #include <mlpack/methods/ann/layer/layer.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/glorot_init.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 
 #include <ensmallen.hpp>
 #include <ensmallen_bits/callbacks/callbacks.hpp>
 
-#if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
+#if ((ENS_VERSION_MAJOR < 2) || \
+    ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
   #error "need ensmallen version 2.13.0 or later"
 #endif
 
-using namespace mlpack::ann;
-
 using namespace arma;
+using namespace mlpack::ann;
 using namespace mlpack::util;
 using namespace ens;
+using namespace std;
 
 arma::Row<size_t> getLabels(arma::mat predOut)
 {
@@ -54,11 +56,11 @@ int main()
   // The number of neurons in the second layer.
   constexpr int H2 = 100;
   // Step size of the optimizer.
-  constexpr double STEP_SIZE = 5e-3;
+  const double STEP_SIZE = 5e-3;
   // Number of data points in each iteration of SGD
-  constexpr size_t BATCH_SIZE = 64;
-  // Allow infinite number of iterations until we stopped by EarlyStopAtMinLoss.
-  const int MAX_ITERATIONS = 0;
+  const size_t BATCH_SIZE = 64;
+  // Allow up to 50 epochs, unless we are stopped early by EarlyStopAtMinLoss.
+  const int EPOCHS = 50;
 
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
@@ -91,27 +93,27 @@ int main()
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. GlorotInitialization means that
   // initial weights in neurons are a uniform gaussian distribution.
-  FFN<NegativeLogLikelihood<>, GlorotInitialization> model;
+  FFN<NegativeLogLikelihood, GlorotInitialization> model;
   // This is intermediate layer that is needed for connection between input
   // data and relu layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
-  model.Add<Linear<>>(trainX.n_rows, H1);
+  model.Add<Linear>(H1);
   // The first relu layer.
-  model.Add<ReLULayer<>>();
+  model.Add<ReLU>();
   // Intermediate layer between relu layers.
-  model.Add<Linear<>>(H1, H2);
+  model.Add<Linear>(H2);
   // The second relu layer.
-  model.Add<ReLULayer<>>();
+  model.Add<ReLU>();
   // Dropout layer for regularization. First parameter is the probability of
   // setting a specific value to 0.
-  model.Add<Dropout<>>(0.2);
+  model.Add<Dropout>(0.2);
   // Intermediate layer.
-  model.Add<Linear<>>(H2, 10);
+  model.Add<Linear>(10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
   // output values to log of probabilities of being a specific class.
-  model.Add<LogSoftMax<>>();
+  model.Add<LogSoftMax>();
 
-  std::cout << "Start training ..." << std::endl;
+  cout << "Start training ..." << endl;
 
   // Set parameters for the Adam optimizer.
   ens::Adam optimizer(
@@ -121,7 +123,7 @@ int main()
       0.9,        // Exponential decay rate for the first moment estimates.
       0.999, // Exponential decay rate for the weighted infinity norm estimates.
       1e-8,  // Value used to initialise the mean squared gradient parameter.
-      MAX_ITERATIONS, // Max number of iterations.
+      EPOCHS * trainX.n_cols, // Max number of iterations.
       1e-8,           // Tolerance.
       true);
 
@@ -140,8 +142,8 @@ int main()
                   [&](const arma::mat& /* param */)
                   {
                     double validationLoss = model.Evaluate(validX, validY);
-                    std::cout << "Validation loss: " << validationLoss
-                        << "." << std::endl;
+                    cout << "Validation loss: " << validationLoss << "."
+                        << endl;
                     return validationLoss;
                   }),
               // Store best coordinates (neural network weights)
@@ -164,8 +166,8 @@ int main()
   double validAccuracy =
       arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
-  std::cout << "Accuracy: train = " << trainAccuracy << "%,"
-            << "\t valid = " << validAccuracy << "%" << endl;
+  cout << "Accuracy: train = " << trainAccuracy << "%,"
+       << "\t valid = " << validAccuracy << "%" << endl;
 
   mlpack::data::Save("model.bin", "model", model, false);
 
@@ -175,19 +177,20 @@ int main()
   arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 
-  std::cout << "Predicting ..." << endl;
+  cout << "Predicting on test set..." << endl;
   mat testPredOut;
   // Getting predictions on test data points.
   model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
 
-  double testAccuracy = arma::accu(testPred == testY) / (double) testY.n_elem * 100;
+  double testAccuracy = arma::accu(testPred == testY) /
+      (double) testY.n_elem * 100;
   cout << "Accuracy: test = " << testAccuracy << "%" << endl;
 
-  std::cout << "Saving predicted labels to \"results.csv\" ..." << std::endl;
+  cout << "Saving predicted labels to \"results.csv\" ..." << endl;
   testPred.save("results.csv", arma::csv_ascii);
 
-  std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
-  std::cout << "Finished" << std::endl;
+  cout << "Neural network model is saved to \"model.bin\"" << endl;
+  cout << "Finished" << endl;
 }

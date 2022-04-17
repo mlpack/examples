@@ -15,10 +15,14 @@
  * @author Manthan-R-Sheth
  */
 
+// NOTE: this example does not currently work!  The BatchNorm and PReLU layers
+// need to be adapted to the new mlpack 4 style for layers.  (See
+// https://github.com/mlpack/mlpack/pull/2777.)
+
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 
-#include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 
 #include <ensmallen.hpp>
@@ -97,30 +101,30 @@ int main()
   // is used for classification problem. RandomInitialization means that
   // initial weights in neurons are generated randomly in the interval
   // from -1 to 1.
-  FFN<NegativeLogLikelihood<>, RandomInitialization> model;
+  FFN<NegativeLogLikelihood, RandomInitialization> model;
   // This is intermediate layer that is needed for connection between input
   // data and PRelU layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
-  model.Add<Linear<>>(trainX.n_rows, H1);
+  model.Add<Linear>(H1);
   // The first PReLU activation layer. parameter can be set as constructor
   // argument.
-  model.Add<PReLU<>>();
+  model.Add<PReLU>();
   // BatchNorm layer applied after PReLU activation as it gives
   // better results practically.
-  model.Add<BatchNorm<>>(H1);
+  model.Add<BatchNorm>(H1);
   // Intermediate layer between PReLU activation layers.
-  model.Add<Linear<>>(H1, H2);
+  model.Add<Linear>(H2);
   // The second PReLU layer.
-  model.Add<PReLU<>>();
+  model.Add<PReLU>();
   // Second BatchNorm layer
-  model.Add<BatchNorm<>>(H2);
+  model.Add<BatchNorm>(H2);
   // Intermediate layer.
-  model.Add<Linear<>>(H2, 10);
+  model.Add<Linear>(10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
   // output values to log of probabilities of being a specific class.
-  model.Add<LogSoftMax<>>();
+  model.Add<LogSoftMax>();
 
-  std::cout << "Training ..." << endl;
+  cout << "Training ..." << endl;
 
   // Set parameters for the Adam optimizer.
   ens::Adam optimizer(
@@ -146,8 +150,8 @@ int main()
                   [&](const arma::mat& /* param */)
                   {
                     double validationLoss = model.Evaluate(validX, validY);
-                    std::cout << "Validation loss: " << validationLoss
-                        << "." << std::endl;
+                    cout << "Validation loss: " << validationLoss
+                        << "." << endl;
                     return validationLoss;
                   }));
   mat predOut;
@@ -164,11 +168,11 @@ int main()
   double validAccuracy =
       arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
 
-  std::cout << "Accuracy: train = " << trainAccuracy << "%,"
+  cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " valid = " << validAccuracy << "%" << endl;
 
   mlpack::data::Save("model.bin", "model", model, false);
-  std::cout << "Predicting ..." << endl;
+  cout << "Predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to Kaggle website).
@@ -187,12 +191,13 @@ int main()
   // Generating labels for the test dataset.
   Row<size_t> testPred = getLabels(testPredOut);
 
-  double testAccuracy = arma::accu(testPred == testY) / (double) testY.n_elem * 100;
+  double testAccuracy = arma::accu(testPred == testY) /
+      (double) testY.n_elem * 100;
   cout << "Accuracy: test = " << testAccuracy << "%" << endl;
 
-  std::cout << "Saving predicted labels to \"results.csv\"" << endl;
+  cout << "Saving predicted labels to \"results.csv\"" << endl;
   testPred.save("results.csv", arma::csv_ascii);
 
-  std::cout << "Neural network model is saved to \"model.bin\"" << std::endl;
-  std::cout << "Finished" << endl;
+  cout << "Neural network model is saved to \"model.bin\"" << endl;
+  cout << "Finished" << endl;
 }

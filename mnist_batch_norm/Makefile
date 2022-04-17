@@ -25,7 +25,13 @@ LIBS := $(addprefix -l,$(LIBS_NAME))
 CLEAN_LIST := $(TARGET) $(OBJS)
 
 # default rule
-default: all
+default: fail
+
+fail:
+	@echo "NOTE: this example does not currently build!"
+	@echo "The BatchNorm and PReLU layers have not yet been adapted to the "
+	@echo "mlpack 4 layer style.  See"
+	@echo "https://github.com/mlpack/mlpack/pull/2777 for more information."
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS) $(LIBS)
