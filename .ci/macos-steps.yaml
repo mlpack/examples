@@ -80,7 +80,7 @@ steps:
 # Now build the examples.
 - script: |
     cd examples/
-    for f in */CPP/Makefile; do
+    for f in */cpp/Makefile; do
       makefiledir=`dirname $f`;
       dir=`dirname $makefiledir`;
 
@@ -103,7 +103,7 @@ steps:
       fi
 
       cd $dir;
-      cd CPP/;
+      cd cpp/;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";
       make;
