@@ -295,7 +295,7 @@ int main()
   // before.  In your own application you may of course load any dataset.
 
   // Load RNN model and use it for prediction.
-  RNN<MeanSquaredError<>, HeInitialization> modelP(rho);
+  RNN<MeanSquaredError, HeInitialization> modelP(rho);
   cout << "Loading model ..." << endl;
   data::Load(modelFile, "LSTMMulti", modelP);
   arma::cube predOutP;
