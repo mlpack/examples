@@ -180,9 +180,6 @@ int main()
   // Nunmber of timesteps to look backward for in the RNN.
   const int rho = 25;
 
-  // Max Rho for LSTM.
-  const int maxRho = rho;
-
   arma::mat dataset;
 
   // In Armadillo rows represent features, columns represent data points.
@@ -234,7 +231,7 @@ int main()
   if (bTrain || bLoadAndTrain)
   {
     // RNN regression model.
-    RNN<MeanSquaredError<>, HeInitialization> model(rho);
+    RNN<MeanSquaredError, HeInitialization> model(rho);
 
     if (bLoadAndTrain)
     {
