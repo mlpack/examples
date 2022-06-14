@@ -102,7 +102,7 @@ else
         echo "***********************************"
         set -eE
         trap 'echo "ERROR setup unsuccessful" && cleanUp' ERR
-        conda install -c conda-forge conda=4.9.2 python=3.7.8 mamba -y
+        conda install -c conda-forge conda=4.11 python=3.9 mamba -y
         installDeps
     else
         echo "************************************"
@@ -112,7 +112,7 @@ else
         echo "************************************"
         set -eE
         trap 'echo "ERROR setup unsuccessful, removing create conda environment" && conda remove -n ${envname} --all -y && cleanUp' ERR
-        conda create -n $envname -c conda-forge conda=4.9.2 python=3.7.8 mamba -y
+        conda create -n $envname -c conda-forge conda=4.11 python=3.9 mamba -y
         if [[ $? -eq 0 ]]; then
             source $CONDA_PREFIX/bin/activate $envname
             installDeps
