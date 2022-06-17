@@ -96,6 +96,12 @@ steps:
         continue;
       fi
 
+      # TODO: necessary layers have not yet been adapted
+      if [ "$dir" == "mnist_batch_norm" ];
+      then
+        continue;
+      fi
+
       cd $dir;
       target_name=`grep 'TARGET := ' Makefile | awk -F ' := ' '{ print $2 }'`;
       echo "Make target $target_name in directory $dir.";

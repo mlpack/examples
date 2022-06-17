@@ -9,10 +9,15 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
+
+// NOTE: this example does not currently build!  The Reparametrization and
+// TransposedConvolution layers have not yet been adapted to the mlpack 4 layer
+// style.  See https://github.com/mlpack/mlpack/pull/2777 for more information.
+
 #include <mlpack/core.hpp>
 #include <mlpack/core/data/split_data.hpp>
 
-#include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 #include <mlpack/methods/ann/ffn.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/reconstruction_loss.hpp>
@@ -29,12 +34,8 @@ using namespace mlpack::ann;
 using namespace ens;
 
 // Convenience typedefs
-typedef FFN<
-    ReconstructionLoss<arma::mat, arma::mat, BernoulliDistribution<arma::mat>>,
-    HeInitialization>
-    ReconModel;
-
-typedef FFN<MeanSquaredError<>, HeInitialization> MeanSModel;
+typedef FFN<ReconstructionLoss, HeInitialization> ReconModel;
+typedef FFN<MeanSquaredError, HeInitialization> MeanSModel;
 
 int main()
 {
@@ -66,13 +67,11 @@ int main()
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of this row, in Armadillo representation it's the first column.
-  fullData =
-      fullData.submat(0, 1, fullData.n_rows -1, fullData.n_cols -1);
+  fullData = fullData.submat(0, 1, fullData.n_rows -1, fullData.n_cols - 1);
   fullData /= 255.0;
 
   // Get rid of the labels
-  fullData = 
-      fullData.submat(1, 0, fullData.n_rows - 1, fullData.n_cols -1);
+  fullData = fullData.submat(1, 0, fullData.n_rows - 1, fullData.n_cols - 1);
 
   if (isBinary)
   {
@@ -86,7 +85,7 @@ int main()
 
   arma::mat train, validation;
   data::Split(fullData, validation, train, trainRatio);
-  
+
   // Loss is calculated on train_test data after each cycle.
   arma::mat trainTest, dump;
   data::Split(train, dump, trainTest, 0.045);
@@ -129,71 +128,51 @@ int main()
   }
   else
   {
-    // To use a Sequential object as the first layer, we need to add an
-    // identity layer before it.
-    vaeModel.Add<IdentityLayer<>>();
-
     /*
-     * Encoder.
+     * Encoder layers.
      */
-    Sequential<>* encoder = new Sequential<>();
 
     // Add the first convolution layer.
-    encoder->Add<Convolution<>>(1,   // Number of input activation maps
-                                16,  // Number of output activation maps.
-                                5,   // Filter width.
-                                5,   // Filter height.
-                                2,   // Stride along width.
-                                2,   // Stride along height.
-                                2,   // Padding width.
-                                2,   // Padding height.
-                                28,  // Input width.
-                                28); // Input height.
+    vaeModel.Add<Convolution>(16, // Number of output activation maps.
+                              5,  // Filter width.
+                              5,  // Filter height.
+                              2,  // Stride along width.
+                              2,  // Stride along height.
+                              2,  // Padding width.
+                              2); // Padding height.
 
     // Add first ReLU.
-    encoder->Add<LeakyReLU<>>();
+    vaeModel.Add<LeakyReLU>();
     // Add the second convolution layer.
-    encoder->Add<Convolution<>>(16, 24, 5, 5, 1, 1, 0, 0, 14, 14);
+    vaeModel.Add<Convolution>(24, 5, 5, 1, 1, 0, 0);
     // Add the second ReLU.
-    encoder->Add<LeakyReLU<>>();
+    vaeModel.Add<LeakyReLU>();
     // Add the final dense layer.
-    encoder->Add<Linear<>>(10 * 10 * 24, 2 * latentSize);
-
-    vaeModel.Add(encoder);
+    vaeModel.Add<Linear>(2 * latentSize);
 
     /*
-     * Reparamterization layer.
+     * Reparamtrization layer.
      */
-    vaeModel.Add<Reparametrization<>>(latentSize);
+    vaeModel.Add<Reparametrization>(latentSize);
 
     /*
-     * Decoder.
+     * Decoder layers.
      */
-    Sequential<>* decoder = new Sequential<>();
-
-    decoder->Add<Linear<>>(latentSize, 10 * 10 * 24);
-    decoder->Add<LeakyReLU<>>();
+    vaeModel.Add<Linear>(10 * 10 * 24);
+    vaeModel.Add<LeakyReLU>();
 
     // Add the first transposed convolution(deconvolution) layer.
-    decoder->Add<TransposedConvolution<>>(
-        24,  // Number of input activation maps.
-        16,  // Number of output activation maps.
-        5,   // Filter width.
-        5,   // Filter height.
-        1,   // Stride along width.
-        1,   // Stride along height.
-        0,   // Padding width.
-        0,   // Padding height.
-        10,  // Input width.
-        10,  // Input height.
-        14,  // Output width.
-        14); // Output height.
+    vaeModel.Add<TransposedConvolution>(
+        16, // Number of output activation maps.
+        5,  // Filter width.
+        5,  // Filter height.
+        1,  // Stride along width.
+        1,  // Stride along height.
+        0,  // Padding width.
+        0); // Padding height.
 
-    decoder->Add<LeakyReLU<>>();
-    decoder->Add<TransposedConvolution<>>
-        (16, 1, 15, 15, 1, 1, 0, 0, 14, 14, 28, 28);
-
-    vaeModel.Add(decoder);
+    vaeModel.Add<LeakyReLU>();
+    vaeModel.Add<TransposedConvolution>(1, 15, 15, 1, 1, 0, 0);
   }
 
   std::cout << "Training ..." << std::endl;
@@ -209,7 +188,7 @@ int main()
       iterPerCycle, // Max number of iterations.
       1e-8,         // Tolerance.
       true);
-      
+
   const clock_t beginTime = clock();
   // Cycles for monitoring the progress.
   for (int i = 0; i < cycles; i++)
@@ -222,7 +201,7 @@ int main()
                    ens::PrintLoss(),
                    ens::ProgressBar(),
                    ens::Report());
-     		   
+
     // Don't reset optimizer's parameters between cycles.
     optimizer.ResetPolicy() = false;
 

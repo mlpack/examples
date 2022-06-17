@@ -33,10 +33,12 @@ date  close  volume  open  high  low
 
 #include <mlpack/core.hpp>
 #include <mlpack/prereqs.hpp>
-#include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
+#include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
+#include <mlpack/methods/ann/init_rules/const_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
 #include <mlpack/core/data/split_data.hpp>
 #include <ensmallen.hpp>
@@ -178,9 +180,6 @@ int main()
   // Nunmber of timesteps to look backward for in the RNN.
   const int rho = 25;
 
-  // Max Rho for LSTM.
-  const int maxRho = rho;
-
   arma::mat dataset;
 
   // In Armadillo rows represent features, columns represent data points.
@@ -230,7 +229,7 @@ int main()
   if (bTrain || bLoadAndTrain)
   {
     // RNN regression model.
-    RNN<MeanSquaredError<>, HeInitialization> model(rho);
+    RNN<MeanSquaredError, HeInitialization> model(rho);
 
     if (bLoadAndTrain)
     {
@@ -241,16 +240,15 @@ int main()
     else
     {
       // Model building.
-      model.Add<IdentityLayer<>>();
-      model.Add<LSTM<>>(inputSize, H1, maxRho);
-      model.Add<Dropout<>>(0.5);
-      model.Add<LeakyReLU<>>();
-      model.Add<LSTM<>>(H1, H1, maxRho);
-      model.Add<Dropout<>>(0.5);
-      model.Add<LeakyReLU<>>();
-      model.Add<LSTM<>>(H1, H1, maxRho);
-      model.Add<LeakyReLU<>>();
-      model.Add<Linear<>>(H1, outputSize);
+      model.Add<LSTM>(H1);
+      model.Add<Dropout>(0.5);
+      model.Add<LeakyReLU>();
+      model.Add<LSTM>(H1);
+      model.Add<Dropout>(0.5);
+      model.Add<LeakyReLU>();
+      model.Add<LSTM>(H1);
+      model.Add<LeakyReLU>();
+      model.Add<Linear>(outputSize);
     }
 
     // Set parameters for the Adam optimizer.
@@ -297,7 +295,7 @@ int main()
   // before.  In your own application you may of course load any dataset.
 
   // Load RNN model and use it for prediction.
-  RNN<MeanSquaredError<>, HeInitialization> modelP(rho);
+  RNN<MeanSquaredError, HeInitialization> modelP(rho);
   cout << "Loading model ..." << endl;
   data::Load(modelFile, "LSTMMulti", modelP);
   arma::cube predOutP;

@@ -19,7 +19,7 @@ using namespace mlpack;
 using namespace mlpack::ann;
 
 // Calculates mean loss over batches.
-template<typename NetworkType = FFN<MeanSquaredError<>, HeInitialization>,
+template<typename NetworkType = FFN<MeanSquaredError, HeInitialization>,
          typename DataType = arma::mat>
 double MeanTestLoss(NetworkType& model, DataType& testSet, size_t batchSize)
 {
@@ -27,7 +27,7 @@ double MeanTestLoss(NetworkType& model, DataType& testSet, size_t batchSize)
   size_t nofPoints = testSet.n_cols;
   size_t i;
 
-  for (i = 0; i < ( size_t )nofPoints / batchSize; i++)
+  for (i = 0; i < (size_t) nofPoints / batchSize; i++)
   {
     loss +=
         model.Evaluate(testSet.cols(batchSize * i, batchSize * (i + 1) - 1),
@@ -38,10 +38,12 @@ double MeanTestLoss(NetworkType& model, DataType& testSet, size_t batchSize)
   {
     loss += model.Evaluate(testSet.cols(batchSize * i, nofPoints - 1),
                            testSet.cols(batchSize * i, nofPoints - 1));
-    loss /= ( int )nofPoints / batchSize + 1;
+    loss /= (int) nofPoints / batchSize + 1;
   }
   else
+  {
     loss /= nofPoints / batchSize;
+  }
 
   return loss;
 }

@@ -37,6 +37,7 @@ DateTime,Consumption kWh,Off-peak,Mid-peak,On-peak
 #include <mlpack/prereqs.hpp>
 #include <mlpack/methods/ann/rnn.hpp>
 #include <mlpack/methods/ann/layer/layer.hpp>
+#include <mlpack/methods/ann/layer/layer_types.hpp>
 #include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
 #include <mlpack/methods/ann/init_rules/he_init.hpp>
 #include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
@@ -221,7 +222,7 @@ int main()
   if (bTrain || bLoadAndTrain)
   {
     // RNN regression model.
-    RNN<MeanSquaredError<>, HeInitialization> model(rho);
+    RNN<MeanSquaredError, HeInitialization> model(rho);
 
     if (bLoadAndTrain)
     {
@@ -232,12 +233,11 @@ int main()
     else
     {
       // Model building.
-      model.Add<IdentityLayer<>>();
-      model.Add<LSTM<>>(inputSize, H1, maxRho);
-      model.Add<LeakyReLU<>>();
-      model.Add<LSTM<>>(H1, H1, maxRho);
-      model.Add<LeakyReLU<>>();
-      model.Add<Linear<>>(H1, outputSize);
+      model.Add<LSTM>(H1);
+      model.Add<LeakyReLU>();
+      model.Add<LSTM>(H1);
+      model.Add<LeakyReLU>();
+      model.Add<Linear>(outputSize);
     }
 
     // Set parameters for the Adam optimizer.
@@ -285,7 +285,7 @@ int main()
   // before.  In your own application you may of course load any dataset.
 
   // Load RNN model and use it for prediction.
-  RNN<MeanSquaredError<>, HeInitialization> modelP(rho);
+  RNN<MeanSquaredError, HeInitialization> modelP(rho);
   cout << "Loading model ..." << endl;
   data::Load(modelFile, "LSTMUnivar", modelP);
   arma::cube predOutP;
