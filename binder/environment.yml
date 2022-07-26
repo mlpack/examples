@@ -33,6 +33,7 @@ dependencies:
 - xeus-cling
 - xtensor
 - xwidgets
+- folium
 - xframe
 # R Kernel
 - r-base=4.1.0
