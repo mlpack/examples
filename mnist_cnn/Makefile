@@ -9,7 +9,7 @@ SRC := mnist_cnn.cpp
 LIBS_NAME := armadillo mlpack
 
 CXX := g++
-CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
+CXXFLAGS += -std=c++14 -Wall -Wextra -O3 -DNDEBUG -fopenmp
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and
 # without optimizations.
 # CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
