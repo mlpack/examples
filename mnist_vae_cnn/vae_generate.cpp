@@ -9,21 +9,12 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-#include <mlpack/core/data/save.hpp>
-
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <mlpack/methods/ann/loss_functions/reconstruction_loss.hpp>
-#include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
-#include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 #include "vae_utils.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 
 // Convenience typedef
 typedef FFN<ReconstructionLoss, HeInitialization> ReconModel;

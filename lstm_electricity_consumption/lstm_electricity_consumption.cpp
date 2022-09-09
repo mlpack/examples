@@ -33,28 +33,19 @@ DateTime,Consumption kWh,Off-peak,Mid-peak,On-peak
 ...
 */
 
-#include <mlpack/core.hpp>
-#include <mlpack/prereqs.hpp>
-#include <mlpack/methods/ann/rnn.hpp>
-#include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
-#include <mlpack/core/data/split_data.hpp>
-#include <ensmallen.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 using namespace std;
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
 
 /*
  * Function to calculate MSE for arma::cube.
  */
-double MSE(arma::cube& pred, arma::cube& Y)
+double ComputeMSE(arma::cube& pred, arma::cube& Y)
 {
-  return metric::SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
+  return SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
 
 /**
@@ -110,15 +101,17 @@ void SaveResults(const string& filename,
   flatDataAndPreds.insert_cols(flatDataAndPreds.n_cols, 1, true);
 
   // We add the predictions as the last column.
-  flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows, temp.rows(temp.n_rows - 1, temp.n_rows - 1));
+  flatDataAndPreds.insert_rows(flatDataAndPreds.n_rows,
+      temp.rows(temp.n_rows - 1, temp.n_rows - 1));
 
   // Save the data to file. The last columns are the predictions; the preceding
   // column is the data used to generate those predictions.
   data::Save(filename, flatDataAndPreds);
 
   // Print the output to screen.
-  std::cout << "The predicted energy consumption for the last hour is : " << std::endl;
-  std::cout << " " << flatDataAndPreds(flatDataAndPreds.n_rows - 1, flatDataAndPreds.n_cols - 1) << std::endl;
+  cout << "The predicted energy consumption for the last hour is : " << endl;
+  cout << " " << flatDataAndPreds(flatDataAndPreds.n_rows - 1,
+                                  flatDataAndPreds.n_cols - 1) << endl;
 }
 
 int main()
@@ -173,9 +166,6 @@ int main()
   // model.  (as more cells are added, accuracy is likely to go up, but training
   // time may take longer)
   const int H1 = 10;
-
-  // Max rho for LSTM.
-  const size_t maxRho = rho;
 
   arma::mat dataset;
 
@@ -241,7 +231,7 @@ int main()
     }
 
     // Set parameters for the Adam optimizer.
-    ens::Adam optimizer(
+    Adam optimizer(
         STEP_SIZE,  // Step size of the optimizer.
         BATCH_SIZE, // Batch size. Number of data points that are used in each
                     // iteration.
@@ -264,13 +254,13 @@ int main()
                 trainY,
                 optimizer,
                 // PrintLoss Callback prints loss for each epoch.
-                ens::PrintLoss(),
+                PrintLoss(),
                 // Progressbar Callback prints progress bar for each epoch.
-                ens::ProgressBar(),
+                ProgressBar(),
                 // Stops the optimization process if the loss stops decreasing
                 // or no improvement has been made. This will terminate the
                 // optimization once we obtain a minima on training set.
-                ens::EarlyStopAtMinLoss());
+                EarlyStopAtMinLoss());
 
     cout << "Finished training." << endl;
     cout << "Saving Model" << endl;
@@ -293,7 +283,7 @@ int main()
   // Get predictions on the test data points.
   modelP.Predict(testX, predOutP);
   // Calculate the MSE on the predictions.
-  double testMSEP = MSE(predOutP, testY);
+  double testMSEP = ComputeMSE(predOutP, testY);
   cout << "Mean Squared Error on Prediction data points: " << testMSEP << endl;
 
   // Save the output predictions and show the results.

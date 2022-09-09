@@ -10,20 +10,12 @@
  */
 
 // Including necessary libraries and namespaces"
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/reinforcement_learning/q_learning.hpp>
-#include <mlpack/methods/reinforcement_learning/q_networks/simple_dqn.hpp>
-#include <mlpack/methods/reinforcement_learning/environment/env_type.hpp>
-#include <mlpack/methods/reinforcement_learning/policy/greedy_policy.hpp>
-#include <mlpack/methods/reinforcement_learning/training_config.hpp>
+#include <mlpack.hpp>
 // Used to run the agent on gym's environment (provided externally) for testing.
 #include "../gym/environment.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
-using namespace mlpack::rl;
 
 template<typename EnvironmentType,
          typename NetworkType,

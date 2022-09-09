@@ -4,24 +4,20 @@
  *
  * @author David Port Louis
  */
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <ensmallen.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 #include "periodic_save.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace arma;
 using namespace std;
 using namespace ens;
 
 // Utility function to generate class labels from probabilities.
-arma::Row<size_t> getLabels(const arma::mat& yPreds)
+Row<size_t> getLabels(const mat& yPreds)
 {
-  arma::Row<size_t> yLabels(yPreds.n_cols);
-  for (arma::uword i = 0; i < yPreds.n_cols; ++i)
+  Row<size_t> yLabels(yPreds.n_cols);
+  for (uword i = 0; i < yPreds.n_cols; ++i)
   {
     yLabels(i) = yPreds.col(i).index_max();
   }
@@ -106,15 +102,15 @@ int main()
   cout << "Start training ..." << endl;
 
   // Train the CNN model using Adam Optimizer and above hyperparameters.
-  ens::Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-8, numIterations,
-      1e-8, true);
+  Adam optimizer(STEP_SIZE, BATCH_SIZE, 0.9, 0.999, 1e-8, numIterations, 1e-8,
+      true);
   model.Train(trainX,
               trainY,
               optimizer,
-              ens::PrintLoss(),
-              ens::ProgressBar(),
-              ens::EarlyStopAtMinLoss(),
-              ens::PeriodicSave<decltype(model)>(model, "./new_models2/"));
+              PrintLoss(),
+              ProgressBar(),
+              EarlyStopAtMinLoss(),
+              PeriodicSave<decltype(model)>(model, "./new_models2/"));
 
   cout << "Starting evaluation on training set..." << endl;
 
@@ -125,10 +121,10 @@ int main()
   model.Predict(trainX, predProbs);
 
   // Convert the predicted probalities into labels.
-  arma::Row<size_t> predLabels = getLabels(predProbs);
+  Row<size_t> predLabels = getLabels(predProbs);
 
   // Calculate accuracy on training data points.
-  double trainAccuracy = arma::accu(predLabels == trainY) /
+  double trainAccuracy = accu(predLabels == trainY) /
       (double) trainY.n_elem * 100;
 
   cout << "Starting evaluation on validation set..." << endl;
@@ -140,12 +136,12 @@ int main()
   predLabels = getLabels(predProbs);
 
   // Calculate accuracy on validation data points.
-  double validAccuracy = arma::accu(predLabels == validY) /
+  double validAccuracy = accu(predLabels == validY) /
       (double) validY.n_elem * 100;
 
   cout << "Accuracy: train = " << trainAccuracy << "%,"
        << "\t valid = " << validAccuracy <<"%" << endl;
 
   // Save trained model.
-  mlpack::data::Save("cifarNet.xml", "model", model, false);
+  data::Save("cifarNet.xml", "model", model, false);
 }

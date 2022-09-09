@@ -31,27 +31,17 @@ date  close  volume  open  high  low
 ...
 */
 
-#include <mlpack/core.hpp>
-#include <mlpack/prereqs.hpp>
-#include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/methods/ann/rnn.hpp>
-#include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <mlpack/methods/ann/init_rules/const_init.hpp>
-#include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
-#include <mlpack/core/data/split_data.hpp>
-#include <ensmallen.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 using namespace std;
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
 
 /*
  * Function to calculate MSE for arma::cube.
  */
-double MSE(arma::cube& pred, arma::cube& Y)
+double ComputeMSE(arma::cube& pred, arma::cube& Y)
 {
   return metric::SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
@@ -303,7 +293,7 @@ int main()
   // Get predictions on test data points.
   modelP.Predict(testX, predOutP);
   // Calculate MSE on prediction.
-  double testMSEP = MSE(predOutP, testY);
+  double testMSEP = ComputeMSE(predOutP, testY);
   cout << "Mean Squared Error on Prediction data points:= " << testMSEP << endl;
 
   // Save the output predictions and show the results.

@@ -12,32 +12,21 @@
  *
  * @author Daivik Nema
  */
-
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-
-#include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-
-#include <ensmallen.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 #if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
   #error "need ensmallen version 2.13.0 or later"
 #endif
 
-using namespace mlpack;
-using namespace mlpack::ann;
-
 using namespace arma;
+using namespace mlpack;
 using namespace std;
 
-using namespace ens;
-
-arma::Row<size_t> getLabels(arma::mat predOut)
+Row<size_t> getLabels(const mat& predOut)
 {
-  arma::Row<size_t> predLabels(predOut.n_cols);
-  for (arma::uword i = 0; i < predOut.n_cols; ++i)
+  Row<size_t> predLabels(predOut.n_cols);
+  for (uword i = 0; i < predOut.n_cols; ++i)
   {
     predLabels(i) = predOut.col(i).index_max();
   }
@@ -190,20 +179,21 @@ int main()
   // Get predictions on training data points.
   model.Predict(trainX, predOut);
   // Calculate accuracy on training data points.
-  arma::Row<size_t> predLabels = getLabels(predOut);
+  Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
-      arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
+      accu(predLabels == trainY) / (double) trainY.n_elem * 100;
 
   // Get predictions on validation data points.
   model.Predict(validX, predOut);
+  predLabels = getLabels(predOut);
   // Calculate accuracy on validation data points.
   double validAccuracy =
-      arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
+      accu(predLabels == validY) / (double) validY.n_elem * 100;
 
   cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << endl;
 
-  mlpack::data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", "model", model, false);
 
   cout << "Predicting on test set..." << endl;
 
@@ -218,7 +208,7 @@ int main()
   // Calculate accuracy on test data points.
   predLabels = getLabels(predOut);
   double testAccuracy =
-      arma::accu(predLabels == testY) / (double) testY.n_elem * 100;
+      accu(predLabels == testY) / (double) testY.n_elem * 100;
 
   cout << "Accuracy: test = " << testAccuracy << "%" << endl;
 

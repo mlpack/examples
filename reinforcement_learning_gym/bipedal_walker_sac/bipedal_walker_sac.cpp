@@ -9,20 +9,14 @@
  */
 
 // Including necessary libraries and namespaces
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/init_rules/gaussian_init.hpp>
-#include <mlpack/methods/ann/loss_functions/empty_loss.hpp>
-#include <mlpack/methods/reinforcement_learning/environment/env_type.hpp>
-#include <mlpack/methods/reinforcement_learning/sac.hpp>
-#include <mlpack/methods/reinforcement_learning/training_config.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 // Used to run the agent on gym's environment (provided externally) for testing.
 #include "../gym/environment.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
-using namespace mlpack::rl;
 using namespace gym;
 
 template<typename EnvironmentType,
@@ -107,24 +101,23 @@ int main()
   bool usePreTrainedModel = true;
 
   // Set up the actor and critic networks.
-  FFN<EmptyLoss<>, GaussianInitialization> policyNetwork(
-      EmptyLoss<>(), GaussianInitialization(0, 0.01));
-  policyNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension, 128));
-  policyNetwork.Add(new ReLULayer<>());
-  policyNetwork.Add(new Linear<>(128, 128));
-  policyNetwork.Add(new ReLULayer<>());
-  policyNetwork.Add(new Linear<>(128, ContinuousActionEnv::Action::size));
-  policyNetwork.Add(new TanHLayer<>());
+  FFN<EmptyLoss, GaussianInitialization> policyNetwork(
+      EmptyLoss(), GaussianInitialization(0, 0.01));
+  policyNetwork.Add<Linear>(128);
+  policyNetwork.Add<ReLU>();
+  policyNetwork.Add<Linear>(128);
+  policyNetwork.Add<ReLU>();
+  policyNetwork.Add<Linear>(ContinuousActionEnv::Action::size);
+  policyNetwork.Add<TanH>();
   policyNetwork.ResetParameters();
 
-  FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
-      EmptyLoss<>(), GaussianInitialization(0, 0.01));
-  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
-    + ContinuousActionEnv::Action::size, 128));
-  qNetwork.Add(new ReLULayer<>());
-  qNetwork.Add(new Linear<>(128, 128));
-  qNetwork.Add(new ReLULayer<>());
-  qNetwork.Add(new Linear<>(128, 1));
+  FFN<EmptyLoss, GaussianInitialization> qNetwork(
+      EmptyLoss(), GaussianInitialization(0, 0.01));
+  qNetwork.Add<Linear>(128);
+  qNetwork.Add<ReLU>();
+  qNetwork.Add<Linear>(128);
+  qNetwork.Add<ReLU>();
+  qNetwork.Add<Linear>(1);
   qNetwork.ResetParameters();
 
   // Set up the replay method.

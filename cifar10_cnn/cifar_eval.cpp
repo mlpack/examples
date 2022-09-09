@@ -1,17 +1,15 @@
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace arma;
 using namespace std;
 
 // Utility function to generate class labels from probabilities.
-arma::Row<size_t> getLabels(const arma::mat& yPreds)
+Row<size_t> getLabels(const mat& yPreds)
 {
-  arma::Row<size_t> yLabels(yPreds.n_cols);
-  for (arma::uword i = 0; i < yPreds.n_cols; ++i)
+  Row<size_t> yLabels(yPreds.n_cols);
+  for (uword i = 0; i < yPreds.n_cols; ++i)
   {
     yLabels(i) = yPreds.col(i).index_max();
   }

@@ -14,23 +14,12 @@
 // TransposedConvolution layers have not yet been adapted to the mlpack 4 layer
 // style.  See https://github.com/mlpack/mlpack/pull/2777 for more information.
 
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <mlpack/methods/ann/loss_functions/reconstruction_loss.hpp>
-#include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
-#include <mlpack/methods/ann/dists/bernoulli_distribution.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 #include "vae_utils.hpp"
 
-#include <ensmallen.hpp>
-
 using namespace mlpack;
-using namespace mlpack::ann;
-
 using namespace ens;
 
 // Convenience typedefs
@@ -178,7 +167,7 @@ int main()
   std::cout << "Training ..." << std::endl;
 
   // Set parameters for the Adam optimizer.
-  ens::Adam optimizer(
+  Adam optimizer(
       stepSize,  // Step size of the optimizer.
       batchSize, // Batch size. Number of data points that are used in each
                  // iteration.
@@ -198,9 +187,9 @@ int main()
     vaeModel.Train(train,
                    train,
                    optimizer,
-                   ens::PrintLoss(),
-                   ens::ProgressBar(),
-                   ens::Report());
+                   PrintLoss(),
+                   ProgressBar(),
+                   Report());
 
     // Don't reset optimizer's parameters between cycles.
     optimizer.ResetPolicy() = false;

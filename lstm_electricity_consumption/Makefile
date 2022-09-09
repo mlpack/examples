@@ -6,18 +6,21 @@
 
 TARGET := lstm_electricity_consumption
 SRC := lstm_electricity_consumption.cpp
-LIBS_NAME := armadillo mlpack
+LIBS_NAME := armadillo
 
 CXX := g++
-CXXFLAGS += -std=c++11 -Wall -Wextra -O3 -DNDEBUG -fopenmp
+CXXFLAGS += -std=c++14 -Wall -Wextra -O3 -DNDEBUG -fopenmp
 # Use these CXXFLAGS instead if you want to compile with debugging symbols
 # and without optimizations.
-# CXXFLAGS += -std=c++11 -Wall -Wextra -g -O0
+# CXXFLAGS += -std=c++14 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
-LDFLAGS += -L . # /path/to/mlpack/library/  # If installed locally.
 # Add header directories for any includes that aren't on the default compiler
 # search path.
 INCLFLAGS := -I .
+# If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
+# update the lines below.
+INCLFLAGS += -I/home/ryan/src/mlpack/src/
+INCLFLAGS += -I/home/ryan/src/mlpack/build/deps/ensmallen-2.19.0/include/
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
