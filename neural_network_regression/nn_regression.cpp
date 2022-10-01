@@ -47,11 +47,12 @@
 using namespace mlpack;
 using namespace ens;
 using namespace std;
+using namespace arma;
 
 /*
  * Function to calculate MSE for arma::cube.
  */
-double MSE(mat& pred, mat& Y)
+double ComputeMSE(mat& pred, mat& Y)
 {
   return SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
@@ -206,7 +207,7 @@ int main()
 
   // We will test the quality of our model by calculating Mean Squared Error on
   // validation dataset.
-  double validMSE = MSE(validY, predOut);
+  double validMSE = ComputeMSE(validY, predOut);
   cout << "Mean Squared Error on Prediction data points: " << validMSE << endl;
 
   // To get meaningful predictions we need to undo the scaling operation on
