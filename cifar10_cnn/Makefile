@@ -14,9 +14,6 @@ INCLFLAGS := -I .
 # update the lines below.
 # INCLFLAGS += -I/path/to/mlpack/include/
 # INCLFLAGS += -I/path/to/ensmallen/include/
-INCLFLAGS += -I/home/ryan/src/mlpack/src/
-INCLFLAGS += -I/home/ryan/src/mlpack/build/deps/ensmallen-2.19.0/include/
-
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)

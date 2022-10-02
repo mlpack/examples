@@ -19,8 +19,8 @@ LDFLAGS  += -fopenmp
 INCLFLAGS := -I .
 # If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
 # update the lines below.
-INCLFLAGS += -I/home/ryan/src/mlpack/src/
-INCLFLAGS += -I/home/ryan/src/mlpack/build/deps/ensmallen-2.19.0/include/
+# INCLFLAGS += -I/path/to/mlpack/include/
+# INCLFLAGS += -I/path/to/ensmallen/include/
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
