@@ -9,21 +9,13 @@
  */
 
 // Including necessary libraries and namespaces.
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/reinforcement_learning/q_learning.hpp>
-#include <mlpack/methods/reinforcement_learning/q_networks/simple_dqn.hpp>
-#include <mlpack/methods/reinforcement_learning/environment/env_type.hpp>
-#include <mlpack/methods/reinforcement_learning/policy/greedy_policy.hpp>
-#include <mlpack/methods/reinforcement_learning/training_config.hpp>
+#include <mlpack.hpp>
 
 // Used to run the agent on gym's environment (provided externally) for testing.
 #include "../gym/environment.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
-using namespace mlpack::rl;
 
 // Function to train the agent on the Acrobot-v1 gym environment.
 template<typename EnvironmentType,
@@ -98,11 +90,11 @@ int main()
   DiscreteActionEnv::Action::size = 3;
 
   // Set up the network.
-  FFN<MeanSquaredError<>, GaussianInitialization> module(
-      MeanSquaredError<>(), GaussianInitialization(0, 1));
-  module.Add<Linear<>>(DiscreteActionEnv::State::dimension, 64);
-  module.Add<ReLULayer<>>();
-  module.Add<Linear<>>(64, DiscreteActionEnv::Action::size);
+  FFN<MeanSquaredError, GaussianInitialization> module(
+      MeanSquaredError(), GaussianInitialization(0, 1));
+  module.Add<Linear>(DiscreteActionEnv::State::dimension, 64);
+  module.Add<ReLULayer>();
+  module.Add<Linear>(64, DiscreteActionEnv::Action::size);
   SimpleDQN<> model(module);
 
   // Set up the policy method.

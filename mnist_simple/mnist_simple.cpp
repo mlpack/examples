@@ -13,27 +13,15 @@
  * @author Eugene Freyman
  * @author Omar Shrit
  */
-
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-
-#include <mlpack/methods/ann/layer/layer.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/init_rules/glorot_init.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-
-#include <ensmallen.hpp>
-#include <ensmallen_bits/callbacks/callbacks.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 #if ((ENS_VERSION_MAJOR < 2) || \
     ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
   #error "need ensmallen version 2.13.0 or later"
 #endif
 
-using namespace arma;
-using namespace mlpack::ann;
-using namespace mlpack::util;
-using namespace ens;
+using namespace mlpack;
 using namespace std;
 
 arma::Row<size_t> getLabels(arma::mat predOut)
@@ -65,7 +53,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  mlpack::data::Load("../data/mnist_train.csv", dataset, true);
+  data::Load("../data/mnist_train.csv", dataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -74,7 +62,7 @@ int main()
 
   // Splitting the training dataset on training and validation parts.
   arma::mat train, valid;
-  mlpack::data::Split(headerLessDataset, train, valid, RATIO);
+  data::Split(headerLessDataset, train, valid, RATIO);
 
   // Getting training and validating dataset with features only and then
   // normalising
@@ -152,7 +140,7 @@ int main()
   // Save the best training weights into the model.
   model.Parameters() = bestCoordinates.BestCoordinates();
 
-  mat predOut;
+  arma::mat predOut;
   // Getting predictions on training data points.
   model.Predict(trainX, predOut);
   // Calculating accuracy on training data points.
@@ -169,20 +157,20 @@ int main()
   cout << "Accuracy: train = " << trainAccuracy << "%,"
        << "\t valid = " << validAccuracy << "%" << endl;
 
-  mlpack::data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", "model", model, false);
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  mlpack::data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../data/mnist_test.csv", dataset, true);
   arma::mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 
   cout << "Predicting on test set..." << endl;
-  mat testPredOut;
+  arma::mat testPredOut;
   // Getting predictions on test data points.
   model.Predict(dataset, testPredOut);
   // Generating labels for the test dataset.
-  Row<size_t> testPred = getLabels(testPredOut);
+  arma::Row<size_t> testPred = getLabels(testPredOut);
 
   double testAccuracy = arma::accu(testPred == testY) /
       (double) testY.n_elem * 100;

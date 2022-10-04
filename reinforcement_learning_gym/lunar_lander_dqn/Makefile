@@ -6,7 +6,7 @@
 
 TARGET := lunar_lander_dqn
 SRC := lunar_lander_dqn.cpp
-LIBS_NAME := armadillo mlpack boost_iostreams
+LIBS_NAME := armadillo boost_iostreams
 
 CXX := g++
 CXXFLAGS += -std=c++14 -Wall -Wextra -O3 -DNDEBUG -fopenmp
@@ -14,10 +14,13 @@ CXXFLAGS += -std=c++14 -Wall -Wextra -O3 -DNDEBUG -fopenmp
 # without optimizations.
 # CXXFLAGS += -std=c++14 -Wall -Wextra -g -O0
 LDFLAGS  += -fopenmp
-LDFLAGS += -L . # /path/to/mlpack/library/  # if installed locally.
 # Add header directories for any includes that aren't on the
 # default compiler search path.
 INCLFLAGS := -I .
+# If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
+# update the lines below.
+# INCLFLAGS += -I/path/to/mlpack/include/
+# INCLFLAGS += -I/path/to/ensmallen/include/
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)

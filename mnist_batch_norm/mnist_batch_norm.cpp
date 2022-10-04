@@ -19,31 +19,21 @@
 // need to be adapted to the new mlpack 4 style for layers.  (See
 // https://github.com/mlpack/mlpack/pull/2777.)
 
-#include <mlpack/core.hpp>
-#include <mlpack/core/data/split_data.hpp>
-
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-
-#include <ensmallen.hpp>
-#include <ensmallen_bits/callbacks/callbacks.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 #if ((ENS_VERSION_MAJOR < 2) || ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
   #error "need ensmallen version 2.13.0 or later"
 #endif
 
 using namespace mlpack;
-using namespace mlpack::ann;
-
 using namespace arma;
 using namespace std;
 
-using namespace ens;
-
-arma::Row<size_t> getLabels(arma::mat predOut)
+Row<size_t> getLabels(mat& predOut)
 {
-  arma::Row<size_t> predLabels(predOut.n_cols);
-  for (arma::uword i = 0; i < predOut.n_cols; ++i)
+  Row<size_t> predLabels(predOut.n_cols);
+  for (uword i = 0; i < predOut.n_cols; ++i)
   {
     predLabels(i) = predOut.col(i).index_max();
   }
@@ -160,18 +150,18 @@ int main()
   // Calculating accuracy on training data points.
   Row<size_t> predLabels = getLabels(predOut);
   double trainAccuracy =
-      arma::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
+      accu(predLabels == trainY) / (double) trainY.n_elem * 100;
   // Getting predictions on validating data points.
   model.Predict(validX, predOut);
   // Calculating accuracy on validating data points.
   predLabels = getLabels(predOut);
   double validAccuracy =
-      arma::accu(predLabels == validY) / (double) validY.n_elem * 100;
+      accu(predLabels == validY) / (double) validY.n_elem * 100;
 
   cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " valid = " << validAccuracy << "%" << endl;
 
-  mlpack::data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", "model", model, false);
   cout << "Predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels
@@ -181,8 +171,8 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
 
-  mlpack::data::Load("../data/mnist_test.csv", dataset, true);
-  arma::mat testY = dataset.row(dataset.n_rows - 1);
+  data::Load("../data/mnist_test.csv", dataset, true);
+  mat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Remove labels.
 
   mat testPredOut;

@@ -12,11 +12,10 @@
 #ifndef MODELS_VAE_UTILS_HPP
 #define MODELS_VAE_UTILS_HPP
 
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 using namespace mlpack;
-using namespace mlpack::ann;
 
 // Calculates mean loss over batches.
 template<typename NetworkType = FFN<MeanSquaredError, HeInitialization>,

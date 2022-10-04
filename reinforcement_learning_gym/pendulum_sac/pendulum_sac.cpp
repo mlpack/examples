@@ -9,21 +9,13 @@
  */
 
 // Including necessary libraries and namespaces.
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/reinforcement_learning/sac.hpp>
-#include <mlpack/methods/ann/loss_functions/empty_loss.hpp>
-#include <mlpack/methods/ann/init_rules/gaussian_init.hpp>
-#include <mlpack/methods/reinforcement_learning/environment/env_type.hpp>
-#include <mlpack/methods/reinforcement_learning/training_config.hpp>
+#include <mlpack.hpp>
 
 // Used to run the agent on gym's environment (provided externally) for testing.
 #include "../gym/environment.hpp"
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
-using namespace mlpack::rl;
 
 template<typename EnvironmentType,
          typename NetworkType,
@@ -100,19 +92,18 @@ int main()
   ContinuousActionEnv::Action::size = 1;
 
   // Set up the actor and critic networks.
-  FFN<EmptyLoss<>, GaussianInitialization> policyNetwork(
-      EmptyLoss<>(), GaussianInitialization(0, 0.1));
-  policyNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension, 32));
-  policyNetwork.Add(new ReLULayer<>());
-  policyNetwork.Add(new Linear<>(32, ContinuousActionEnv::Action::size));
-  policyNetwork.Add(new TanHLayer<>());
+  FFN<EmptyLoss, GaussianInitialization> policyNetwork(
+      EmptyLoss(), GaussianInitialization(0, 0.1));
+  policyNetwork.Add<Linear>(32);
+  policyNetwork.Add<ReLU>();
+  policyNetwork.Add<Linear>(ContinuousActionEnv::Action::size);
+  policyNetwork.Add<TanH>();
 
-  FFN<EmptyLoss<>, GaussianInitialization> qNetwork(
-      EmptyLoss<>(), GaussianInitialization(0, 0.1));
-  qNetwork.Add(new Linear<>(ContinuousActionEnv::State::dimension
-      + ContinuousActionEnv::Action::size, 32));
-  qNetwork.Add(new ReLULayer<>());
-  qNetwork.Add(new Linear<>(32, 1));
+  FFN<EmptyLoss, GaussianInitialization> qNetwork(
+      EmptyLoss(), GaussianInitialization(0, 0.1));
+  qNetwork.Add<Linear>(32);
+  qNetwork.Add<ReLU>();
+  qNetwork.Add<Linear>(1);
 
   // Set up the policy method.
   RandomReplay<ContinuousActionEnv> replayMethod(32, 10000);

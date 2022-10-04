@@ -2,12 +2,19 @@ TARGET := cifar_train
 TARGET1 := cifar_eval
 SRC := cifar_train.cpp
 SRC1 := cifar_eval.cpp
-LIBS_NAME := armadillo mlpack
+LIBS_NAME := armadillo
 
 CXX := g++
 CXXFLAGS := -std=c++14 -Wall -g -rdynamic -Wextra -O3 -DNDEBUG -fopenmp
 
 LDFLAGS := -fopenmp
+
+INCLFLAGS := -I .
+# If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
+# update the lines below.
+# INCLFLAGS += -I/path/to/mlpack/include/
+# INCLFLAGS += -I/path/to/ensmallen/include/
+CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
 OBJS1 := $(SRC1:.cpp=.o)
@@ -18,7 +25,7 @@ default: all
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET) $(LDFLAGS) $(LIBS)
-    
+
 $(TARGET1): $(OBJS1)
 	$(CXX) $(CXXFLAGS) $(OBJS1) -o $(TARGET1) $(LDFLAGS) $(LIBS)
 

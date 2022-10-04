@@ -10,13 +10,11 @@
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
 
-#ifndef ENSMALLEN_CALLBACKS_PERIODIC_SAVE_HPP
-#define ENSMALLEN_CALLBACKS_PERIODIC_SAVE_HPP
+#ifndef PERIODIC_SAVE_HPP
+#define PERIODIC_SAVE_HPP
 
-#include <ensmallen.hpp>
-#include <mlpack/core.hpp>
-
-namespace ens {
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 /**
  * Saves model being trained periodically.
@@ -96,7 +94,5 @@ class PeriodicSave
   // The output stream that all data is to be sent to; example: std::cout.
   std::ostream& output;
 };
-
-} // namespace ens
 
 #endif

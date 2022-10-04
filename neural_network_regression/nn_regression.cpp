@@ -2,10 +2,11 @@
  * @file nn_regression.cpp
  * @author Zoltan Somogyi
  *
- * \brief MLPACK TUTORIAL: neural network regression
- * \details Real world example which shows how to create a neural network
- * mlpack/C++ model for regression, how to save and load the model and then use
- * it for prediction (inference).
+ * MLPACK TUTORIAL: neural network regression
+ *
+ * Real world example which shows how to create a neural network mlpack/C++
+ * model for regression, how to save and load the model and then use it for
+ * prediction (inference).
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
@@ -23,7 +24,7 @@
  * by just using some low cost measurements of the body. The columns in the
  * dataset are the following:
  *
- * Percent body fat (%) => this is the decision column (what we want to get from 
+ * Percent body fat (%) => this is the decision column (what we want to get from
  * the model).
  * Age (years)
  * Weight (lbs)
@@ -40,34 +41,28 @@
  * Wrist circumference (cm)
  * Density determined from underwater weighing
  */
-
-#include <mlpack/core.hpp>
-#include <mlpack/methods/ann/loss_functions/mean_squared_error.hpp>
-#include <mlpack/core/data/scaler_methods/min_max_scaler.hpp>
-#include <mlpack/methods/ann/layer/layer_types.hpp>
-#include <mlpack/core/data/split_data.hpp>
-#include <mlpack/methods/ann/ffn.hpp>
-#include <mlpack/methods/ann/init_rules/he_init.hpp>
-#include <ensmallen.hpp>
+#define MLPACK_ENABLE_ANN_SERIALIZATION
+#include <mlpack.hpp>
 
 using namespace mlpack;
-using namespace mlpack::ann;
 using namespace ens;
+using namespace std;
+using namespace arma;
 
 /*
  * Function to calculate MSE for arma::cube.
  */
-double MSE(arma::mat& pred, arma::mat& Y)
+double ComputeMSE(mat& pred, mat& Y)
 {
-  return metric::SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
+  return SquaredEuclideanDistance::Evaluate(pred, Y) / (Y.n_elem);
 }
 
 int main()
 {
   //! Path to the dataset used for training and testing.
-  const std::string datasetPath = "./../data/BodyFat.tsv";
+  const string datasetPath = "./../data/BodyFat.tsv";
   // File for saving the model.
-  const std::string modelFile = "nn_regressor.bin";
+  const string modelFile = "nn_regressor.bin";
 
   // Testing data is taken from the dataset in this ratio.
   constexpr double RATIO = 0.1; // 10%
@@ -102,7 +97,7 @@ int main()
   arma::mat dataset;
 
   // In Armadillo rows represent features, columns represent data points.
-  std::cout << "Reading data." << std::endl;
+  cout << "Reading data." << endl;
   bool loadedDataset = data::Load(datasetPath, dataset, true);
   // If dataset is not loaded correctly, exit.
   if (!loadedDataset)
@@ -145,7 +140,7 @@ int main()
     if (bLoadAndTrain)
     {
       // The model will be trained further.
-      std::cout << "Loading and further training the model." << std::endl;
+      cout << "Loading and further training the model." << endl;
       data::Load(modelFile, "NNRegressor", model);
     }
     else
@@ -194,9 +189,9 @@ int main()
                 // optimization once we obtain a minima on training set.
                 ens::EarlyStopAtMinLoss(20));
 
-    std::cout << "Finished training. \nSaving Model" << std::endl;
+    cout << "Finished training. \nSaving Model" << endl;
     data::Save(modelFile, "NNRegressor", model);
-    std::cout << "Model saved in " << modelFile << std::endl;
+    cout << "Model saved in " << modelFile << endl;
   }
 
   // NOTE: the code below is added in order to show how in a real application
@@ -212,9 +207,8 @@ int main()
 
   // We will test the quality of our model by calculating Mean Squared Error on
   // validation dataset.
-  double validMSE = MSE(validY, predOut);
-  std::cout << "Mean Squared Error on Prediction data points: " << validMSE
-            << std::endl;
+  double validMSE = ComputeMSE(validY, predOut);
+  cout << "Mean Squared Error on Prediction data points: " << validMSE << endl;
 
   // To get meaningful predictions we need to undo the scaling operation on
   // predictions.
@@ -223,7 +217,5 @@ int main()
   bool saved = data::Save("results.csv", predOut, true);
 
   if (!saved)
-    std::cout << "Results have not been saved." << std::endl;
-
-  return 0;
+    cout << "Results have not been saved." << endl;
 }
