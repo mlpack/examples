@@ -10,6 +10,7 @@ jupyter kernelspec remove -f xcpp17
 git clone --depth 1 https://github.com/mlpack/mlpack
 cd mlpack
 cp -r src/* /srv/conda/envs/notebook/include/
+cd ../
 rm -r mlpack
 
 # Install STB headers manually.
