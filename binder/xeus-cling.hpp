@@ -1,5 +1,4 @@
 #pragma cling load("/srv/conda/envs/notebook/lib/libarmadillo.so")
-#pragma cling load("/srv/conda/envs/notebook/lib/libmlpack.so")
 #pragma cling load("/srv/conda/envs/notebook/lib/libboost_serialization.so")
 #pragma cling load("/srv/conda/envs/notebook/lib/libboost_unit_test_framework.so")
 #pragma cling load("/srv/conda/envs/notebook/lib/libboost_program_options.so")

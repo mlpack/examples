@@ -6,6 +6,18 @@ pip install sos-xeus-cling sos-javascript sos-python sos-r sos-julia
 jupyter kernelspec remove -f xcpp11
 jupyter kernelspec remove -f xcpp17
 
+# Install mlpack from git.
+git clone --depth 1 https://github.com/mlpack/mlpack
+cd mlpack
+cp -r src/* /srv/conda/envs/notebook/include/
+rm -r mlpack
+
+# Install STB headers manually.
+wget mlpack.org/files/stb.tar.gz
+tar -xvzpf stb.tar.gz
+mv stb/include/* /srv/conda/envs/notebook/include/
+rm -r stb stb.tar.gz
+
 cp $HOME/binder/kernel.json /srv/conda/envs/notebook/share/jupyter/kernels/xcpp14/kernel.json
 cp $HOME/binder/xeus-cling.hpp /srv/conda/envs/notebook/include/mlpack/
 
