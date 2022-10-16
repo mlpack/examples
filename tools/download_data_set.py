@@ -136,7 +136,7 @@ def iris_dataset():
 
 def spam_dataset():
   print("Downloading spam dataset...")
-  spam = requests.get("https://www.mlpack.org/datasets/dataset_sms_spam_bhs_indonesia_v1.tar.gz")
+  spam = requests.get("https://datasets.mlpack.org/dataset_sms_spam_bhs_indonesia_v1.tar.gz")
   progress_bar("dataset_sms_spam_bhs_indonesia_v1.tar.gz", spam)
   tar = tarfile.open("dataset_sms_spam_bhs_indonesia_v1.tar.gz", "r:gz")
   tar.extractall()
