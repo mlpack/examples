@@ -1,17 +1,17 @@
-#!/usr/bin/env/bash
+#!/usr/bin/env bash
 
 function cleanUp() {
     echo "**************"
     echo "Cleaning Up..."
     echo "**************"
     if [[ -f "./kernel.json" ]]; then
-    	rm kernel.json
+        rm kernel.json
     fi
     if [[ -f "./xeus-cling.hpp" ]]; then
-    	rm xeus-cling.hpp
+        rm xeus-cling.hpp
     fi
     if [[ -f "./environment.yml" ]]; then
-    	rm environment.yml
+        rm environment.yml
     fi
     if [[ -d "${CONDA_PREFIX}/share/jupyter/lab" ]]; then
         jupyter lab clean 
