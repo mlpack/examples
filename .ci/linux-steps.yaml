@@ -28,7 +28,7 @@ steps:
     rm -rf armadillo-9.800.1/
 
     # Build and install the latest version of ensmallen.
-    curl -O http://www.ensmallen.org/files/ensmallen-latest.tar.gz
+    curl -O https://www.ensmallen.org/files/ensmallen-latest.tar.gz
     tar xvzf ensmallen-latest.tar.gz
     cd ensmallen-*/
     mkdir build
