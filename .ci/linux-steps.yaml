@@ -78,12 +78,6 @@ steps:
     for f in */Makefile; do
       dir=`dirname $f`;
 
-      # TODO: this takes too long right now.
-      if [ "$dir" == "mnist_cnn" ];
-      then
-        continue;
-      fi
-
       # TODO: the dataset cannot be loaded.
       if [ "$dir" == "mnist_vae_cnn" ];
       then
@@ -92,12 +86,6 @@ steps:
 
       # TODO: the dataset cannot be loaded.
       if [ "$dir" == "spam" ];
-      then
-        continue;
-      fi
-
-      # TODO: necessary layers have not yet been adapted
-      if [ "$dir" == "mnist_batch_norm" ];
       then
         continue;
       fi
