@@ -172,8 +172,8 @@ int main()
   // https://www.kaggle.com/c/digit-recognizer/data
 
   data::Load("../data/mnist_test.csv", dataset, true);
-  mat testY = dataset.row(dataset.n_rows - 1);
-  dataset.shed_row(dataset.n_rows - 1); // Remove labels.
+  mat testY = dataset.row(0);
+  dataset.shed_row(0); // Remove labels.
 
   mat testPredOut;
   // Getting predictions on test data points .
