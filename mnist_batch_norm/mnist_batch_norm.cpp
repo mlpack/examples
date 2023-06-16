@@ -101,13 +101,13 @@ int main()
   model.Add<PReLU>();
   // BatchNorm layer applied after PReLU activation as it gives
   // better results practically.
-  model.Add<BatchNorm>(H1);
+  model.Add<BatchNorm>();
   // Intermediate layer between PReLU activation layers.
   model.Add<Linear>(H2);
   // The second PReLU layer.
   model.Add<PReLU>();
   // Second BatchNorm layer
-  model.Add<BatchNorm>(H2);
+  model.Add<BatchNorm>();
   // Intermediate layer.
   model.Add<Linear>(10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
