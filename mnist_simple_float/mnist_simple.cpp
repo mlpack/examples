@@ -124,18 +124,18 @@ int main()
               trainY,
               optimizer,
               ens::PrintLoss(),
-              ens::ProgressBar());
-              //// Stop the training using Early Stop at min loss.
-              //ens::EarlyStopAtMinLoss(
-                  //[&](const arma::fmat& [> param <])
-                  //{
-                    //double validationLoss = model.Evaluate(validX, validY);
-                    //cout << "Validation loss: " << validationLoss << "."
-                        //<< endl;
-                    //return validationLoss;
-                  //}),
-              //// Store best coordinates (neural network weights)
-              //bestCoordinates);
+              ens::ProgressBar(),
+              // Stop the training using Early Stop at min loss.
+              ens::EarlyStopAtMinLossType<arma::fmat>(
+                  [&](const arma::fmat& /* param */)
+                  {
+                    double validationLoss = model.Evaluate(validX, validY);
+                    cout << "Validation loss: " << validationLoss << "."
+                        << endl;
+                    return validationLoss;
+                  }),
+              // Store best coordinates (neural network weights)
+              bestCoordinates);
 
   // Save the best training weights into the model.
   model.Parameters() = bestCoordinates.BestCoordinates();
