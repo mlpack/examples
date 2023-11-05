@@ -27,6 +27,8 @@
 using namespace mlpack;
 using namespace std;
 
+CEREAL_REGISTER_MLPACK_LAYERS(arma::fmat);
+
 arma::Row<size_t> getLabels(arma::fmat predOut)
 {
   arma::Row<size_t> predLabels(predOut.n_cols);
