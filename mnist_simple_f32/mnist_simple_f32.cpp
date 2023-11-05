@@ -3,7 +3,10 @@
  * solving Digit Recognizer problem from Kaggle website.
  *
  * The full description of a problem as well as datasets for training
- * and testing are available here https://www.kaggle.com/c/digit-recognizer
+ * and testing are available here: https://www.kaggle.com/c/digit-recognizer.
+ *
+ * This example is similar to the mnist_simple. The main difference is that,
+ * this one loads the dataset as a float32 and creates a float32 model.
  *
  * mlpack is free software; you may redistribute it and/or modify it under the
  * terms of the 3-clause BSD license.  You should have received a copy of the
