@@ -102,10 +102,10 @@ int main()
 
   // Add the first convolution layer.
   model.Add<ConvolutionType<
-    NaiveConvolution<ValidConvolution>,
-    NaiveConvolution<FullConvolution>,
-    NaiveConvolution<ValidConvolution>,
-    arma::fmat>>(6,  // Number of output activation maps.
+             NaiveConvolution<ValidConvolution>,
+             NaiveConvolution<FullConvolution>,
+             NaiveConvolution<ValidConvolution>,
+             arma::fmat>>(6,  // Number of output activation maps.
                          5,  // Filter width.
                          5,  // Filter height.
                          1,  // Stride along width.
