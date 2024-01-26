@@ -21,7 +21,8 @@ INCLFLAGS := -I .
 # If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
 # update the lines below.
 INCLFLAGS += -I/opt/cuda/targets/x86_64-linux/include
-# INCLFLAGS += -I/path/to/ensmallen/include/
+INCLFLAGS += -I/meta/mlpack/src
+#INCLFLAGS += -I/meta/m
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)

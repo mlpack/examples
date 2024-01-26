@@ -14,8 +14,10 @@
  * @author Omar Shrit
  */
 #define MLPACK_ENABLE_ANN_SERIALIZATION
-#include <mlpack.hpp>
+#define MLPACK_HAS_COOT
+
 #include <bandicoot>
+#include <mlpack.hpp>
 
 #if ((ENS_VERSION_MAJOR < 2) || \
     ((ENS_VERSION_MAJOR == 2) && (ENS_VERSION_MINOR < 13)))
@@ -30,7 +32,7 @@ coot::Row<size_t> getLabels(coot::mat predOut)
   coot::Row<size_t> predLabels(predOut.n_cols);
   for (coot::uword i = 0; i < predOut.n_cols; ++i)
   {
-    predLabels(i) = predOut.col(i).index_max();
+    // predLabels(i) = predOut.col(i).index_max();
   }
   return predLabels;
 }
@@ -82,25 +84,25 @@ int main()
   // Specifying the NN model. NegativeLogLikelihood is the output layer that
   // is used for classification problem. GlorotInitialization means that
   // initial weights in neurons are a uniform gaussian distribution.
-  FFN<NegativeLogLikelihoodType<coot::mat>, GlorotInitialization> model;
+  FFN<NegativeLogLikelihoodType<coot::mat>, GlorotInitialization, coot::mat> model;
   // This is intermediate layer that is needed for connection between input
   // data and relu layer. Parameters specify the number of input features
   // and number of neurons in the next layer.
-  model.Add<Linear>(H1);
+  model.Add<LinearType<coot::mat>>(H1);
   // The first relu layer.
-  model.Add<ReLU>();
+  model.Add<ReLUType<coot::mat>>();
   // Intermediate layer between relu layers.
-  model.Add<Linear>(H2);
+  model.Add<LinearType<coot::mat>>(H2);
   // The second relu layer.
-  model.Add<ReLU>();
+  model.Add<ReLUType<coot::mat>>();
   // Dropout layer for regularization. First parameter is the probability of
   // setting a specific value to 0.
-  model.Add<Dropout>(0.2);
+  model.Add<DropoutType<coot::mat>>(0.2);
   // Intermediate layer.
-  model.Add<Linear>(10);
+  model.Add<LinearType<coot::mat>>(10);
   // LogSoftMax layer is used together with NegativeLogLikelihood for mapping
   // output values to log of probabilities of being a specific class.
-  model.Add<LogSoftMax>();
+  model.Add<LogSoftMaxType<coot::mat>>();
 
   cout << "Start training ..." << endl;
 
@@ -127,7 +129,7 @@ int main()
               ens::PrintLoss(),
               ens::ProgressBar(),
               // Stop the training using Early Stop at min loss.
-              ens::EarlyStopAtMinLoss(
+              ens::EarlyStopAtMinLossType<coot::mat>(
                   [&](const coot::mat& /* param */)
                   {
                     double validationLoss = model.Evaluate(validX, validY);
