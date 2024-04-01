@@ -10,10 +10,12 @@ https://lab.mlpack.org/.
 
 ### 0. Contents
 
-  1. [Overview](#1-overview)
-  2. [Building the examples and usage](#2-Building-the-examples-and-usage)
-  3. [List of examples](#3-List-of-examples)
-  4. [Datasets](#4-datasets)
+- [0. Contents](#0-contents)
+- [1. Overview](#1-overview)
+- [2. Building the examples and usage](#2-building-the-examples-and-usage)
+- [3. List of examples](#3-list-of-examples)
+- [4. Datasets](#4-datasets)
+- [5. Setup](#5-setup)
 
 ###  1. Overview
 
@@ -92,4 +94,10 @@ extract all the necessary dataset in order for examples to work perfectly:
 ```sh
 cd tools/
 ./download_data_set.py
+```
+
+### 5. Setup
+To setup a jupyter local environment that work with C++ using xeus-cling you shall execute the following command:
+```sh
+./script/jupyter-conda-setup.sh <environment_name>
 ```
