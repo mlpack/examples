@@ -17,6 +17,10 @@
 using namespace mlpack;
 using namespace ens;
 
+// Set up the state and action space.
+constexpr size_t stateDimension = 6;
+constexpr size_t actionSize = 3;
+
 // Function to train the agent on the Acrobot-v1 gym environment.
 template<typename EnvironmentType,
          typename NetworkType,
@@ -49,7 +53,7 @@ void Train(gym::Environment& env,
       arma::mat action = {double(agent.Action().action)};
 
       env.step(action);
-      DiscreteActionEnv::State nextState;
+      DiscreteActionEnv<stateDimension, actionSize>::State nextState;
       nextState.Data() = env.observation;
 
       replayMethod.Store(
@@ -85,22 +89,22 @@ void Train(gym::Environment& env,
 int main()
 {
   // Initializing the agent.
-  // Set up the state and action space.
-  DiscreteActionEnv::State::dimension = 6;
-  DiscreteActionEnv::Action::size = 3;
 
   // Set up the network.
   FFN<MeanSquaredError, GaussianInitialization> module(
       MeanSquaredError(), GaussianInitialization(0, 1));
-  module.Add<Linear>(DiscreteActionEnv::State::dimension, 64);
-  module.Add<ReLULayer>();
-  module.Add<Linear>(64, DiscreteActionEnv::Action::size);
+  module.Add<Linear>(64);
+  module.Add<ReLU>();
+  module.Add<Linear>(actionSize);
   SimpleDQN<> model(module);
 
   // Set up the policy method.
-  GreedyPolicy<DiscreteActionEnv> policy(1.0, 1000, 0.1, 0.99);
+  GreedyPolicy<DiscreteActionEnv<stateDimension, actionSize>> 
+      policy(1.0, 1000, 0.1, 0.99);
+
   // To enable 3-step learning, we set the last parameter of the replay method as 3.
-  PrioritizedReplay<DiscreteActionEnv> replayMethod(64, 5000, 0.6, 3);
+  PrioritizedReplay<DiscreteActionEnv<stateDimension, actionSize>>
+      replayMethod(64, 5000, 0.6, 3);
 
   // Set up training configurations.
   TrainingConfig config;
@@ -111,7 +115,7 @@ int main()
   config.DoubleQLearning() = true;
 
   // Set up DQN agent.
-  QLearning<DiscreteActionEnv,
+  QLearning<DiscreteActionEnv<stateDimension, actionSize>,
             decltype(model),
             AdamUpdate,
             decltype(policy),
@@ -120,7 +124,7 @@ int main()
 
   // Preparation for training the agent
   // Set up the gym training environment.
-  gym::Environment env("gym.kurg.org", "4040", "Acrobot-v1");
+  gym::Environment env("localhost", "4040", "Acrobot-v1");
 
   // Initializing training variables.
   std::vector<double> returnList;
@@ -144,7 +148,7 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "Acrobot-v1");
+  gym::Environment envTest("localhost", "4040", "Acrobot-v1");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
@@ -193,8 +197,9 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  envTest.monitor.start("./dummy/", true, true);
-
+  // envTest.monitor.start("./dummy/", true, true);
+  envTest.compression(9);
+  
   // Resets the environment.
   envTest.reset();
   envTest.render();
