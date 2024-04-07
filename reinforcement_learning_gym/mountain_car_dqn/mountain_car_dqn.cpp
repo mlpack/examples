@@ -16,6 +16,10 @@
 using namespace mlpack;
 using namespace ens;
 
+// Set up the state and action space.
+constexpr size_t stateDimension = 2;
+constexpr size_t actionSize = 3;
+
 template<typename EnvironmentType,
          typename NetworkType,
          typename UpdaterType,
@@ -45,7 +49,7 @@ void Train(
       arma::mat action = {double(agent.Action().action)};
 
       env.step(action);
-      DiscreteActionEnv::State nextState;
+      DiscreteActionEnv<stateDimension, actionSize>::State nextState;
       nextState.Data() = env.observation;
 
       // Use an adjusted reward for task completion.
@@ -92,22 +96,20 @@ void Train(
 int main()
 {
   // Initializing the agent.
-  // Set up the state and action space.
-  DiscreteActionEnv::State::dimension = 2;
-  DiscreteActionEnv::Action::size = 3;
-
   // Set up the network.
   FFN<MeanSquaredError, GaussianInitialization> network(
       MeanSquaredError(), GaussianInitialization(0, 1));
   network.Add<Linear>(128);
-  network.Add<ReLULayer>();
-  network.Add<Linear>(DiscreteActionEnv::Action::size);
+  network.Add<ReLU>();
+  network.Add<Linear>(actionSize);
   // Set up the network.
   SimpleDQN<> model(network);
 
   // Set up the policy method.
-  GreedyPolicy<DiscreteActionEnv> policy(1.0, 1000, 0.1, 0.99);
-  RandomReplay<DiscreteActionEnv> replayMethod(32, 10000);
+  GreedyPolicy<DiscreteActionEnv<stateDimension, actionSize>> 
+      policy(1.0, 1000, 0.1, 0.99);
+  RandomReplay<DiscreteActionEnv<stateDimension, actionSize>> 
+      replayMethod(32, 10000);
 
   // Set up training configurations.
   TrainingConfig config;
@@ -115,7 +117,7 @@ int main()
   config.ExplorationSteps() = 400;
 
   // Set up DQN agent.
-  QLearning<DiscreteActionEnv,
+  QLearning<DiscreteActionEnv<stateDimension, actionSize>,
             decltype(model),
             AdamUpdate,
             decltype(policy),
@@ -125,7 +127,7 @@ int main()
   // Preparation for training the agent.
 
   // Set up the gym training environment.
-  gym::Environment env("gym.kurg.org", "4040", "MountainCar-v0");
+  gym::Environment env("localhost", "4040", "MountainCar-v0");
 
   // Initializing training variables.
   std::vector<double> returnList;
@@ -164,7 +166,7 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "MountainCar-v0");
+  gym::Environment envTest("localhost", "4040", "MountainCar-v0");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
