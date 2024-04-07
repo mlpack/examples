@@ -19,6 +19,10 @@ using namespace mlpack;
 using namespace ens;
 using namespace gym;
 
+// Set up the state and action space.
+constexpr size_t stateDimension = 24;
+constexpr size_t actionSize = 4;
+
 template<typename EnvironmentType,
          typename NetworkType,
          typename UpdaterType,
@@ -48,7 +52,7 @@ void Train(gym::Environment& env,
       arma::mat action = {agent.Action().action};
 
       env.step(action);
-      ContinuousActionEnv::State nextState;
+      ContinuousActionEnv<stateDimension, actionSize>::State nextState;
       nextState.Data() = env.observation;
 
       replayMethod.Store(
@@ -94,10 +98,6 @@ void Train(gym::Environment& env,
 int main()
 {
   // Initializing the agent.
-  // Set up the state and action space.
-  ContinuousActionEnv::State::dimension = 24;
-  ContinuousActionEnv::Action::size = 4;
-
   bool usePreTrainedModel = true;
 
   // Set up the actor and critic networks.
@@ -107,9 +107,8 @@ int main()
   policyNetwork.Add<ReLU>();
   policyNetwork.Add<Linear>(128);
   policyNetwork.Add<ReLU>();
-  policyNetwork.Add<Linear>(ContinuousActionEnv::Action::size);
+  policyNetwork.Add<Linear>(actionSize);
   policyNetwork.Add<TanH>();
-  policyNetwork.ResetParameters();
 
   FFN<EmptyLoss, GaussianInitialization> qNetwork(
       EmptyLoss(), GaussianInitialization(0, 0.01));
@@ -118,10 +117,11 @@ int main()
   qNetwork.Add<Linear>(128);
   qNetwork.Add<ReLU>();
   qNetwork.Add<Linear>(1);
-  qNetwork.ResetParameters();
+
 
   // Set up the replay method.
-  RandomReplay<ContinuousActionEnv> replayMethod(32, 10000);
+  RandomReplay<ContinuousActionEnv<stateDimension, actionSize>> 
+      replayMethod(32, 10000);
 
   // Set up training configurations.
   TrainingConfig config;
@@ -148,14 +148,14 @@ int main()
    * To default is to use the usePreTrainedModel. Otherwise you can disable this
    * by change the usePreTrainedModel to false and then recompile this example.
    */
-  SAC<ContinuousActionEnv,
+  SAC<ContinuousActionEnv<stateDimension, actionSize>,
       decltype(qNetwork),
       decltype(policyNetwork),
       AdamUpdate>
       agent(config, qNetwork, policyNetwork, replayMethod);
 
   const std::string environment = "BipedalWalker-v3";
-  const std::string host = "gym.kurg.org";
+  const std::string host = "127.0.0.1";
   const std::string port = "4040";
 
   Environment env(host, port, environment);
@@ -187,7 +187,7 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "BipedalWalker-v3");
+  gym::Environment envTest(host, port, environment);
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
