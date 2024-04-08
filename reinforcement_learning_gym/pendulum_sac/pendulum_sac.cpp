@@ -147,7 +147,6 @@ int main()
 
   // Creating and setting up the gym environment for testing.
   gym::Environment envTest("localhost", "4040", "Pendulum-v1");
-  envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
   envTest.reset();
@@ -175,7 +174,7 @@ int main()
     if (envTest.done)
     {
       std::cout << " Total steps: " << totalSteps
-                << "\\t Total reward: " << totalReward << std::endl;
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
@@ -231,7 +230,7 @@ int main()
     if (envTest.done)
     {
       std::cout << " Total steps: " << totalSteps
-                << "\\t Total reward: " << totalReward << std::endl;
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
