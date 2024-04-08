@@ -146,10 +146,11 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("localhost", "4040", "Pendulum-v1-render");
+  gym::Environment envTest("localhost", "4040", "Pendulum-v1");
 
   // Resets the environment.
   envTest.reset();
+  envTest.render();
 
   double totalReward = 0;
   size_t totalSteps = 0;
