@@ -156,16 +156,17 @@ int main()
         returnList,
         episodes,
         consecutiveEpisodes,
-        100000);
+        10000);
 
   // Testing the trained agent.
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("localhost", "4040", "MountainCarContinuous-v0-render");
+  gym::Environment envTest("localhost", "4040", "MountainCarContinuous-v0");
 
   // Resets the environment.
   envTest.reset();
+  envTest.render();
 
   double totalReward = 0;
   size_t totalSteps = 0;
