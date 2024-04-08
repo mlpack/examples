@@ -17,6 +17,10 @@
 using namespace mlpack;
 using namespace ens;
 
+// Set up the state and action space.
+constexpr size_t stateDimension = 3;
+constexpr size_t actionSize = 1;
+
 template<typename EnvironmentType,
          typename NetworkType,
          typename UpdaterType,
@@ -44,7 +48,7 @@ void Train(gym::Environment& env,
       arma::mat action = {double(agent.Action().action[0] * 2)};
 
       env.step(action);
-      ContinuousActionEnv::State nextState;
+      ContinuousActionEnv<stateDimension, actionSize>::State nextState;
       nextState.Data() = env.observation;
 
       replayMethod.Store(
@@ -86,17 +90,12 @@ void Train(gym::Environment& env,
 int main()
 {
   // Initializing the agent.
-
-  // Set up the state and action space.
-  ContinuousActionEnv::State::dimension = 3;
-  ContinuousActionEnv::Action::size = 1;
-
   // Set up the actor and critic networks.
   FFN<EmptyLoss, GaussianInitialization> policyNetwork(
       EmptyLoss(), GaussianInitialization(0, 0.1));
   policyNetwork.Add<Linear>(32);
   policyNetwork.Add<ReLU>();
-  policyNetwork.Add<Linear>(ContinuousActionEnv::Action::size);
+  policyNetwork.Add<Linear>(actionSize);
   policyNetwork.Add<TanH>();
 
   FFN<EmptyLoss, GaussianInitialization> qNetwork(
@@ -106,7 +105,8 @@ int main()
   qNetwork.Add<Linear>(1);
 
   // Set up the policy method.
-  RandomReplay<ContinuousActionEnv> replayMethod(32, 10000);
+  RandomReplay<ContinuousActionEnv<stateDimension, actionSize>> 
+      replayMethod(32, 10000);
 
   // Set up training configurations.
   TrainingConfig config;
@@ -114,7 +114,7 @@ int main()
   config.UpdateInterval() = 1;
 
   // Set up Soft actor-critic agent.
-  SAC<ContinuousActionEnv,
+  SAC<ContinuousActionEnv<stateDimension, actionSize>,
       decltype(qNetwork),
       decltype(policyNetwork),
       AdamUpdate>
@@ -122,7 +122,7 @@ int main()
 
   // Preparation for training the agent.
   // Set up the gym training environment.
-  gym::Environment env("gym.kurg.org", "4040", "Pendulum-v0");
+  gym::Environment env("localhost", "4040", "Pendulum-v1");
 
   // Initializing training variables.
   std::vector<double> returnList;
@@ -146,7 +146,7 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  gym::Environment envTest("gym.kurg.org", "4040", "Pendulum-v0");
+  gym::Environment envTest("localhost", "4040", "Pendulum-v1");
   envTest.monitor.start("./dummy/", true, true);
 
   // Resets the environment.
