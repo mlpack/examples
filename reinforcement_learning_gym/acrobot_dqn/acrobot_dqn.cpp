@@ -186,7 +186,6 @@ int main()
     //   << totalReward << "\t Action taken: " << action;
   }
 
-  envTest.close();
   std::cout << envTest.url() << std::endl;
 
   /** 
@@ -197,12 +196,10 @@ int main()
   agent.Deterministic() = true;
 
   // Creating and setting up the gym environment for testing.
-  // envTest.monitor.start("./dummy/", true, true);
-  envTest.compression(9);
+  envTest.monitor.start("./dummy/", true, true);
   
   // Resets the environment.
   envTest.reset();
-  envTest.render();
 
   totalReward = 0;
   totalSteps = 0;

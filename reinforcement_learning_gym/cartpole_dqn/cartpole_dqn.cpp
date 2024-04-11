@@ -183,7 +183,6 @@ int main()
     //   << totalReward << "\\t Action taken: " << action;
   }
 
-  envTest.close();
   std::cout << envTest.url() << std::endl;
 
   // A little more training...
@@ -203,7 +202,6 @@ int main()
 
   // Resets the environment.
   envTest.reset();
-  envTest.render();
 
   totalReward = 0;
   totalSteps = 0;

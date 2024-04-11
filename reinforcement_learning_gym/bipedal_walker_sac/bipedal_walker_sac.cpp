@@ -218,7 +218,7 @@ int main()
     if (envTest.done)
     {
       std::cout << " Total steps: " << totalSteps
-                << "\\t Total reward: " << totalReward << std::endl;
+                << "\t Total reward: " << totalReward << std::endl;
       break;
     }
 
