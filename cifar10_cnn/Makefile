@@ -5,7 +5,7 @@ SRC1 := cifar_eval.cpp
 LIBS_NAME := armadillo
 
 CXX := g++
-CXXFLAGS := -std=c++14 -Wall -g -rdynamic -Wextra -O3 -DNDEBUG -fopenmp
+CXXFLAGS := -std=c++17 -Wall -g -rdynamic -Wextra -O3 -DNDEBUG -fopenmp
 
 LDFLAGS := -fopenmp
 

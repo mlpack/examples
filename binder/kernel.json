@@ -4,7 +4,7 @@
       "/srv/conda/envs/notebook/bin/xcpp",
       "-f",
       "{connection_file}",
-      "-std=c++14", "-fopenmp", "-pthread"
+      "-std=c++17", "-fopenmp", "-pthread"
   ],
   "language": "C++14"
 }
