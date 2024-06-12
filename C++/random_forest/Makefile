@@ -9,7 +9,7 @@ SRC := covertype-rf.cpp
 LIBS_NAME := armadillo
 
 CXX := g++
-CXXFLAGS += -std=c++17 -Wall -Wextra -Os -DNDEBUG -fopenmp -fdata-sections -ffunction-sections -fomit-frame-pointer -fno-unwind-tables -fno-asynchronous-unwind-tables -fvisibility=hidden -fshort-enums -finline-small-functions -findirect-inlining -fno-common -flto -fuse-ld=gold 
+CXXFLAGS += -std=c++17 -Wall -Wextra -Os -DNDEBUG -fopenmp 
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and
 # without optimizations.
 # CXXFLAGS += -std=c++17 -Wall -Wextra -g -O0
