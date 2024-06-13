@@ -12,8 +12,7 @@ https://lab.mlpack.org/.
 
   1. [Overview](#1-overview)
   2. [Building the examples and usage](#2-Building-the-examples-and-usage)
-  3. [List of examples](#3-List-of-examples)
-  4. [Datasets](#4-datasets)
+  3. [Datasets](#4-datasets)
 
 ###  1. Overview
 
@@ -28,9 +27,10 @@ provides bindings to other languages, including Python and Julia, and it also
 provides command-line programs.
 
 Therefore, this repository contains examples not just in C++ but also in other
-languages.  C++ mlpack usage examples are contained in the `c++/` directory;
-Python examples in the `python/` directory, command-line examples in the
-`command-line/` directory, and so forth.
+languages.  C++ mlpack usage examples are contained in the `c++/` directory,
+Jupyter notebook examples in the `jupyter/` directory, embedded system related
+examples can be found in the `embedded` directory, command-line examples in the
+`cli_bindings/` directory, and so forth.
 
 ### 2. Building the examples and usage
 
@@ -50,46 +50,14 @@ Each example should be easily runnable and should perform a simple machine
 learning task on a dataset.  You might need to download the dataset first---so
 be sure to check any README for the example.
 
-### 3. List of examples
-
-Below is a list of examples available in this repository along with a quick
-description (just a little bit more than the title):
-
- - `lstm_electricity_consumption`: use an LSTM-based recurrent neural network to
-   predict electricity consumption
-
- - `lstm_stock_prediction`: predict Google's historical stock price (daily high
-   _and_ low) using an LSTM-based recurrent neural network
-
- - `spam`: predict whether a mobile phone text message in Indonesian is spam 
-    or not using logistic regression
-
- - `mnist_batch_norm`: use batch normalization in a simple feedforward neural
-   network to recognize the MNIST digits
-
- - `mnist_cnn`: use a convolutional neural network (CNN) similar to LeNet-5 to
-   recognize the MNIST digits
-
- - `mnist_simple`: use a very simple three-layer feedforward neural network with
-   dropout to recognize the MNIST digits
-
- - `mnist_vae_cnn`: use a variational autoencoder with convolutional neural
-   networks in the encoder and reparametrization networks to recognize the MNIST
-   digits
-   
- - `neural_network_regression`: use neural network to do regression on Body fat 
-    dataset
-    
- - `q_learning`: train a simple deep Q-network agent on CartPole environment
-   
-### 4. Datasets
+### 3. Datasets
 
 All the required dataset needed by the examples can be downloaded using the
-provided script in the `tools` directory. You will have to execute
-`download_data_set.py` from the `tools/` directory and it will download and
+provided script in the `scripts` directory. You will have to execute
+`download_data_set.py` from the `scripts/` directory and it will download and
 extract all the necessary dataset in order for examples to work perfectly:
 
 ```sh
-cd tools/
+cd scripts/
 ./download_data_set.py
 ```
