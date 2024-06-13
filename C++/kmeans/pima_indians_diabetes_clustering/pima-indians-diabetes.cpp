@@ -19,9 +19,9 @@ using namespace mlpack;
 
 int main(int argc, char* argv[])
 {
-  // The dataset is originally from the National Institute of Diabetes and\n",
-  // Digestive and Kidney Diseases and can be used to predict whether a\n",
-  // patient has diabetes based on certain diagnostic factors.\n",
+  // The dataset is originally from the National Institute of Diabetes and,
+  // Digestive and Kidney Diseases and can be used to predict whether a,
+  // patient has diabetes based on certain diagnostic factors.,
   arma::mat input;
   data::Load("pima-indians-diabetes.csv", input);
   // Print the first 10 rows of the input data.,

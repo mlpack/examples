@@ -153,6 +153,15 @@ def pima_diabetes_dataset():
     pima = requests.get("https://datasets.mlpack.org/pima-indians-diabetes.csv")
     progress_bar("pima-indians-diabetes.csv", pima)
 
+def dominant_color_dataset():
+    print("Downloading dominant color dataset...")
+    jurassic_park = requests.get("https://datasets.mlpack.org/jurassic-park.png")
+    progress_bar("jurassic-park.png", jurassic_park)
+    godfather = requests.get("https://datasets.mlpack.org/the-godfather.png")
+    progress_bar("the-godfather.png", godfather)
+    budapest = requests.get("https://datasets.mlpack.org/the-grand-budapest-hotel.png")
+    progress_bar("the-grand-budapest-hotel.png", budapest)
+
 def cifar10_dataset():
     print("Downloading CIFAR10 dataset...")
     cifar = requests.get("http://datasets.mlpack.org/cifar-10.tar.xz")
@@ -172,6 +181,7 @@ def all_datasets():
     spam_dataset()
     cifar10_dataset()
     pima_diabetes_dataset()
+    dominant_color_dataset()
 
 if __name__ == '__main__':
 
@@ -197,6 +207,7 @@ if __name__ == '__main__':
         salary: will download the salary dataset
         cifar10: will download the cifar10 dataset
         pima: will download the pima diabetes dataset
+        color: will download the dominant color dataset
         all : will download all datasets for all examples
         '''))
 
@@ -235,6 +246,9 @@ if __name__ == '__main__':
     elif args.dataset_name == "pima":
         create_dataset_dir()
         pima_diabetes_dataset()
+    elif args.dataset_name == "color":
+        create_dataset_dir()
+        dominant_color_dataset()
       elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()

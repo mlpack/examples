@@ -223,7 +223,7 @@ int main(int argc, char* argv[])
       imageData.shed_row(3);
   
   // Convert from RGB to CIE*Lab color space.
-  rgb2labMatrix(imageData);"
+  rgb2labMatrix(imageData);
   // Perform K-means clustering using the Euclidean distance.
   //
   // For more information checkout https://mlpack.org/doc/stable/doxygen/classmlpack_1_1kmeans_1_1KMeans.html
