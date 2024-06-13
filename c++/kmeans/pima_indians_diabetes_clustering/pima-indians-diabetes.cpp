@@ -8,13 +8,12 @@
  */
 #include <mlpack.hpp>
 #include <sstream>
-// Header files to create and show the plot.
-#define WITHOUT_NUMPY 1
-#include "matplotlibcpp.h"
-#include "xwidgets/ximage.hpp"
-#include "../utils/scatter.hpp"
 
-namespace plt = matplotlibcpp;
+// Header files to create and produce the plot using Python
+// You can use this header safely and uncomment the Scatter function 
+// if you want to see any visualization
+// #include "../../../utils/scatter.hpp"
+
 using namespace mlpack;
 
 int main(int argc, char* argv[])
@@ -23,17 +22,17 @@ int main(int argc, char* argv[])
   // Digestive and Kidney Diseases and can be used to predict whether a,
   // patient has diabetes based on certain diagnostic factors.,
   arma::mat input;
-  data::Load("pima-indians-diabetes.csv", input);
+  data::Load("../../../data/pima-indians-diabetes.csv", input);
   // Print the first 10 rows of the input data.,
-  std::cout << std::setw(18) << "Pregnancies ",
-            << std::setw(10) << "Glucose ",
-            << "BloodPressure ",
-            << std::left << std::setw(18) << "SkinThickness ",
-            << std::left << std::setw(15) << "Insulin ",
-            << "BMI ",
-            << "DiabetesPedigreeFunction ",
-            << "Age ",
-            << "Outcome " << std::endl;,
+  std::cout << std::setw(18) << "Pregnancies "
+            << std::setw(10) << "Glucose "
+            << "BloodPressure "
+            << std::left << std::setw(18) << "SkinThickness "
+            << std::left << std::setw(15) << "Insulin "
+            << "BMI "
+            << "DiabetesPedigreeFunction "
+            << "Age "
+            << "Outcome " << std::endl;
   
   std::cout << input.submat(0, 0, input.n_rows - 1 , 10).t() << std::endl;
   // Split the labels last column.
@@ -53,21 +52,18 @@ int main(int argc, char* argv[])
   std::vector<double> x = arma::conv_to<std::vector<double>>::from(dataset.row(0));
   std::vector<double> y = arma::conv_to<std::vector<double>>::from(dataset.row(1));
   
-  plt::figure_size(800, 800);
-  plt::scatter(x, y, 4);
-  
-  plt::xlabel("Principal Component - 1");
-  plt::ylabel("Principal Component - 2");
-  plt::title("Projection of Pima Indians Diabetes dataset onto first two principal components");
-  
-  plt::save("./pca.png");
-  auto im = xw::image_from_file("pca.png").finalize(); 
+  /**
+   * // Uncomment the following part of the code if you want to use
+   * // matplotlibcpp
+   * plt::figure_size(800, 800);
+   * plt::scatter(x, y, 4);
+   * plt::xlabel("Principal Component - 1");
+   * plt::ylabel("Principal Component - 2");
+   * plt::title("Projection of Pima Indians Diabetes dataset onto first two principal components");
+   * plt::save("./pca.png");
+  */
   
   // Perform K-means clustering using the Euclidean distance.
-  //
-  // For more information checkout
-  // https://mlpack.org/doc/stable/doxygen/classmlpack_1_1kmeans_1_1KMeans.html
-
   // The assignments will be stored in this vector.
   arma::Row<size_t> assignments;
 
@@ -119,11 +115,12 @@ int main(int argc, char* argv[])
         cData << centroids(j) << ";";
   }
   // Plot the K-means optimization steps.
-  Scatter(xData.str()  /* Dataset first feature. */,
-          yData.str()  /* Dataset second feature. */,
-          aData.str()  /* K-means assignments. */,
-          cData.str()  /* K-means centroids. */,
-          iterations,  /* Number of optimization steps. */
-          "output.gif" /* Output file. */);
-   auto im = xw::image_from_file("output.gif").finalize();
+  // This function depends on Python, uncomment in makefile and the above
+  // header to use it
+  //Scatter(xData.str()  [> Dataset first feature. <],
+          //yData.str()  [> Dataset second feature. <],
+          //aData.str()  [> K-means assignments. <],
+          //cData.str()  [> K-means centroids. <],
+          //iterations,  [> Number of optimization steps. <]
+          //"output.gif" [> Output file. <]);
 }

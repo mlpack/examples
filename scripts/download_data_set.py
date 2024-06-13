@@ -249,6 +249,6 @@ if __name__ == '__main__':
     elif args.dataset_name == "color":
         create_dataset_dir()
         dominant_color_dataset()
-      elif args.dataset_name == "all":
+    elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
