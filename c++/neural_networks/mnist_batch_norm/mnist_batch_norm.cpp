@@ -70,7 +70,7 @@ int main()
   mat dataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, true);
 
   // Splitting the dataset on training and validation parts.
   mat train, valid;

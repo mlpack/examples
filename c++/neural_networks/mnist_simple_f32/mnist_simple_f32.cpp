@@ -58,7 +58,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::fmat dataset;
-  data::Load("../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, true);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.

@@ -62,7 +62,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, true);
 
   // Split the dataset into training and validation sets.
   arma::fmat train, valid;
