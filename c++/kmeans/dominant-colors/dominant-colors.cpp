@@ -9,14 +9,12 @@
  * most in the image.
  */
 
-#include <mlpack/xeus-cling.hpp>
 // Enable image load/save support.
 #define HAS_STB
 #include <mlpack.hpp>
-#include <sstream>"
+#include <sstream>
 // Header files to create and show images.
-#include "xwidgets/ximage.hpp"
-#include "../utils/stackedbar.hpp"
+#include "../../../utils/stackedbar.hpp"
 using namespace mlpack;
 
 // Before we apply K-means on an image we have to be aware that the RGB color space has some shortages. In fact, it's
@@ -186,23 +184,23 @@ void GetColorBarData(std::string& values,
   std::stringstream colorsString;
   for (size_t i = 0; i < indices.n_elem; ++i)
   {
-      colorsString << (int)centroids.col(indices(i))(0) << \";\"
-                   << (int)centroids.col(indices(i))(1) << \";\"
-                   << (int)centroids.col(indices(i))(2) << \";\";
+      colorsString << (int)centroids.col(indices(i))(0) << ";"
+                   << (int)centroids.col(indices(i))(1) << ";"
+                   << (int)centroids.col(indices(i))(2) << ";";
 
-      valuesString << h(indices(i)) << \";\";
+      valuesString << h(indices(i)) << ";";
   }
   
   values = valuesString.str();
   colors = colorsString.str();
 }
 
-int main(int argc, char* argv[])
+void dominantColors(std::string PathToImage)
 {
   // Load the example image.
   arma::Mat<unsigned char> imageMatrix;
   data::ImageInfo info;
-  data::Load("jurassic-park.png", imageMatrix, info, false);
+  data::Load(PathToImage, imageMatrix, info, false);
   // Print the image shape.
   std::cout << "Image info -"
             << " Width:" << info.Width()
@@ -217,37 +215,32 @@ int main(int argc, char* argv[])
   //  [R, G, B]]
   arma::mat imageData = arma::conv_to<arma::mat>::from(
       arma::reshape(imageMatrix, info.Channels(), imageMatrix.n_elem / 3));
-  
+
   // Remove the alpha channel if the image comes with one.
   if (info.Channels() > 3)
       imageData.shed_row(3);
-  
+
   // Convert from RGB to CIE*Lab color space.
   rgb2labMatrix(imageData);
+
   // Perform K-means clustering using the Euclidean distance.
-  //
-  // For more information checkout https://mlpack.org/doc/stable/doxygen/classmlpack_1_1kmeans_1_1KMeans.html
-  // or uncomment the line below.
-  // ?KMeans<>
-  
   // The assignments will be stored in this vector.
   arma::Row<size_t> assignments;
   
   // The centroids will be stored in this matrix.
   arma::mat centroids;
-  
+
   // The number of clusters we are getting (colors).
   // For the image we like the see the first 5 dominate colors.
   size_t cluster = 5;
-  
+
   // Initialize with the default arguments.
   KMeans<> kmeans;
   kmeans.Cluster(imageData, cluster, assignments, centroids);
-  
+
   // Convert back from CIE*Lab to RGB color space to plot the result.
   lab2rgbMatrix(centroids);
-  // Show the input image.
-  auto im = xw::image_from_file("jurassic-park.png").finalize();
+
   // Create color bar data using the centroids matrix and assignments vector.
   // In our case which the centroids matrix contains the dominant colors in
   // RGB color space, and the assignments vector contains the associated
@@ -257,126 +250,11 @@ int main(int argc, char* argv[])
   
   // Show the dominant colors.
   StackedBar(values, colors, "jurassic-park-colors.png");
-  auto im = xw::image_from_file("jurassic-park-colors.png").finalize();
+}
 
-  // Load the example image.
-  arma::Mat<unsigned char> imageMatrix;
-  data::ImageInfo info;
-  data::Load("the-godfather.png", imageMatrix, info, false);
-  // Print the image shape.
-  std::cout << "Image info -"
-            << " Width:" << info.Width()
-            << " Height: " << info.Height()
-            << " Channels: " << info.Channels() << std::endl;
-  // Each column of the image matrix contains an image that
-  // is vectorized in the format of [R, G, B, R, G, B, ..., R, G, B].
-  // Here we transform the image data into the expected format:
-  // [[R, G, B],
-  //  [R, G, B],
-  //  ...
-  //  [R, G, B]]
-  arma::mat imageData = arma::conv_to<arma::mat>::from(
-      arma::reshape(imageMatrix, info.Channels(), imageMatrix.n_elem / 3));
-
-  // Remove the alpha channel if the image comes with one.
-  if (info.Channels() > 3)
-      imageData.shed_row(3);
-
-  // Convert from RGB to CIE*Lab color space.
-  rgb2labMatrix(imageData);"
-  // Perform K-means clustering using the Euclidean distance.
-  //
-  // For more information checkout https://mlpack.org/doc/stable/doxygen/classmlpack_1_1kmeans_1_1KMeans.html
-  // or uncomment the line below.
-  // ?KMeans<>
-  
-  // The assignments will be stored in this vector.
-  arma::Row<size_t> assignments;
-
-  // The centroids will be stored in this matrix.
-  arma::mat centroids;
-
-  // The number of clusters we are getting (colors).
-  // For the image we like the see the first 4 dominate colors.
-  size_t cluster = 4;
-
-  // Initialize with the default arguments.
-  KMeans<> kmeans;
-  kmeans.Cluster(imageData, cluster, assignments, centroids);
-
-  // Convert back from CIE*Lab to RGB color space to plot the result.
-  lab2rgbMatrix(centroids);
-  // Show the input image.
-  auto im = xw::image_from_file("the-godfather.png").finalize();
-
-  // Create color bar data using the centroids matrix and assignments vector.
-  // In our case which the centroids matrix contains the dominant colors in
-  // RGB color space, and the assignments vector contains the associated
-  // dominant color for each pixel in the image.
-  std::string values, colors;
-  GetColorBarData(values, colors, cluster, assignments, centroids);
-  
-  // Show the dominant colors.
-  StackedBar(values, colors, \"the-godfather-colors.png\");
-  auto im = xw::image_from_file(\"the-godfather-colors.png\").finalize();//
-  im"
-  // Load the example image.
-  arma::Mat<unsigned char> imageMatrix;
-  data::ImageInfo info;
-  data::Load("the-grand-budapest-hotel.png", imageMatrix, info, false);
-  // Print the image shape.
-  std::cout << "Image info -"
-            << " Width:" << info.Width()
-            << " Height: " << info.Height()
-            << " Channels: " << info.Channels() << std::endl;
-  // Each column of the image matrix contains an image that
-  // is vectorized in the format of [R, G, B, R, G, B, ..., R, G, B].
-  // Here we transform the image data into the expected format:
-  // [[R, G, B],
-  //  [R, G, B],
-  //  ...
-  //  [R, G, B]]
-  arma::mat imageData = arma::conv_to<arma::mat>::from(
-      arma::reshape(imageMatrix, info.Channels(), imageMatrix.n_elem / 3));
-  
-  // Remove the alpha channel if the image comes with one.
-  if (info.Channels() > 3)
-      imageData.shed_row(3);
-  
-  // Convert from RGB to CIE*Lab color space.
-  rgb2labMatrix(imageData);
-  // Perform K-means clustering using the Euclidean distance.
-  //
-  // For more information checkout https://mlpack.org/doc/stable/doxygen/classmlpack_1_1kmeans_1_1KMeans.html
-  // or uncomment the line below.
-  // ?KMeans<>
-  
-  // The assignments will be stored in this vector.
-  arma::Row<size_t> assignments;
-  
-  // The centroids will be stored in this matrix.
-  arma::mat centroids;
-  
-  // The number of clusters we are getting (colors).
-  // For the image we like the see the first 4 dominate colors.
-  size_t cluster = 4;
-  
-  // Initialize with the default arguments.
-  KMeans<> kmeans;
-  kmeans.Cluster(imageData, cluster, assignments, centroids);
-  
-  // Convert back from CIE*Lab to RGB color space to plot the result.
-  lab2rgbMatrix(centroids);
-  // Show the input image.
-  auto im = xw::image_from_file("the-grand-budapest-hotel.png").finalize();
-  // Create color bar data using the centroids matrix and assignments vector.
-  // In our case which the centroids matrix contains the dominant colors in
-  // RGB color space, and the assignments vector contains the associated
-  // dominant color for each pixel in the image.
-  std::string values, colors;
-  GetColorBarData(values, colors, cluster, assignments, centroids);
-  StackedBar(values, colors, "the-grand-budapest-hotel-colors.png");
-  
-  // Show the dominant colors.
-  auto im = xw::image_from_file("the-grand-budapest-hotel-colors.png").finalize();
+int main()
+{
+  dominantColors("../../../data/jurassic-park.png");
+  dominantColors("../../../data/the-grand-budapest-hotel.png");
+  dominantColors("../../../data/the-godfather.png");
 }
