@@ -48,37 +48,37 @@ def convert(imgf, labelf, outf, n):
 
 def create_dataset_dir():
     if os.path.exists("../data"):
-      os.chdir("../data")
+        os.chdir("../data")
     else:
-      os.mkdir("../data")
-      os.chdir("../data")
+        os.mkdir("../data")
+        os.chdir("../data")
 
 def clean():
     dataset = "."
     files = os.listdir(dataset)
     for f in files:
-      if f.endswith(".gz"):
-        os.remove(os.path.join(dataset, f))
-      elif f.endswith(".tar.gz"):
-        os.remove(os.path.join(dataset, f))
-      elif f.endswith(".ubytes"):
-        os.remove(os.path.join(dataset, f))
+        if f.endswith(".gz"):
+            os.remove(os.path.join(dataset, f))
+        elif f.endswith(".tar.gz"):
+            os.remove(os.path.join(dataset, f))
+        elif f.endswith(".ubytes"):
+            os.remove(os.path.join(dataset, f))
 
 def ungzip(gzip_file, outputfile):
     with open(outputfile, 'wb') as f_in, gzip.open(gzip_file, 'rb') as f_out:
-      shutil.copyfileobj(f_out, f_in)
+        shutil.copyfileobj(f_out, f_in)
 
 def progress_bar(outputfile, request):
     total_size = int(request.headers.get('content-length', 0))
     block_size = 1024 #1 Kibibyte
     t=tqdm(total=total_size, unit='iB', unit_scale=True)
     with open(outputfile, 'wb') as f:
-      for data in request.iter_content(block_size):
-        t.update(len(data))
-        f.write(data)
+        for data in request.iter_content(block_size):
+            t.update(len(data))
+            f.write(data)
     t.close()
     if total_size != 0 and t.n != total_size:
-      print("ERROR, something went wrong")
+        print("ERROR, something went wrong")
 
 def mnist_dataset():
     print("Start downloading the mnist dataset")
