@@ -60,7 +60,7 @@ double ComputeMSE(mat& pred, mat& Y)
 int main()
 {
   //! Path to the dataset used for training and testing.
-  const string datasetPath = "./../data/BodyFat.tsv";
+  const string datasetPath = "../../../data/BodyFat.tsv";
   // File for saving the model.
   const string modelFile = "nn_regressor.bin";
 
