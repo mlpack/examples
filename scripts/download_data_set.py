@@ -153,6 +153,12 @@ def pima_diabetes_dataset():
     pima = requests.get("https://datasets.mlpack.org/pima-indians-diabetes.csv")
     progress_bar("pima-indians-diabetes.csv", pima)
 
+def covertype_dataset():
+    print("Downloading covertype dataset...")
+    covertype = requests.get("https://datasets.mlpack.org/covertype-small.csv.gz")
+    progress_bar("covertype-small.csv.gz", covertype)
+    ungzip("covertype-small.csv.gz", "covertype-small.csv")
+
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")
     jurassic_park = requests.get("https://datasets.mlpack.org/jurassic-park.png")
@@ -182,6 +188,7 @@ def all_datasets():
     cifar10_dataset()
     pima_diabetes_dataset()
     dominant_color_dataset()
+    covertype_dataset()
 
 if __name__ == '__main__':
 
@@ -208,6 +215,7 @@ if __name__ == '__main__':
         cifar10: will download the cifar10 dataset
         pima: will download the pima diabetes dataset
         color: will download the dominant color dataset
+        covertype: will download the forest covertype dataset
         all : will download all datasets for all examples
         '''))
 
@@ -215,40 +223,43 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if len(sys.argv) == 1:
-      create_dataset_dir()
-      all_datasets()
-
-    if args.dataset_name:
-      if args.dataset_name == "mnist":
-        create_dataset_dir()
-        mnist_dataset()
-      elif args.dataset_name == "electricity":
-        create_dataset_dir()
-        electricity_consumption_dataset()
-      elif args.dataset_name == "stock":
-        create_dataset_dir()
-        stock_exchange_dataset()
-      elif args.dataset_name == "iris":
-        create_dataset_dir()
-        iris_dataset()
-      elif args.dataset_name == "bodyFat":
-        create_dataset_dir()
-        body_fat_dataset()
-      elif args.dataset_name == "spam":
-        create_dataset_dir()
-        spam_dataset()
-      elif args.dataset_name == "salary":
-        create_dataset_dir()
-        salary_dataset()
-      elif args.dataset_name == "cifar10":
-        create_dataset_dir()
-        cifar10_dataset()
-    elif args.dataset_name == "pima":
-        create_dataset_dir()
-        pima_diabetes_dataset()
-    elif args.dataset_name == "color":
-        create_dataset_dir()
-        dominant_color_dataset()
-    elif args.dataset_name == "all":
         create_dataset_dir()
         all_datasets()
+
+    if args.dataset_name:
+        if args.dataset_name == "mnist":
+            create_dataset_dir()
+            mnist_dataset()
+        elif args.dataset_name == "electricity":
+            create_dataset_dir()
+            electricity_consumption_dataset()
+        elif args.dataset_name == "stock":
+            create_dataset_dir()
+            stock_exchange_dataset()
+        elif args.dataset_name == "iris":
+            create_dataset_dir()
+            iris_dataset()
+        elif args.dataset_name == "bodyFat":
+            create_dataset_dir()
+            body_fat_dataset()
+        elif args.dataset_name == "spam":
+            create_dataset_dir()
+            spam_dataset()
+        elif args.dataset_name == "salary":
+            create_dataset_dir()
+            salary_dataset()
+        elif args.dataset_name == "cifar10":
+            create_dataset_dir()
+            cifar10_dataset()
+        elif args.dataset_name == "pima":
+            create_dataset_dir()
+            pima_diabetes_dataset()
+        elif args.dataset_name == "color":
+            create_dataset_dir()
+            dominant_color_dataset()
+        elif args.dataset_name == "covertype":
+            create_dataset_dir()
+            covertype_dataset()
+        elif args.dataset_name == "all":
+            create_dataset_dir()
+            all_datasets()
