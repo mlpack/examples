@@ -2,10 +2,10 @@
 
 using namespace mlpack;
 
-int main(int argc, char** argv)
+int main()
 {
   arma::mat dataset;
-  data::Load("covertype-small.csv", dataset);
+  data::Load("../../../data/covertype-small.csv", dataset);
 
   // Labels are the last row.\n",
   // The dataset stores labels from 1 through 7, but we need 0 through 6\n",
