@@ -77,21 +77,15 @@ steps:
 
   displayName: "Download datasets"
 
-# Now build the examples.
+# Now build the examples, only c++.
 - script: |
-    for f in */Makefile; do
+    for f in c++/*/*/*; do
       dir=`dirname $f`;
       # Remove the -fopenmp flag from the Makefile.
       sed -i '' 's/ -fopenmp//' $f;
 
       # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "mnist_vae_cnn" ];
-      then
-        continue;
-      fi
-
-      # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "spam" ];
+      if [ "$dir" == "c++/neural_networks/mnist_vae_cnn" ];
       then
         continue;
       fi
