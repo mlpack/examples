@@ -83,22 +83,22 @@ def progress_bar(outputfile, request):
 def mnist_dataset():
     print("Start downloading the mnist dataset")
     train_features = requests.get(
-        "http://yann.lecun.com/exdb/mnist/train-images-idx3-ubyte.gz")
+        "https://datasets.mlpack.org/mnist/train-images-idx3-ubyte.gz")
     progress_bar("train_features.gz", train_features)
     ungzip("train_features.gz", "train_features.ubytes")
   
     train_labels = requests.get(
-        "http://yann.lecun.com/exdb/mnist/train-labels-idx1-ubyte.gz")
+        "https://datasets.mlpack.org/mnist/train-labels-idx1-ubyte.gz")
     progress_bar("train_labels.gz", train_labels)
     ungzip("train_labels.gz", "train_labels.ubytes")
   
     test_features = requests.get(
-        "http://yann.lecun.com/exdb/mnist/t10k-images-idx3-ubyte.gz")
+        "https://datasets.mlpack.org/mnist/t10k-images-idx3-ubyte.gz")
     progress_bar("test_features.gz", test_features)
     ungzip("test_features.gz", "test_features.ubytes")
   
     test_labels = requests.get(
-        "http://yann.lecun.com/exdb/mnist/t10k-labels-idx1-ubyte.gz")
+        "https://datasets.mlpack.org/mnist/t10k-labels-idx1-ubyte.gz")
     progress_bar("test_labels.gz", test_labels)
     ungzip("test_labels.gz", "test_labels.ubytes")
   
