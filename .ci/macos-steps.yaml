@@ -102,7 +102,7 @@ steps:
       else
         echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
       fi
-      cd ../;
+      cd ../../../;
     done
 
     # Print any failures.
