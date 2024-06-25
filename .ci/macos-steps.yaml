@@ -79,7 +79,7 @@ steps:
 
 # Now build the examples, only c++.
 - script: |
-    for f in c++/*/*/*; do
+    for f in cpp/*/*/*; do
       dir=`dirname $f`;
       # Remove the -fopenmp flag from the Makefile.
       sed -i '' 's/ -fopenmp//' $f;

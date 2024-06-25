@@ -75,7 +75,7 @@ steps:
 
 # Now build the examples, only c++.
 - script: |
-    for f in c++/*/*/*; do
+    for f in cpp/*/*/*; do
       dir=`dirname $f`;
 
       # TODO: the dataset cannot be loaded.
