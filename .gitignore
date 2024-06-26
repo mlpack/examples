@@ -12,4 +12,10 @@ cmake-build-*
 *.so
 data
 plots
+mnist_*
+nn_*
+cifar_*
+covertype-rf
+dominant_colors
+pima_indians_diabetes
 *__pycache__*

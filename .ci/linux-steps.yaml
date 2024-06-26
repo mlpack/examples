@@ -66,26 +66,20 @@ steps:
 # Download datasets.
 - script: |
     python -m pip install tqdm requests
-    cd tools/
+    cd scripts/
     ./download_data_set.py
     cd ../
     ls data/
 
   displayName: "Download datasets"
 
-# Now build the examples.
+# Now build the examples, only c++.
 - script: |
-    for f in */Makefile; do
+    for f in cpp/*/*/*; do
       dir=`dirname $f`;
 
       # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "mnist_vae_cnn" ];
-      then
-        continue;
-      fi
-
-      # TODO: the dataset cannot be loaded.
-      if [ "$dir" == "spam" ];
+      if [ "$dir" == "c++/neural_networks/mnist_vae_cnn" ];
       then
         continue;
       fi
@@ -102,7 +96,7 @@ steps:
       else
         echo "Example succeeded; ${PIPESTATUS[0]}, ${PIPESTATUS[1]}";
       fi
-      cd ../;
+      cd ../../../;
     done
 
     # Print any failures.

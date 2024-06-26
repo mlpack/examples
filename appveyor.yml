@@ -8,14 +8,10 @@ environment:
      #  Architecture: x86_amd64
      #  VCPREFIX:'C:\Program Files (x86)\Microsoft Visual Studio 14.0'
      #  VCVARS: 'VC\vcvarsall.bat'
-     #  BOOST_ROOT: C:\Libraries\boost_1_69_0
-     #  BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.0
      - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
        VSVER: Visual Studio 15 2017 Win64
        VCPREFIX: 'C:/Program Files (x86)/Microsoft Visual Studio/2017/Community'
        VCVARS: 'VC/Auxiliary/Build/vcvars64.bat'
-       BOOST_ROOT: C:\Libraries\boost_1_69_0
-       BOOST_LIBRARYDIR: C:\Libraries\boost_1_69_0\lib64-msvc-14.0
 
 configuration: Release
 
@@ -36,8 +32,6 @@ build_script:
     cmake -G "%VSVER%"
     -DDEBUG=OFF -DPROFILE=OFF
     -DUSE_OPENMP=OFF
-    -DBOOST_ROOT=%BOOST_ROOT%
-    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
     -DBUILD_CLI_EXECUTABLES=OFF
     -DBUILD_JULIA_BINDINGS=OFF
     -DBUILD_PYTHON_BINDINGS=OFF
@@ -55,8 +49,6 @@ build_script:
 #  - >
 #    cmake -G "%VSVER%"
 #    -DDEBUG=OFF -DPROFILE=OFF
-#    -DBOOST_ROOT=%BOOST_ROOT%
-#    -DBOOST_LIBRARYDIR=%BOOST_LIBRARYDIR%
 #    -DMLPACK_LIBRARY:FILEPATH=%MLPACK_LIB%
 #    -DMLPACK_INCLUDE_DIR:PATH=%MLPACK_INCLUDE%
 #    -DBUILD_PYTHON_BINDINGS=OFF -DCMAKE_BUILD_TYPE=Release
