@@ -4,10 +4,10 @@ This is a set of CMakefiles that autodowload all the mlpack dependencies. The
 objective of this example is to provide the minimum configurations that allow
 to build an mlpack application with in the objective of embedded system.
 
-These files contains the necessary cmake files that are ncessary in the
-embedded context, especially the cross compilation step, and build a
-statically linked binary, but this is not necessary as well since you
-can use these configs to build any mlpack application for your machine as well.
+These files contains the necessary cmake files that are required in the
+embedded context, especially the cross compilation step, and to build a
+statically linked binary, you can use these configs to build any mlpack
+application for any platform as long as you modify the configs accordingly.
 
 The main CMakeLists.txt assumes that the project name is `main` and that you
 have a file that is called `main.cpp` that contains the mlpack C++ code you are
