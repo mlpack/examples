@@ -39,8 +39,8 @@ int main(int argc, char** argv)
   // Predict the labels of the test points.
   arma::Row<size_t> output;
   rf.Classify(testSet, output);
-  // Now print the accuracy. The 'probabilities' output could also be used to"
-  // generate an ROC curve."
+  // Now print the accuracy. The 'probabilities' output could also be used to
+  // generate an ROC curve.
   const size_t correct = arma::accu(output == testLabels);
   std::cout << correct
             << " correct out of "
