@@ -34,21 +34,14 @@
 * In this example we'll be implementing 4 parts i.e modelling on imbalanced,
 * oversampled, SMOTE & undersampled data respectively."
 */
-#include <mlpack.hpp>"
+#include <mlpack.hpp>
 
-// Import utility headers.
-#define WITHOUT_NUMPY 1
-#include "matplotlibcpp.h"
-#include "xwidgets/ximage.hpp"
-#include "../utils/preprocess.hpp"
-#include "../utils/plot.hpp"
-
-namespace plt = matplotlibcpp;
 using namespace mlpack;
 using namespace mlpack::data;
 
-// Utility functions for evaluation metrics.
 /**
+ * Utility functions and definitions for evaluation metrics.
+ *
  * True Positive - The actual value was true & the model predicted true.
  * False Positive - The actual value was false & the model predicted true.
  * True Negative - The actual value was false & the model predicted false.
@@ -118,7 +111,7 @@ void ClassificationReport(const arma::Row<size_t>& yPreds, const arma::Row<size_
             << std::setw(15) << "f1-score" << std::setw(15) << "support" 
             << std::endl << std::endl;
   
-  for(auto val: uniqs)
+  for (auto val: uniqs)
   {
     size_t truePos = arma::accu(yTrue == val && yPreds == val && yPreds == yTrue);
     size_t falsePos = arma::accu(yPreds == val && yPreds != yTrue);
@@ -141,7 +134,7 @@ Drop the dataset header using sed, sed is an unix utility that prases and transf
 !cat LoanDefault.csv | sed 1d > ./data/LoanDefault_trim.csv"
 */
 // Load the preprocessed dataset into armadillo matrix.
-int main(int argc, char* argv[])
+void ImbalancedDataset() 
 {
   arma::mat loanData;
   data::Load("./data/LoanDefault_trim.csv", loanData);
@@ -149,24 +142,6 @@ int main(int argc, char* argv[])
   std::cout << std::setw(12) << "Employed" << std::setw(15) << "Bank Balance" << std::setw(15) << "Annual Salary" 
             << std::setw(12) << "Defaulted" << std::endl;
   std::cout << loanData.submat(0, 0, loanData.n_rows-1, 5).t() << std::endl;
-
-  //### Part 1 - Modelling using Imbalanced Dataset"
-  // Visualize the distribution of target classes.
-  CountPlot("LoanDefault.csv", "Defaulted?", "", "Part-1 Distribution of target class");
-  auto img = xw::image_from_file("./plots/Part-1 Distribution of target class.png").finalize();
-
-  /**
-   * From the above visualization, we can observe that the presence of "0" and "1", so there is a huge class imbalance.
-   * For the first part we would not be handling the class imbalance. In order to see how our model performs on the raw imbalanced data"
-   */
-
-  // Visualize the distibution of target classes with respect to Employment.
-  CountPlot("LoanDefault.csv", "Defaulted?", "Employed", "Part-1 Distribution of target class & Employed");
-  auto img = xw::image_from_file("./plots/Part-1 Distribution of target class & Employed.png").finalize();
-
-  // Plot the correlation matrix as heatmap.
-  HeatMapPlot("LoanDefault.csv", "coolwarm", "Part-1 Correlation Heatmap", 1, 5, 5);
-  auto img = xw::image_from_file("./plots/Part-1 Correlation Heatmap.png").finalize();
 
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
@@ -211,9 +186,6 @@ int main(int argc, char* argv[])
   // Model evaluation metrics.
   std::cout << "Accuracy: " << ComputeAccuracy(output, Ytest) << std::endl;
   ClassificationReport(output, Ytest);
-  // Plot ROC AUC Curve to visualize the performance of the model on TP & FP.
-  RocAucPlot("./data/ytest.csv", "./data/probabilities.csv", "Part-1 Imbalanced Targets ROC AUC Curve");
-  auto img = xw::image_from_file("./plots/Part-1 Imbalanced Targets ROC AUC Curve.png").finalize();
 }
 
 // Part 2 - Modelling using Random Oversampling
@@ -222,12 +194,11 @@ int main(int argc, char* argv[])
 //`Resample()` method to oversample the minority class i.e "1, signifying
 //Defaulted""
 
+void ModelingOverSampling()
 {
-  // Oversample the minority population.
+  // TODO: include this function and see if we can compile
+  // Objective no deps
   Resample("LoanDefault.csv", "Defaulted?", 0, 1, "oversample");
-  // Visualize the distribution of target classes.
-  CountPlot("./data/LoanDefault_oversampled.csv", "Defaulted?", "", "Part-2 Distribution of target class");
-  auto img = xw::image_from_file("./plots/Part-2 Distribution of target class.png").finalize();
   
   /**
    * From the above plot we can see that after resampling the minority class (Yes)
@@ -238,9 +209,6 @@ int main(int argc, char* argv[])
   // Load the preprocessed dataset into armadillo matrix.
   arma::mat loanData;
   data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Plot the correlation matrix as heatmap.
-  HeatMapPlot("./data/LoanDefault_oversampled.csv", "coolwarm", "Part-2 Correlation Heatmap", 1, 5, 5);
-  auto img = xw::image_from_file("./plots/Part-2 Correlation Heatmap.png").finalize();
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
   // Targets are dropped from the loaded matrix.
@@ -277,12 +245,9 @@ int main(int argc, char* argv[])
    * significance that our model performs well on unseen data."
    */
   ClassificationReport(output, Ytest);
-  // Plot ROC AUC Curve to visualize the performance of the model on TP & FP.
-  RocAucPlot("./data/ytest.csv", "./data/probabilities.csv", "Part-2 Random Oversampled Targets ROC AUC Curve");
-  auto img = xw::image_from_file("./plots/Part-2 Random Oversampled Targets ROC AUC Curve.png").finalize();
 }
 
-
+void ModelingSyntheticMinority()
 {
   // Part 3 - Modelling using Synthetic Minority Oversampling Technique
   /**
@@ -293,18 +258,10 @@ int main(int argc, char* argv[])
    */
   // Oversample the minority class using SMOTE resampling strategy.
   Resample("LoanDefault.csv", "Defaulted?", 0, 1, "smote");
-  We need to put back the headers manually into the newely sampled dataset for visualization purpose."
-  //!sed -i "1iEmployed,Bank Balance,Annual Salary,Defaulted?" ./data/LoanDefault_smotesampled.csv"
-  // Visualize the distribution of target classes.
-  CountPlot("./data/LoanDefault_smotesampled.csv", "Defaulted?", "", "Part-3 Distribution of target class");
-  auto img = xw::image_from_file("./plots/Part-3 Distribution of target class.png").finalize();
-  //!cat ./data/LoanDefault_smotesampled.csv | sed 1d > ./data/LoanDefault_trim.csv"
+
   // Load the preprocessed dataset into armadillo matrix.
   arma::mat loanData;
   data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Plot the correlation matrix as heatmap.
-  HeatMapPlot("./data/LoanDefault_smotesampled.csv", "coolwarm", "Part-3 Correlation Heatmap", 1, 5, 5);
-  auto img = xw::image_from_file("./plots/Part-3 Correlation Heatmap.png").finalize();
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
   // Targets are dropped from the loaded matrix.
@@ -338,11 +295,9 @@ int main(int argc, char* argv[])
    * lower than the Oversampled data.
    */
   ClassificationReport(output, Ytest);
-  // Plot ROC AUC Curve to visualize the performance of the model on TP & FP.
-  RocAucPlot("./data/ytest.csv", "./data/probabilities.csv", "Part-3 SMOTE ROC AUC Curve");
-  auto img = xw::image_from_file("./plots/Part-3 SMOTE ROC AUC Curve.png").finalize();
 }
 
+void ModelingRandomUndersampling()
 {
   // Part 4 - Modelling using Random Undersampling
   /**
@@ -357,16 +312,10 @@ int main(int argc, char* argv[])
 
   // Undersample the majority class.
   Resample("LoanDefault.csv", "Defaulted?", 0, 1, "undersample");
-  // Visualize the distribution of target classes.
-  CountPlot("./data/LoanDefault_undersampled.csv", "Defaulted?", "", "Part-4 Distribution of target class");
-  auto img = xw::image_from_file("./plots/Part-4 Distribution of target class.png").finalize();
   //!cat ./data/LoanDefault_undersampled.csv | sed 1d > ./data/LoanDefault_trim.csv"
   // Load the preprocessed dataset into armadillo matrix.
   arma::mat loanData;
   data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Plot the correlation matrix as heatmap.
-  HeatMapPlot("./data/LoanDefault_undersampled.csv", "coolwarm", "Part-4 Correlation Heatmap", 1, 5, 5);
-  auto img = xw::image_from_file("./plots/Part-4 Correlation Heatmap.png").finalize();
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
   // Targets are dropped from the loaded matrix.
@@ -400,12 +349,9 @@ int main(int argc, char* argv[])
    * better than imbalanced model.
    */
   ClassificationReport(output, Ytest);
-  // Plot ROC AUC Curve to visualize the performance of the model on TP & FP.
-  RocAucPlot("./data/ytest.csv", "./data/probabilities.csv", "Part-4 Random Undersampled targets ROC AUC Curve");
-  auto img = xw::image_from_file("./plots/Part-4 Random Undersampled targets ROC AUC Curve.png").finalize();
 }
 
-int main(int argc, char* argv[])
+int main()
 {
-
+  
 }
