@@ -120,6 +120,9 @@ int main()
                         2, // Stride along height.
                         true);
 
+  // Add BatchNorm.
+  model.Add<BatchNorm>();
+
   // Add the second convolution layer.
   model.Add<Convolution>(16, // Number of output activation maps.
                          5,  // Filter width.
@@ -136,6 +139,9 @@ int main()
   // Add the second pooling layer.
   model.Add<MaxPooling>(2, 2, 2, 2, true);
 
+  // Add BatchNorm
+  model.Add<BatchNorm>();
+  
   // Add the final dense layer.
   model.Add<Linear>(10);
   model.Add<LogSoftMax>();
@@ -200,7 +206,7 @@ int main()
   // Get predictions on test data points.
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, true);
   const mat testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1)
       / 256.0;
   const mat testY = dataset.row(0);
