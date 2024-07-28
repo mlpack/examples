@@ -153,6 +153,11 @@ def pima_diabetes_dataset():
     pima = requests.get("https://datasets.mlpack.org/pima-indians-diabetes.csv")
     progress_bar("pima-indians-diabetes.csv", pima)
 
+def loan_default_dataset():
+    print("Downloading load default dataset...")
+    loan = requests.get("http://datasets.mlpack.org/LoanDefault.csv")
+    progress_bar("LoanDefault.csv", loan)
+
 def covertype_dataset():
     print("Downloading covertype dataset...")
     covertype = requests.get("https://datasets.mlpack.org/covertype-small.csv.gz")
@@ -214,6 +219,7 @@ if __name__ == '__main__':
         salary: will download the salary dataset
         cifar10: will download the cifar10 dataset
         pima: will download the pima diabetes dataset
+        loan: will download the loan default dataset
         color: will download the dominant color dataset
         covertype: will download the forest covertype dataset
         all : will download all datasets for all examples
@@ -254,6 +260,9 @@ if __name__ == '__main__':
         elif args.dataset_name == "pima":
             create_dataset_dir()
             pima_diabetes_dataset()
+        elif args.dataset_name == "loan":
+            create_dataset_dir()
+            loan_default_dataset()
         elif args.dataset_name == "color":
             create_dataset_dir()
             dominant_color_dataset()
