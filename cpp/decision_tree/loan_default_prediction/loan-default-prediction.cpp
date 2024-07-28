@@ -4,6 +4,10 @@
 *
 * Using Decision Tree for Loan Default Prediction
 *
+* This example is trimmed from the original one to reduce depencies 
+* on a couple of functions that needs Python. If you are interested in the
+* full example please refer to the Jupyter notebook directory.
+*
 * What is our objective ?
 * To reliably predict wether a person's loan payment will be defaulted based
 * on features such as Salary, Account Balance etc.
@@ -127,21 +131,10 @@ void ClassificationReport(const arma::Row<size_t>& yPreds, const arma::Row<size_
   }
 }
 
-/*
- * The following to be removed later
-!mkdir -p ./data"
-Drop the dataset header using sed, sed is an unix utility that prases and transforms text."
-!cat LoanDefault.csv | sed 1d > ./data/LoanDefault_trim.csv"
-*/
-// Load the preprocessed dataset into armadillo matrix.
-void ImbalancedDataset() 
+int main() 
 {
   arma::mat loanData;
-  data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Inspect the first 5 examples in the dataset
-  std::cout << std::setw(12) << "Employed" << std::setw(15) << "Bank Balance" << std::setw(15) << "Annual Salary" 
-            << std::setw(12) << "Defaulted" << std::endl;
-  std::cout << loanData.submat(0, 0, loanData.n_rows-1, 5).t() << std::endl;
+  data::Load("../../../data/LoanDefault.csv", loanData);
 
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
@@ -188,170 +181,3 @@ void ImbalancedDataset()
   ClassificationReport(output, Ytest);
 }
 
-// Part 2 - Modelling using Random Oversampling
-//For this part we would be handling the class imbalance. In order to see
-//how our model performs on the randomly oversampled data. We will be using
-//`Resample()` method to oversample the minority class i.e "1, signifying
-//Defaulted""
-
-void ModelingOverSampling()
-{
-  // TODO: include this function and see if we can compile
-  // Objective no deps
-  Resample("LoanDefault.csv", "Defaulted?", 0, 1, "oversample");
-  
-  /**
-   * From the above plot we can see that after resampling the minority class (Yes)
-   * is oversampled to be equal to the majority class (No). This solves our imbalanced
-   * data issue for this part.
-   */
-  //!cat ./data/LoanDefault_oversampled.csv | sed 1d > ./data/LoanDefault_trim.csv"
-  // Load the preprocessed dataset into armadillo matrix.
-  arma::mat loanData;
-  data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Split the data into features (X) and target (y) variables, targets are the last row.
-  arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
-  // Targets are dropped from the loaded matrix.
-  loanData.shed_row(loanData.n_rows-1);
-  
-  /** 
-   * The dataset has to be split into training and test set. Here the dataset
-   * has 19334 observations and the test ratio is taken as 20% of the total
-   * observations. This indicates that the test set should have
-   * 20% * 19334 = 3866 observations and training set should have 15468
-   * observations respectively. This can be done using the `data::Split()`
-   * api from mlpack.
-   */
-  // Split the dataset into train and test sets using mlpack.
-  arma::mat Xtrain, Xtest;
-  arma::Row<size_t> Ytrain, Ytest;
-  Split(loanData, targets, Xtrain, Xtest, Ytrain, Ytest, 0.25);
-  // Create and train Decision Tree model using mlpack.
-  DecisionTree<> dt(Xtrain, Ytrain, 2);
-  // Classify the test set using trained model & get the probabilities.
-  arma::Row<size_t> output;
-  arma::mat probs;
-  dt.Classify(Xtest, output, probs);
-  // Save the yTest and probabilities into csv for generating ROC AUC plot.
-  data::Save("./data/probabilities.csv", probs);
-  data::Save("./data/ytest.csv", Ytest);
-  // Model evaluation metrics.
-  std::cout << "Accuracy: " << ComputeAccuracy(output, Ytest) << std::endl;
-  /**
-   * From the following classification report, we can infer that our model trained on
-   * oversampled data performs well on both the classes, This proves the fact that
-   * imbalanced data has affected the model trained in part one. Also from the ROC
-   * AUC Curve, we can infer the True Positive Rate is around 99%, which is a good
-   * significance that our model performs well on unseen data."
-   */
-  ClassificationReport(output, Ytest);
-}
-
-void ModelingSyntheticMinority()
-{
-  // Part 3 - Modelling using Synthetic Minority Oversampling Technique
-  /**
-   * For this part we would be handling the class imbalance. In order to see how
-   * our model performs on the oversampled data using SMOTE. We will be using
-   * `SMOTE` API from imblearn to oversample the minority class i.e "1,
-   * signifying Defaulted
-   */
-  // Oversample the minority class using SMOTE resampling strategy.
-  Resample("LoanDefault.csv", "Defaulted?", 0, 1, "smote");
-
-  // Load the preprocessed dataset into armadillo matrix.
-  arma::mat loanData;
-  data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Split the data into features (X) and target (y) variables, targets are the last row.
-  arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
-  // Targets are dropped from the loaded matrix.
-  loanData.shed_row(loanData.n_rows-1);
-  
-  /**
-   * The dataset has to be split into training and test set. The test ratio is
-   * taken as 25% of the total observations. This can be done using the
-   * `data::Split()` api from mlpack.
-   */
-  // Split the dataset into train and test sets using mlpack.
-  arma::mat Xtrain, Xtest;
-  arma::Row<size_t> Ytrain, Ytest;
-  Split(loanData, targets, Xtrain, Xtest, Ytrain, Ytest, 0.25);
-  // Create and train Decision Tree model.
-  DecisionTree<> dt(Xtrain, Ytrain, 2);
-  // Classify the test set using trained model & get the probabilities.
-  arma::Row<size_t> output;
-  arma::mat probs;
-  dt.Classify(Xtest, output, probs);
-  // Save the yTest and probabilities into csv for generating ROC AUC plot.
-  data::Save("./data/probabilities.csv", probs);
-  data::Save("./data/ytest.csv", Ytest);
-  // Model evaluation metrics.
-  std::cout << "Accuracy: " << ComputeAccuracy(output, Ytest) << std::endl;
-  /**
-   * From the above classification report, we can infer that our model trained on
-   * SMOTE data performs well on both the classes. Also from the ROC AUC Curve,
-   * we can infer the True Positive Rate is around 90%, which is a quantifies
-   * that our model performs well on unseen data. But it performs slightly
-   * lower than the Oversampled data.
-   */
-  ClassificationReport(output, Ytest);
-}
-
-void ModelingRandomUndersampling()
-{
-  // Part 4 - Modelling using Random Undersampling
-  /**
-   * For this part we would be handling the class imbalance by undersampling
-   * the majority class, to see how well our model trains and performs on
-   * randomly undersampled data.
-   * Since the size of the data set is quite small, undersampling of majority
-   * class would not make much sense here. But still we are going forward with
-   * this part to get a sense of how our model performs on less amount of data
-   * and it's impact on the learning.
-   */
-
-  // Undersample the majority class.
-  Resample("LoanDefault.csv", "Defaulted?", 0, 1, "undersample");
-  //!cat ./data/LoanDefault_undersampled.csv | sed 1d > ./data/LoanDefault_trim.csv"
-  // Load the preprocessed dataset into armadillo matrix.
-  arma::mat loanData;
-  data::Load("./data/LoanDefault_trim.csv", loanData);
-  // Split the data into features (X) and target (y) variables, targets are the last row.
-  arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));
-  // Targets are dropped from the loaded matrix.
-  loanData.shed_row(loanData.n_rows-1);
-  /**
-   * The dataset has to be split into training and test set. Here the dataset has
-   * 666 observations and the test ratio is taken as 20% of the total
-   * observations. This indicates that the test set should have 20% * 666 = 133
-   * observations and training set should have 533 observations respectively.
-   * This can be done using the `data::Split()` api from mlpack.
-   */
-  arma::mat Xtrain, Xtest;
-  arma::Row<size_t> Ytrain, Ytest;
-  Split(loanData, targets, Xtrain, Xtest, Ytrain, Ytest, 0.25);
-  // Create and train Decision Tree model.
-  DecisionTree<> dt(Xtrain, Ytrain, 2);
-  // Classify the test set using trained model & get the probabilities.
-  arma::Row<size_t> output;
-  arma::mat probs;
-  dt.Classify(Xtest, output, probs);
-  // Save the yTest and probabilities into csv for generating ROC AUC plot.
-  data::Save("./data/probabilities.csv", probs);
-  data::Save("./data/ytest.csv", Ytest);
-  // Model evaluation metrics.
-  std::cout << "Accuracy: " << ComputeAccuracy(output, Ytest) << std::endl;
-  /**
-   * From the following classification report, we can infer that our model trained
-   * on undersampled data performs well on both the classes compared to imbalanced
-   * model in Part 1. Also from the ROC AUC Curve, we can infer the True Positive
-   * Rate is around 80% although there is a small flatline, but still performs
-   * better than imbalanced model.
-   */
-  ClassificationReport(output, Ytest);
-}
-
-int main()
-{
-  
-}
