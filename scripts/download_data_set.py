@@ -9,6 +9,7 @@ import sys
 import tarfile
 import textwrap
 from tqdm import tqdm
+import pandas as pd
 import requests
 import shutil
 
@@ -45,6 +46,11 @@ def convert(imgf, labelf, outf, n):
     o.close()
     l.close()
     t.close()
+
+
+def pull_csv(file):
+    csv_file = pd.read_csv(file, sep=',', comment='#')
+    return csv_file
 
 def create_dataset_dir():
     if os.path.exists("../data"):
@@ -164,6 +170,11 @@ def avocado_dataset():
     avocado = requests.get("https://datasets.mlpack.org/avocado.csv.gz")
     progress_bar("avocado.csv.gz", avocado)
     ungzip("avocado.csv.gz", "avocado.csv")
+    avocado_data = pull_csv("avocado.csv")
+    avocado_data = avocado_data.iloc[:, 2:]
+    avocado_data.to_csv("avocado.csv", index=False)
+    
+
 
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")

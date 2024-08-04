@@ -47,12 +47,12 @@ int main()
  // this allows mlpack to map numeric values to each of those values,
  // which can later be unmapped to strings.
  // Load the dataset into armadillo matrix.
- 
+
  arma::mat matrix;
  data::DatasetInfo info;
  info.Type(9) = data::Datatype::categorical;
  info.Type(11) = data::Datatype::categorical;
- data::Load("avocado_trim.csv", matrix, info);
+ data::Load("../../../data/avocado.csv", matrix, info);
  // Printing header for dataset.
  std::cout << std::setw(10) << "AveragePrice" << std::setw(14) 
      << "Total Volume" << std::setw(9) << "4046" << std::setw(13) 
@@ -81,6 +81,7 @@ int main()
  // Convert armadillo Rows into rowvec. (Required by mlpacks' LinearRegression API in this format).
  arma::rowvec yTrain = arma::conv_to<arma::rowvec>::from(Ytrain);
  arma::rowvec yTest = arma::conv_to<arma::rowvec>::from(Ytest);
+
  /* Training the linear model.
   * Regression analysis is the most widely used method of prediction.
   * Linear regression is used when the dataset has a linear correlation
@@ -103,8 +104,6 @@ int main()
  arma::mat histpreds = yTest - yPreds;
  mlpack::data::Save("./data/predictions.csv", preds);
  mlpack::data::Save("./data/predsDiff.csv", yPreds);
- //!sed -i '1iY_Test,Y_Preds' ./data/predictions.csv"
- //!sed -i '1iY_Diff' ./data/predsDiff.csv"
  /*
   * Model Evaluation,
   * Test data is visualized with `yTest` and `yPreds`, the blue points
@@ -129,7 +128,8 @@ int main()
  // Model evaluation metrics.
  // From the above metrics, we can notice that our model MAE is ~0.2,
  // which is relatively small compared to our average price of $1.405,
- // from this and the above plot we can conclude our model is a reasonably good fit.
+ // from this and the above plot we can conclude our model is a reasonably
+ // good fit.
 
  std::cout << "Mean Absolute Error: "
            << arma::mean(arma::abs(yPreds - yTest)) << std::endl;
