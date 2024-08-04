@@ -159,6 +159,12 @@ def covertype_dataset():
     progress_bar("covertype-small.csv.gz", covertype)
     ungzip("covertype-small.csv.gz", "covertype-small.csv")
 
+def avocado_dataset():
+    print("Downloading the avocado price prediction dataset...")
+    avocado = requests.get("https://datasets.mlpack.org/avocado.csv.gz")
+    progress_bar("avocado.csv.gz", avocado)
+    ungzip("avocado.csv.gz", "avocado.csv")
+
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")
     jurassic_park = requests.get("https://datasets.mlpack.org/jurassic-park.png")
@@ -205,6 +211,7 @@ if __name__ == '__main__':
 
         Usage: --dataset_name dataset_name
         Available options:
+        avocado: will download the avocado price prediction dataset
         mnist : will download mnist dataset
         electricity : will download electricty_consumption_dataset
         stock : will download stock_exchange dataset
@@ -257,6 +264,9 @@ if __name__ == '__main__':
         elif args.dataset_name == "color":
             create_dataset_dir()
             dominant_color_dataset()
+        elif args.dataset_name == "avocado":
+            create_dataset_dir()
+            avocado_dataset()
         elif args.dataset_name == "covertype":
             create_dataset_dir()
             covertype_dataset()
