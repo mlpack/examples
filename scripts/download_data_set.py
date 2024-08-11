@@ -165,6 +165,11 @@ def covertype_dataset():
     progress_bar("covertype-small.csv.gz", covertype)
     ungzip("covertype-small.csv.gz", "covertype-small.csv")
 
+def california_housing_dataset():
+    print("Downloading the california housing dataset...")
+    california = requests.get("https://datasets.mlpack.org/examples/housing.csv")
+    progress_bar("housing.csv", california)
+
 def avocado_dataset():
     print("Downloading the avocado price prediction dataset...")
     avocado = requests.get("https://datasets.mlpack.org/avocado.csv.gz")
@@ -223,17 +228,18 @@ if __name__ == '__main__':
         Usage: --dataset_name dataset_name
         Available options:
         avocado: will download the avocado price prediction dataset
-        mnist : will download mnist dataset
-        electricity : will download electricty_consumption_dataset
-        stock : will download stock_exchange dataset
-        iris : will downlaod the iris dataset
         bodyFat : will download the bodyFat dataset
-        spam : will download the spam dataset
-        salary: will download the salary dataset
+        california: will download the california housing dataset
         cifar10: will download the cifar10 dataset
-        pima: will download the pima diabetes dataset
         color: will download the dominant color dataset
         covertype: will download the forest covertype dataset
+        electricity : will download electricty_consumption_dataset
+        iris : will downlaod the iris dataset
+        mnist : will download mnist dataset
+        pima: will download the pima diabetes dataset
+        salary: will download the salary dataset
+        spam : will download the spam dataset
+        stock : will download stock_exchange dataset
         all : will download all datasets for all examples
         '''))
 
@@ -260,6 +266,9 @@ if __name__ == '__main__':
         elif args.dataset_name == "bodyFat":
             create_dataset_dir()
             body_fat_dataset()
+        elif args.dataset_name == "california":
+            create_dataset_dir()
+            california_housing_dataset()
         elif args.dataset_name == "spam":
             create_dataset_dir()
             spam_dataset()
