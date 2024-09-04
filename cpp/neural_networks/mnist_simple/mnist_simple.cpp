@@ -161,7 +161,7 @@ int main()
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, true);
   arma::mat testY = dataset.row(0);
   dataset.shed_row(0); // Strip labels before predicting.
   dataset /= 255.0; // Apply the same normalization as to the training data.

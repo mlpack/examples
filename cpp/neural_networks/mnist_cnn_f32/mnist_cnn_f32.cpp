@@ -213,7 +213,7 @@ int main()
   // Get predictions on test data points.
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, true);
   const arma::fmat testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1)
       / 256.0;
   const arma::fmat testY = dataset.row(0);

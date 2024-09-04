@@ -166,7 +166,7 @@ int main()
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  data::Load("../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, true);
   arma::fmat testY = dataset.row(dataset.n_rows - 1);
   dataset.shed_row(dataset.n_rows - 1); // Strip labels before predicting.
 
