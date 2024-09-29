@@ -178,8 +178,6 @@ def avocado_dataset():
     avocado_data = pull_csv("avocado.csv")
     avocado_data = avocado_data.iloc[:, 2:]
     avocado_data.to_csv("avocado.csv", index=False)
-    
-
 
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")
