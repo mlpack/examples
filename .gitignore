@@ -12,7 +12,7 @@ cmake-build-*
 *.so
 data
 plots
-mnist_*
+mnist_t*
 nn_*
 cifar_*
 covertype-rf
