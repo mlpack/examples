@@ -132,9 +132,9 @@ int main()
  
   // Let's manually check some predictions.
   std::cout << testLabels[1] << std::endl;
-  std::cout << output[1] << std::endl;"
+  std::cout << output[1] << std::endl;
   std::cout << testLabels[7] << std::endl;
-  std::cout << output[7] << std::endl;"
+  std::cout << output[7] << std::endl;
   arma::mat preds;
   preds.insert_rows(0, testLabels);
   preds.insert_rows(1, output);
@@ -162,7 +162,6 @@ int main()
    * value indicates better performance.
    * RMSE = \\sqrt{\\frac {1}{n} \\sum_{i=1}^n (y_{i} - \\hat{y_{i}})^2}
    */
-
   std::cout << "Mean Absolute Error: " 
             << arma::mean(arma::abs(output - testLabels)) << std::endl;
   std::cout << "Mean Squared Error: "
