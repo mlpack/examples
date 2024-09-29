@@ -54,11 +54,16 @@ using namespace mlpack;
 using namespace mlpack::data;
 
 
-  //"But, there's one thing which we need to do before loading the dataset as an Armadillo matrix; that is, we need to deal with any missing values. Since 207 values were removed from the original dataset from \"total_bedrooms_column\", we need to fill them using either \"mean\" or \"median\" of that feature (for numerical) and \"mode\" (for categorical)."
-  //"// The imputing functions follows this:\n",
- //// Impute(inputFile, outputFile, kind);\n",
- //// Here, inputFile is our raw file, outputFile is our new file with the imputations, \n",
- //// and kind refers to imputation method.\n",
+//But, there's one thing which we need to do before loading the dataset 
+//as an Armadillo matrix; that is, we need to deal with any missing values.
+//Since 207 values were removed from the original dataset from
+//\"total_bedrooms_column\", we need to fill them using either
+//\"mean\" or \"median\" of that feature (for numerical) and
+//\"mode\" (for categorical).
+// The imputing functions follows this
+// Impute(inputFile, outputFile, kind)
+// Here, inputFile is our raw file, outputFile is our new file with the imputations.
+// and kind refers to imputation method.
 
 int main()
 {
@@ -72,12 +77,11 @@ int main()
   arma::mat dataset;
   data::DatasetInfo info;
   info.Type(9) = mlpack::data::Datatype::categorical;
-  data::Load("housing_without_header.csv", dataset, info);
+  // Please remove the header of the file if exist, otherwise the results will
+  // not work
+  data::Load("../../../data/housing.csv", dataset, info);
+  dataset.brief_print();
 
-  // Should remove this and use brief_print function from arma
-  // Print the first 6 rows of the input data.
-  std::cout << dataset.submat(0, 0, dataset.n_rows - 1 , 5)<< std::endl;
-  
   /*
    * Did you notice something? Yes, the last row looks like it is entirely
    * filled with '0'. Let's check our dataset to see what it corresponds to.
