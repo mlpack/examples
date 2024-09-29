@@ -21,7 +21,7 @@ int main()
 {
   // Load the dataset into armadillo matrix.
   arma::mat inputs;
-  data::Load("Salary_Data.csv" inputs);
+  data::Load("Salary_Data.csv", inputs);
   // Drop the first row as they represent header.
   inputs.shed_col(0);
   // Display the first 5 rows of the input data.
