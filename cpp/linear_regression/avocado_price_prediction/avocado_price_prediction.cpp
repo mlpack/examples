@@ -75,8 +75,8 @@ int main()
  // 14600 observations respectively.
  arma::mat Xtrain;
  arma::mat Xtest;
- arma::Row<double> Ytrain;
- arma::Row<double> Ytest;
+ arma::rowvec Ytrain;
+ arma::rowvec Ytest;
  data::Split(output, targets, Xtrain, Xtest, Ytrain, Ytest, 0.2);
  // Convert armadillo Rows into rowvec. (Required by mlpacks' LinearRegression API in this format).
  arma::rowvec yTrain = arma::conv_to<arma::rowvec>::from(Ytrain);
