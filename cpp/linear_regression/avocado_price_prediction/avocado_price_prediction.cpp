@@ -29,8 +29,8 @@
 * various evaluation metrics to quantify how well our model behaves.
 */
 #include <mlpack.hpp>
+
 using namespace mlpack;
-using namespace mlpack::data;
 
 //Drop the dataset header using sed, sed is a Unix utility that parses and transforms text."
 //!mkdir -p data && cat avocado.csv | sed 1d > avocado_trim.csv"
