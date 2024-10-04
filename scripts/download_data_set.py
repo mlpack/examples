@@ -9,6 +9,7 @@ import sys
 import tarfile
 import textwrap
 from tqdm import tqdm
+import pandas as pd
 import requests
 import shutil
 
@@ -45,6 +46,11 @@ def convert(imgf, labelf, outf, n):
     o.close()
     l.close()
     t.close()
+
+
+def pull_csv(file):
+    csv_file = pd.read_csv(file, sep=',', comment='#')
+    return csv_file
 
 def create_dataset_dir():
     if os.path.exists("../data"):
@@ -164,6 +170,20 @@ def covertype_dataset():
     progress_bar("covertype-small.csv.gz", covertype)
     ungzip("covertype-small.csv.gz", "covertype-small.csv")
 
+def california_housing_dataset():
+    print("Downloading the california housing dataset...")
+    california = requests.get("https://datasets.mlpack.org/examples/housing.csv")
+    progress_bar("housing.csv", california)
+
+def avocado_dataset():
+    print("Downloading the avocado price prediction dataset...")
+    avocado = requests.get("https://datasets.mlpack.org/avocado.csv.gz")
+    progress_bar("avocado.csv.gz", avocado)
+    ungzip("avocado.csv.gz", "avocado.csv")
+    avocado_data = pull_csv("avocado.csv")
+    avocado_data = avocado_data.iloc[:, 2:]
+    avocado_data.to_csv("avocado.csv", index=False)
+
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")
     jurassic_park = requests.get("https://datasets.mlpack.org/jurassic-park.png")
@@ -210,18 +230,20 @@ if __name__ == '__main__':
 
         Usage: --dataset_name dataset_name
         Available options:
-        mnist : will download mnist dataset
-        electricity : will download electricty_consumption_dataset
-        stock : will download stock_exchange dataset
-        iris : will downlaod the iris dataset
+        avocado: will download the avocado price prediction dataset
         bodyFat : will download the bodyFat dataset
-        spam : will download the spam dataset
-        salary: will download the salary dataset
+        california: will download the california housing dataset
         cifar10: will download the cifar10 dataset
-        pima: will download the pima diabetes dataset
-        loan: will download the loan default dataset
         color: will download the dominant color dataset
         covertype: will download the forest covertype dataset
+        electricity : will download electricty_consumption_dataset
+        iris : will downlaod the iris dataset
+        loan: will download the loan default dataset
+        mnist : will download mnist dataset
+        pima: will download the pima diabetes dataset
+        salary: will download the salary dataset
+        spam : will download the spam dataset
+        stock : will download stock_exchange dataset
         all : will download all datasets for all examples
         '''))
 
@@ -248,6 +270,9 @@ if __name__ == '__main__':
         elif args.dataset_name == "bodyFat":
             create_dataset_dir()
             body_fat_dataset()
+        elif args.dataset_name == "california":
+            create_dataset_dir()
+            california_housing_dataset()
         elif args.dataset_name == "spam":
             create_dataset_dir()
             spam_dataset()
@@ -266,6 +291,9 @@ if __name__ == '__main__':
         elif args.dataset_name == "color":
             create_dataset_dir()
             dominant_color_dataset()
+        elif args.dataset_name == "avocado":
+            create_dataset_dir()
+            avocado_dataset()
         elif args.dataset_name == "covertype":
             create_dataset_dir()
             covertype_dataset()
