@@ -5,39 +5,7 @@
 *
 * To predict California Housing Prices using the most simple Linear Regression
 * Model and see how it performs. To understand the modeling workflow using mlpack.
-
-* About the Data
 *
-* This dataset is a modified version of the California Housing dataset available
-* from Luís Torgo's page (University of Porto). Luís Torgo obtained it from the
-* StatLib repository (which is closed now). The dataset may also be downloaded
-* from StatLib mirrors.
-*
-* This dataset is also used in a book HandsOn-ML (a very good book and highly
-* recommended: https://www.oreilly.com/library/view/hands-on-machine-learning/9781491962282/]).
-*
-* The dataset in this directory is almost identical to the original, with two
-* differences:
-* 207 values were randomly removed from the totalbedrooms column, so we can
-* discuss what to do with missing data. An additional categorical attribute
-* called oceanproximity was added, indicating (very roughly) whether each
-* block group is near the ocean, near the Bay area, inland or on an island.
-* This allows discussing what to do with categorical data.
-* Note that the block groups are called \"districts\" in the Jupyter notebooks,
-* simply because in some contexts the name \"block group\" was confusing.
-
-* Lets look at the features of the dataset:
-*
-* Longitude : Longitude coordinate of the houses.
-* Latitude : Latitude coordinate of the houses.
-* Housing Median Age : Average lifespan of houses.
-* Total Rooms : Number of rooms in a location.
-* Total Bedrooms : Number of bedroooms in a location.
-* Population : Population in that location.
-* Median Income : Median Income of households in a location.
-* Median House Value : Median House Value in a location.
-* Ocean Proximity : Closeness to shore. 
-
 * Approach
 *
 * Here, we will try to recreate the workflow from the book mentioned above. 
@@ -51,23 +19,27 @@
 #include <mlpack.hpp>
 
 using namespace mlpack;
-using namespace mlpack::data;
-
-
-//But, there's one thing which we need to do before loading the dataset 
-//as an Armadillo matrix; that is, we need to deal with any missing values.
-//Since 207 values were removed from the original dataset from
-//\"total_bedrooms_column\", we need to fill them using either
-//\"mean\" or \"median\" of that feature (for numerical) and
-//\"mode\" (for categorical).
-// The imputing functions follows this
-// Impute(inputFile, outputFile, kind)
-// Here, inputFile is our raw file, outputFile is our new file with the imputations.
-// and kind refers to imputation method.
 
 int main()
 {
   /**
+   * Dataset structure 
+   *
+   * This dataset is a modified version of the California Housing
+   * dataset available from Luís Torgo's page (University of Porto).
+   * Luís Torgo obtained it from the StatLib repository. The dataset
+   * may also be downloaded from StatLib mirrors.
+   *
+   * Longitude : Longitude coordinate of the houses.
+   * Latitude : Latitude coordinate of the houses.
+   * Housing Median Age : Average lifespan of houses.
+   * Total Rooms : Number of rooms in a location.
+   * Total Bedrooms : Number of bedroooms in a location.
+   * Population : Population in that location.
+   * Median Income : Median Income of households in a location.
+   * Median House Value : Median House Value in a location.
+   * Ocean Proximity : Closeness to shore. 
+   *
    * we need to load the dataset as an Armadillo matrix for further operations.
    * Our dataset has a total of 9 features: 8 numerical and
    * 1 categorical(ocean proximity). We need to map the
@@ -80,17 +52,7 @@ int main()
   // Please remove the header of the file if exist, otherwise the results will
   // not work
   data::Load("../../../data/housing.csv", dataset, info);
-  dataset.brief_print();
 
-  /*
-   * Did you notice something? Yes, the last row looks like it is entirely
-   * filled with '0'. Let's check our dataset to see what it corresponds to.
-   * It corresponds to Ocean Proximity which is a categorical value, but here
-   * it is zero.
-   * WWhy? It's because the load function loads numerical values only. This is
-   * exactly why we mapped Ocean proximity earlier.
-   * So, let's deal with this.
-   */
   arma::mat encoded_dataset; 
   // Here, we chose our pre-built encoding method "One Hot Encoding" to deal
   // with the categorical values.
@@ -100,9 +62,9 @@ int main()
   arma::rowvec labels =
       arma::conv_to<arma::rowvec>::from(encoded_dataset.row(8));
   encoded_dataset.shed_row(8);
+
   arma::mat trainSet, testSet;
   arma::rowvec trainLabels, testLabels;
-   // Split dataset randomly into training set and test set.
   data::Split(encoded_dataset, labels, trainSet, testSet, trainLabels, testLabels,
       0.2 /* Percentage of dataset to use for test set. */);
 
