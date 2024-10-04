@@ -2,16 +2,12 @@
  * Predicting Salary using Linear Regression.
  * Objective:
  * We have to predict the salary of an employee given how many years of experience they have.
- * Dataset:
- * Salary_Data.csv has 2 columns — “Years of Experience” (feature) and “Salary”
- * (target) for 30 employees in a company.
  * Approach:
  * So in this example, we will train a Linear Regression model to learn the
  * correlation between the number of years of experience of each employee and
  * their respective salary.
  * Once the model is trained, we will be able to do some sample predictions.
 */
-//    !wget -q https://datasets.mlpack.org/Salary_Data.csv"
 #include <mlpack.hpp>
 #include <cmath>
 
@@ -19,14 +15,16 @@ using namespace mlpack;
 
 int main()
 {
-  // Load the dataset into armadillo matrix.
+  /* Dataset:
+   * Salary_Data.csv has 2 columns — “Years of Experience” (feature) and “Salary”
+   * (target) for 30 employees in a company.
+   *
+   * Please if the data set contains header, please consider removing the
+   * header, before loading the dataset, otherwise Load function may not work 
+   * correctly.
+   */
   arma::mat inputs;
   data::Load("../../../data/Salary_Data.csv", inputs);
-  // Drop the first row as they represent header.
-  inputs.shed_col(0);
-  // Display the first 5 rows of the input data.
-  std::cout << std::setw(18) << "Years Of Experience" << std::setw(10) << "Salary" << std::endl;
-  std::cout << inputs.submat(0, 0, inputs.n_rows-1, 5).t() << std::endl;
 
   // Split the data into features (X) and target (y) variables
   // targets are the last row.
@@ -71,12 +69,7 @@ int main()
   // Make predictions for test data points.
   arma::rowvec yPreds;
   lr.Predict(Xtest, yPreds);
-
-  // Convert armadillo vectors and matrices to vector for plotting purpose.
-  std::vector<double> XtestPlot = arma::conv_to<std::vector<double>>::from(Xtest);
-  std::vector<double> yTestPlot = arma::conv_to<std::vector<double>>::from(yTest);
-  std::vector<double> yPredsPlot = arma::conv_to<std::vector<double>>::from(yPreds);
-  
+ 
   /*
    * Evaluation Metrics for Regression model.
    * In the Previous cell we have visualized our model performance by plotting.
