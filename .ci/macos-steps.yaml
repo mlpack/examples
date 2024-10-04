@@ -21,15 +21,15 @@ steps:
     mkdir deps/
     cd deps/
 
-    # Install Armadillo 9.800.1 (the oldest supported version).
-    curl -O http://files.mlpack.org/armadillo-9.800.1.tar.gz
-    tar xvzf armadillo-9.800.1.tar.gz
-    cd armadillo-9.800.1
+    # Install Armadillo 10.8.2 (the oldest supported version).
+    curl -O https://files.mlpack.org/armadillo-10.8.2.tar.gz
+    tar xvzf armadillo-10.8.2.tar.gz
+    cd armadillo-10.8.2
     cmake .
     make
     sudo make install
     cd ../
-    rm -rf armadillo-9.800.1/
+    rm -rf armadillo-10.8.2/
 
     # Build and install the latest version of ensmallen.
     curl -O https://www.ensmallen.org/files/ensmallen-latest.tar.gz
