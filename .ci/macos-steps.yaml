@@ -69,7 +69,7 @@ steps:
 
 # Download datasets.
 - script: |
-    python -m pip install tqdm requests
+    python -m pip install tqdm requests pandas
     cd scripts/
     ./download_data_set.py
     cd ../
