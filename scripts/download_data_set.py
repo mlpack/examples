@@ -86,22 +86,22 @@ def mnist_dataset():
         "https://datasets.mlpack.org/mnist/train-images-idx3-ubyte.gz")
     progress_bar("train_features.gz", train_features)
     ungzip("train_features.gz", "train_features.ubytes")
-  
+
     train_labels = requests.get(
         "https://datasets.mlpack.org/mnist/train-labels-idx1-ubyte.gz")
     progress_bar("train_labels.gz", train_labels)
     ungzip("train_labels.gz", "train_labels.ubytes")
-  
+
     test_features = requests.get(
         "https://datasets.mlpack.org/mnist/t10k-images-idx3-ubyte.gz")
     progress_bar("test_features.gz", test_features)
     ungzip("test_features.gz", "test_features.ubytes")
-  
+
     test_labels = requests.get(
         "https://datasets.mlpack.org/mnist/t10k-labels-idx1-ubyte.gz")
     progress_bar("test_labels.gz", test_labels)
     ungzip("test_labels.gz", "test_labels.ubytes")
-  
+
     print("Converting mnist ubytes images files into csv...")
     print("This might take a while...")
     print("Converting features images...")
@@ -163,6 +163,7 @@ def covertype_dataset():
     covertype = requests.get("https://datasets.mlpack.org/covertype-small.csv.gz")
     progress_bar("covertype-small.csv.gz", covertype)
     ungzip("covertype-small.csv.gz", "covertype-small.csv")
+    clean() # Remove .gz file.
 
 def dominant_color_dataset():
     print("Downloading dominant color dataset...")
@@ -182,6 +183,13 @@ def cifar10_dataset():
     tar.close()
     clean()
 
+def dga_dataset():
+    print("Downloading DGA domains dataset...")
+    dga = requests.get("http://datasets.mlpack.org/dga_domains.csv.gz")
+    progress_bar("dga_domains.csv.gz", dga)
+    ungzip("dga_domains.csv.gz", "dga_domains.csv")
+    clean() # Remove .gz file.
+
 def all_datasets():
     mnist_dataset()
     electricity_consumption_dataset()
@@ -194,6 +202,7 @@ def all_datasets():
     pima_diabetes_dataset()
     dominant_color_dataset()
     covertype_dataset()
+    dga_dataset()
 
 if __name__ == '__main__':
 
