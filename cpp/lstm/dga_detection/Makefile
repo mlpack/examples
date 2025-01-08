@@ -8,8 +8,6 @@ TARGET1 := lstm_dga_detection_train
 SRC1 := lstm_dga_detection_train.cpp
 TARGET2 := lstm_dga_detection_predict
 SRC2 := lstm_dga_detection_predict.cpp
-TARGET3 := lstm_dga_detectors_train
-SRC3 := lstm_dga_detectors_train.cpp
 LIBS_NAME := armadillo
 
 CXX := g++
@@ -31,9 +29,8 @@ CXXFLAGS += $(INCLFLAGS)
 
 OBJS1 := $(SRC1:.cpp=.o)
 OBJS2 := $(SRC2:.cpp=.o)
-OBJS3 := $(SRC3:.cpp=.o)
 LIBS := $(addprefix -l,$(LIBS_NAME))
-CLEAN_LIST := $(TARGET1) $(TARGET2) $(OBJS1) $(OBJS2) $(OBJS3)
+CLEAN_LIST := $(TARGET1) $(TARGET2) $(OBJS1) $(OBJS2)
 
 # default rule
 default: all
@@ -44,11 +41,8 @@ $(TARGET1): $(OBJS1)
 $(TARGET2): $(OBJS2)
 	$(CXX) $(CXXFLAGS) $(OBJS2) -o $(TARGET2) $(LDFLAGS) $(LIBS)
 
-$(TARGET3): $(OBJS3)
-	$(CXX) $(CXXFLAGS) $(OBJS3) -o $(TARGET3) $(LDFLAGS) $(LIBS)
-
 .PHONY: all
-all: $(TARGET1) $(TARGET2) $(TARGET3)
+all: $(TARGET1) $(TARGET2)
 
 .PHONY: clean
 clean:

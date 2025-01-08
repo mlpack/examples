@@ -2,30 +2,124 @@
  * @file lstm_dga_detection_predict.cpp
  * @author Ryan Curtin
  *
- * Given a trained DGA detection model, make predictions.  Domains should be
+ * Given two trained DGA detection RNNs, make predictions.  Domains should be
  * input on stdin.
+ *
+ * Predictions are made by computing the likelihood of a domain coming from the
+ * benign model and from the malicious model.  The predicted class is benign, if
+ * the likelihood of the domain coming from the benign model is higher (and
+ * malicious if vice versa).
+ *
+ * This is called the generalized likelihood ratio test (GLRT).
+ *
+ * To keep the model small and the code fast, we use `float` as a datatype
+ * instead of the default `double`.
  */
-#define MLPACK_ENABLE_ANN_SERIALIZATION
 #include <mlpack.hpp>
+
+// To keep compilation time and program size down, we only register
+// serialization for layers used in our RNNs.  Plus, given that we are using
+// floats instead of doubles for our data, we need to register the layers for
+// serialization either individually or all of them with
+// CEREAL_REGISTER_MLPACK_LAYERS() (commented out below).
+CEREAL_REGISTER_TYPE(mlpack::Layer<arma::fmat>);
+CEREAL_REGISTER_TYPE(mlpack::MultiLayer<arma::fmat>);
+CEREAL_REGISTER_TYPE(mlpack::RecurrentLayer<arma::fmat>);
+CEREAL_REGISTER_TYPE(mlpack::LSTMType<arma::fmat>);
+CEREAL_REGISTER_TYPE(mlpack::LinearType<arma::fmat>);
+CEREAL_REGISTER_TYPE(mlpack::LogSoftMaxType<arma::fmat>);
+
+// This will register all mlpack layers with the arma::fmat type.
+// It is useful for playing around with the network architecture, but can make
+// compilation time a lot longer.  Comment out the individual
+// CEREAL_REGISTER_TYPE() calls above if you use the line below.
+//
+// CEREAL_REGISTER_MLPACK_LAYERS(arma::fmat);
+
+using namespace mlpack;
+using namespace std;
+
+// Utility function: map a character to the one-hot encoded dimension that
+// represents it.  Characters will be assigned to one of 38 dimensions.  If an
+// incorrect character is given, size_t(-1) is returned. 
+inline size_t CharToDim(const char inC)
+{
+  char c = tolower(inC);
+  if (c >= 'a' && c <= 'z')
+    return size_t(c - 'a'); 
+  else if (c >= '0' && c <= '9')
+    return 26 + size_t(c - '0');
+  else if (c == '-')
+    return 36;
+  else if (c == '.')
+    return 37;
+  else
+    return size_t(-1);
+}
+
+// Utility function: turn a domain string into an arma::cube.
+inline void PrepareString(const string& domain,
+                          arma::fcube& data,
+                          arma::fcube& response)
+{
+  data.zeros(39, 1, domain.size());
+  response.set_size(1, 1, domain.size());
+
+  // One-hot encode each character.
+  for (size_t t = 0; t < domain.size(); ++t)
+  {
+    const size_t dim = CharToDim(domain[t]);
+    if (dim == size_t(-1))
+    {
+      cerr << "Domain '" << domain << "' has invalid character '" << domain[t]
+          << "'!" << endl;
+      exit(1);
+    }
+
+    data(dim, 0, t) = 1.0;
+
+    if (t > 0)
+      response(0, 0, t - 1) = dim;
+  }
+
+  // Set end-of-input response.
+  response(0, 0, domain.size() - 1) = 38;
+}
+
+// Compute the likelihood that the string came from the model, given the
+// predicted outputs of the model.
+inline float ComputeLikelihood(const arma::fcube& predictions,
+                               const arma::fcube& response)
+{
+  float likelihood = 0.0;
+  for (size_t t = 0; t < response.n_slices; ++t)
+    likelihood += predictions((size_t) response(0, 0, t), 0, t);
+
+  return likelihood;
+}
 
 using namespace mlpack;
 using namespace std;
 
 int main(int argc, char** argv)
 {
-  if (argc != 2)
+  if (argc != 3)
   {
-    cerr << "Usage: " << argv[0] << " model.bin" << endl;
+    cerr << "Usage: " << argv[0] << " benign_model.bin malicious_model.bin"
+        << endl;
     cerr << " - Train a model with the lstm_dga_detection_train program."
         << endl;
   }
 
   // First load the model.
-  RNN<MeanSquaredError, HeInitialization> network;
-  data::Load(argv[1], "lstm_model", network, true /* fatal on failure */);
+  RNN<NegativeLogLikelihoodType<arma::fmat>, RandomInitialization, arma::fmat>
+      benignModel, maliciousModel;
+  data::Load(argv[1], "lstm_model", benignModel, true /* fatal on failure */);
+  data::Load(argv[2], "lstm_model", maliciousModel, true);
 
   // Now enter a loop where we read domains from stdin and then make
   // predictions.
+  arma::fcube input, response, benignOutput, maliciousOutput;
   while (true)
   {
     string line;
@@ -37,57 +131,21 @@ int main(int argc, char** argv)
       return 0;
     }
 
-    // We have to process the input into the correct one-hot format that the
-    // model expects.  This will be a cube of shape:
-    //
-    //   rows = 41 (26 lowercase letters, 10 digits, period, hyphen, end,
-    //              2 labels)
-    //   columns = 1 (just one domain name)
-    //   slices = up to maximum length of domain name supported by model
-    const size_t len = std::max(network.BPTTSteps(), line.size() + 1);
-
-    if (len != line.size() + 1)
-    {
-      cout << "Domain name is too long; will be truncated to '"
-          << line.substr(0, len - 1) << "'." << endl;
-    }
-
-    arma::cube input(41, 1, len, arma::fill::zeros);
-    for (size_t i = 0; i < len - 1; ++i)
-    {
-      char c = tolower(line[i]);
-      size_t dim = 0;
-      if (c >= 'a' && c <= 'z')
-        dim = size_t(c - 'a');
-      else if (c >= '0' && c <= '9')
-        dim = 26 + size_t(c - '0');
-      else if (c == '-')
-        dim = 36;
-      else if (c == '.')
-        dim = 37;
-      else
-      {
-        cerr << "Cannot predict; domain has invalid character '" << c << "'!"
-            << endl;
-        continue;
-      }
-
-      input(dim, 0, i) = 1.0;
-    }
-
-    // Denote end of input.
-    input(38, 0, len - 1) = 1.0;
+    // Prepare the data for prediction and then make predictions with both
+    // models.
+    PrepareString(line, input, response);
 
     // Now compute prediction.
-    arma::cube output;
-    network.Predict(input, output);
+    benignModel.Predict(input, benignOutput);
+    maliciousModel.Predict(input, maliciousOutput);
 
-    // If the activation for the malicious class is higher than the activation
-    // for the benign class, then the domain is malicious.  We simply print the
-    // prediction to stdout.
-    if (output(40, 0, len - 1) >= output(39, 0, len - 1))
-      cout << "malicious" << endl;
-    else
+    const float benignLikelihood = ComputeLikelihood(benignOutput, response);
+    const float maliciousLikelihood = ComputeLikelihood(maliciousOutput,
+        response);
+
+    if (benignLikelihood > maliciousLikelihood)
       cout << "benign" << endl;
+    else
+      cout << "malicious" << endl;
   }
 }
