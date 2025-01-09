@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.11)
 project(main)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 include(CMake/Autodownload.cmake)
 include(CMake/ConfigureCrossCompile.cmake)
+include(CMake/Findmlpack.cmake)
 
 option(USE_OPENMP "If available, use OpenMP for parallelization." ON)
-
 # Set required standard to C++17.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -17,11 +18,20 @@ if (CMAKE_COMPILER_IS_GNUCC)
   set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
+find_package(mlpack PATHS ${CMAKE_BINARY_DIR})
+if (NOT MLPACK_FOUND)
+  get_deps(https://github.com/mlpack/mlpack/archive/refs/tags/4.5.1.tar.gz mlpack 4.5.1.tar.gz)
+  set(MLPACK_INCLUDE_DIRS ${GENERIC_INCLUDE_DIR})
+  find_package(mlpack REQUIRED)
+endif()
+
 search_openblas(0.3.26)
 
-get_deps(https://files.mlpack.org/armadillo-12.6.5.tar.gz armadillo armadillo-12.6.5.tar.gz)
-set(ARMADILLO_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
-find_package(Armadillo REQUIRED)
+find_package(Armadillo PATHS ${CMAKE_BINARY_DIR})
+if (NOT ARMADILLO_FOUND)
+  get_deps(https://files.mlpack.org/armadillo-12.6.5.tar.gz armadillo armadillo-12.6.5.tar.gz)
+  set(ARMADILLO_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
+endif()
 # Include directories for the previous dependencies.
 set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
 set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} ${ARMADILLO_LIBRARIES})
