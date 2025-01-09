@@ -4,7 +4,6 @@ project(main)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 include(CMake/Autodownload.cmake)
 include(CMake/ConfigureCrossCompile.cmake)
-include(CMake/Findmlpack.cmake)
 
 option(USE_OPENMP "If available, use OpenMP for parallelization." ON)
 # Set required standard to C++17.
