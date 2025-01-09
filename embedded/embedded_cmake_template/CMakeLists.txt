@@ -22,7 +22,9 @@ find_package(mlpack PATHS ${CMAKE_BINARY_DIR})
 if (NOT MLPACK_FOUND)
   get_deps(https://github.com/mlpack/mlpack/archive/refs/tags/4.5.1.tar.gz mlpack 4.5.1.tar.gz)
   set(MLPACK_INCLUDE_DIRS ${GENERIC_INCLUDE_DIR})
+  message("Look for mlpack a second time")
   find_package(mlpack REQUIRED)
+  message("mlpack found")
 endif()
 
 search_openblas(0.3.26)
@@ -31,10 +33,10 @@ find_package(Armadillo PATHS ${CMAKE_BINARY_DIR})
 if (NOT ARMADILLO_FOUND)
   get_deps(https://files.mlpack.org/armadillo-12.6.5.tar.gz armadillo armadillo-12.6.5.tar.gz)
   set(ARMADILLO_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
-endif()
 # Include directories for the previous dependencies.
 set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${ARMADILLO_INCLUDE_DIRS})
 set(MLPACK_LIBRARIES ${MLPACK_LIBRARIES} ${ARMADILLO_LIBRARIES})
+endif()
 
 # Find stb_image.h and stb_image_write.h.
 get_deps(https://mlpack.org/files/stb.tar.gz stb stb.tar.gz)
@@ -42,15 +44,22 @@ set(STB_IMAGE_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
 set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} "${STB_IMAGE_INCLUDE_DIR}")
 
 # Find ensmallen.
-get_deps(https://www.ensmallen.org/files/ensmallen-latest.tar.gz ensmallen ensmallen-latest.tar.gz)
-set(ENSMALLEN_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
-set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} "${ENSMALLEN_INCLUDE_DIR}")
-
+find_package(Ensmallen PATHS ${CMAKE_BINARY_DIR})
+if (NOT ENSMALLEN_FOUND)
+  get_deps(https://www.ensmallen.org/files/ensmallen-latest.tar.gz ensmallen ensmallen-latest.tar.gz)
+  find_package(Ensmallen REQUIRED)
+  set(ENSMALLEN_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
+  set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} "${ENSMALLEN_INCLUDE_DIR}")
+endif()
+  
 # Find cereal.
-get_deps(https://github.com/USCiLab/cereal/archive/refs/tags/v1.3.0.tar.gz cereal cereal-1.3.0.tar.gz)
-set(CEREAL_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
-set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${CEREAL_INCLUDE_DIR})
-
+find_package(cereal PATHS ${CMAKE_BINARY_DIR})
+if (NOT CEREAL_FOUND)
+  get_deps(https://github.com/USCiLab/cereal/archive/refs/tags/v1.3.0.tar.gz cereal cereal-1.3.0.tar.gz)
+  find_package(cereal REQUIRED)
+  set(CEREAL_INCLUDE_DIR ${GENERIC_INCLUDE_DIR})
+  set(MLPACK_INCLUDE_DIRS ${MLPACK_INCLUDE_DIRS} ${CEREAL_INCLUDE_DIR})
+endif()
 # Detect OpenMP support in a compiler. If the compiler supports OpenMP, flags
 # to compile with OpenMP are returned and added.  Note that MSVC does not
 # support a new-enough version of OpenMP to be useful.
