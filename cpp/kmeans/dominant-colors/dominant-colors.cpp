@@ -195,7 +195,7 @@ void GetColorBarData(std::string& values,
   colors = colorsString.str();
 }
 
-void dominantColors(std::string PathToImage)
+void dominantColors(std::string PathToImage, std::string PathToColorBars)
 {
   // Load the example image.
   arma::Mat<unsigned char> imageMatrix;
@@ -249,15 +249,12 @@ void dominantColors(std::string PathToImage)
   GetColorBarData(values, colors, cluster, assignments, centroids);
   
   // Show the dominant colors.
-  size_t pos = PathToImage.find_last_of("/\\") + 1;
-  size_t len = PathToImage.rfind(".png") - pos;
-  std::string pathToColorBars = PathToImage.substr(pos, len) + "-colors.png";
-  StackedBar(values, colors, pathToColorBars);
+  StackedBar(values, colors, PathToColorBars);
 }
 
 int main()
 {
-  dominantColors("../../../data/jurassic-park.png");
-  dominantColors("../../../data/the-grand-budapest-hotel.png");
-  dominantColors("../../../data/the-godfather.png");
+  dominantColors("../../../data/jurassic-park.png", "jurassic-park-colors.png");
+  dominantColors("../../../data/the-grand-budapest-hotel.png", "the-grand-budapest-hotel-colors.png");
+  dominantColors("../../../data/the-godfather.png", "the-godfather-colors.png");
 }
