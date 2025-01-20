@@ -249,7 +249,10 @@ void dominantColors(std::string PathToImage)
   GetColorBarData(values, colors, cluster, assignments, centroids);
   
   // Show the dominant colors.
-  StackedBar(values, colors, "jurassic-park-colors.png");
+  size_t pos = PathToImage.find_last_of("/\\") + 1;
+  size_t len = PathToImage.rfind(".png") - pos;
+  std::string pathToColorBars = PathToImage.substr(pos, len) + "-colors.png";
+  StackedBar(values, colors, pathToColorBars);
 }
 
 int main()
