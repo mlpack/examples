@@ -255,6 +255,7 @@ void dominantColors(std::string PathToImage, std::string PathToColorBars)
 int main()
 {
   dominantColors("../../../data/jurassic-park.png", "jurassic-park-colors.png");
-  dominantColors("../../../data/the-grand-budapest-hotel.png", "the-grand-budapest-hotel-colors.png");
+  dominantColors("../../../data/the-grand-budapest-hotel.png",
+      "the-grand-budapest-hotel-colors.png");
   dominantColors("../../../data/the-godfather.png", "the-godfather-colors.png");
 }
