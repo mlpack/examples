@@ -19,8 +19,6 @@ LDFLAGS  += -fopenmp
 # Add header directories for any includes that aren't on the
 # default compiler search path.
 INCLFLAGS := -I .
-INCLFLAGS += -I/home/ryan/src/mlpack/src/
-INCLFLAGS += -I/home/ryan/src/ensmallen/include/
 # If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
 # update the lines below.
 # INCLFLAGS += -I/path/to/mlpack/include/
