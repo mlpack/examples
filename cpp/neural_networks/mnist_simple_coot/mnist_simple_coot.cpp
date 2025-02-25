@@ -70,9 +70,9 @@ int main()
   // Getting training and validating dataset with features only and then
   // normalising
   const coot::mat trainX =
-      ConvTo<coot::mat>::from(train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) / 255.0);
+      ConvTo<coot::mat>::From(train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) / 255.0);
   const coot::mat validX =
-      ConvTo<coot::mat>::from(valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0);
+      ConvTo<coot::mat>::From(valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0);
 
   // Labels should specify the class of a data point and be in the interval [0,
   // numClasses).
