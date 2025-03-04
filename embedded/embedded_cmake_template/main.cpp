@@ -19,5 +19,5 @@ using namespace mlpack;
 
 int main(int argc, char** argv)
 {
-  Log::Info << "Welcome to an mlpack crosscompiled binary." <<std::endl;
+  Log::Info << "Welcome to an mlpack crosscompiled binary." << std::endl;
 }
