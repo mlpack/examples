@@ -26,6 +26,10 @@
  * Train the model on the `dga_domains.csv` file in the data/ directory in the
  * repository (once you have run `scripts/download_data_set.py`).
  */
+
+// This must be defined to avoid RNN::serialize() throwing an error---we know
+// what we are doing and have manually registered the layer types we care about.
+#define MLPACK_ANN_IGNORE_SERIALIZATION_WARNING
 #include <mlpack.hpp>
 
 // To keep compilation time and program size down, we only register
@@ -115,7 +119,7 @@ void PrepareData(const vector<string>& domains,
 size_t ComputeCorrect(const arma::fcube& benignPredictions,
                       const arma::fcube& maliciousPredictions,
                       const arma::fcube& labels,
-                      const arma::uvec& sequenceLengths,
+                      const arma::urowvec& sequenceLengths,
                       const bool malicious)
 {
   size_t correct = 0;

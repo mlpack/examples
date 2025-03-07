@@ -15,6 +15,10 @@
  * To keep the model small and the code fast, we use `float` as a datatype
  * instead of the default `double`.
  */
+
+// This must be defined to avoid RNN::serialize() throwing an error---we know
+// what we are doing and have manually registered the layer types we care about.
+#define MLPACK_ANN_IGNORE_SERIALIZATION_WARNING
 #include <mlpack.hpp>
 
 // To keep compilation time and program size down, we only register
@@ -142,10 +146,11 @@ int main(int argc, char** argv)
     const float benignLikelihood = ComputeLikelihood(benignOutput, response);
     const float maliciousLikelihood = ComputeLikelihood(maliciousOutput,
         response);
+    const float score = benignLikelihood - maliciousLikelihood;
 
     if (benignLikelihood > maliciousLikelihood)
-      cout << "benign" << endl;
+      cout << "benign (score " << score << ")" << std::endl;
     else
-      cout << "malicious" << endl;
+      cout << "malicious (score " << -score << ")" << std::endl;
   }
 }
