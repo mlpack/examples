@@ -154,7 +154,7 @@ def pima_diabetes_dataset():
     progress_bar("pima-indians-diabetes.csv", pima)
 
 def loan_default_dataset():
-    print("Downloading load default dataset...")
+    print("Downloading loan default dataset...")
     loan = requests.get("http://datasets.mlpack.org/LoanDefault.csv")
     progress_bar("LoanDefault.csv", loan)
 
@@ -203,6 +203,7 @@ def all_datasets():
     dominant_color_dataset()
     covertype_dataset()
     dga_dataset()
+    loan_default_dataset()
 
 if __name__ == '__main__':
 
