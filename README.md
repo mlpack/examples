@@ -39,6 +39,8 @@ This repository is organized per language and per method that is used.
 * `cli/` directory contains mlpack methods executed directly from the terminal
   command line, suitable if you have a ready to use dataset and you do not want
   to jump to the code.
+* `binder/`: configuration files for running the example notebooks interactively via [Binder](https://mybinder.org), without any local installation.
+* `utils/`: shared helper code for plotting (heatmaps, histograms, scatter plots) and data preprocessing (imputation), reused across the C++ and Python examples.
 
 ### 2. Building the examples and usage
 
