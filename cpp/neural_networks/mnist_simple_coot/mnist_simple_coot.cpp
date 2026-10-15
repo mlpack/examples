@@ -156,8 +156,8 @@ int main()
   // Calculating accuracy on validating data points.
   double validAccuracy = accuracy(getLabels(predOut), validY);
 
-  //cout << "Accuracy: train = " << trainAccuracy << "%,"
-       //<< "\t valid = " << validAccuracy << "%" << endl;
+  cout << "Accuracy: train = " << trainAccuracy << "%,"
+       << "\t valid = " << validAccuracy << "%" << endl;
 
   //data::Save("model.bin", "model", model, false);
 
