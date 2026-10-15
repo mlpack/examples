@@ -146,19 +146,15 @@ int main()
   // Save the best training weights into the model.
   model.Parameters() = bestCoordinates.BestCoordinates();
 
-  //coot::mat predOut;
-  //// Getting predictions on training data points.
-  //model.Predict(trainX, predOut);
-  //// Calculating accuracy on training data points.
-  //coot::Row<size_t> predLabels = getLabels(predOut);
-  //double trainAccuracy =
-      //coot::accu(predLabels == trainY) / (double) trainY.n_elem * 100;
-  //// Getting predictions on validating data points.
-  //model.Predict(validX, predOut);
-  //// Calculating accuracy on validating data points.
-  //predLabels = getLabels(predOut);
-  //double validAccuracy =
-      //coot::accu(predLabels == validY) / (double) validY.n_elem * 100;
+  coot::mat predOut;
+  // Getting predictions on training data points.
+  model.Predict(trainX, predOut);
+  // Calculating accuracy on training data points.
+  double trainAccuracy = accuracy(getLabels(predOut), trainY);
+  // Getting predictions on validating data points.
+  model.Predict(validX, predOut);
+  // Calculating accuracy on validating data points.
+  double validAccuracy = accuracy(getLabels(predOut), validY);
 
   //cout << "Accuracy: train = " << trainAccuracy << "%,"
        //<< "\t valid = " << validAccuracy << "%" << endl;
