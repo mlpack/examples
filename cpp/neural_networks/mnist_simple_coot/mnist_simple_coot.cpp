@@ -69,10 +69,10 @@ int main()
 
   // Getting training and validating dataset with features only and then
   // normalising
-  const coot::mat trainX =
-      coot::conv_to<coot::mat>::from(train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) / 255.0);
-  const coot::mat validX =
-      coot::conv_to<coot::mat>::from(valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0);
+  const coot::mat trainX = coot::conv_to<coot::mat>::from(
+      train.submat(1, 0, train.n_rows - 1, train.n_cols - 1) / 255.0);
+  const coot::mat validX = coot::conv_to<coot::mat>::from(
+      valid.submat(1, 0, valid.n_rows - 1, valid.n_cols - 1) / 255.0);
 
 //  trainX.raw_print("trainx");
 //  validX.raw_print("validX");
