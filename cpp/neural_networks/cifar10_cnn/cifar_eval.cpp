@@ -20,13 +20,13 @@ int main()
 {
   FFN<NegativeLogLikelihood, RandomInitialization> model;
   // Load pretrained model weights for inference.
-  data::Load("cifarNet.xml", "model", model);
+  data::Load("cifarNet.xml", model, data::XML);
 
   cout << "Starting Prediction on testset ..." << endl;
   // Matrix for storing test feeature & labels.
   mat testData, testY;
   // Load the test data.
-  data::Load("../../../data/cifar-10_test.csv", testData, true);
+  data::Load("../../../data/cifar-10_test.csv", testData, data::Fatal);
   // Drop the header column.
   testData.shed_col(0);
   // Remove labels before predicting.

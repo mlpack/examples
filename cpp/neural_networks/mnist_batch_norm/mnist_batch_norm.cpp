@@ -70,7 +70,7 @@ int main()
   mat dataset;
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../../../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, data::Fatal);
 
   // Splitting the dataset on training and validation parts.
   mat train, valid;
@@ -161,7 +161,7 @@ int main()
   cout << "Accuracy: train = " << trainAccuracy << "%,"
             << " valid = " << validAccuracy << "%" << endl;
 
-  data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", model, data::BIN);
   cout << "Predicting ..." << endl;
 
   // Loading test dataset (the one whose predicted labels
@@ -171,7 +171,7 @@ int main()
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
 
-  data::Load("../../../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, data::Fatal);
   mat testY = dataset.row(0);
   dataset.shed_row(0); // Remove labels.
 

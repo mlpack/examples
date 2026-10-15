@@ -134,7 +134,7 @@ void ClassificationReport(const arma::Row<size_t>& yPreds, const arma::Row<size_
 int main() 
 {
   arma::mat loanData;
-  data::Load("../../../data/LoanDefault.csv", loanData);
+  data::Load("http://datasets.mlpack.org/LoanDefault.csv", loanData);
 
   // Split the data into features (X) and target (y) variables, targets are the last row.
   arma::Row<size_t> targets = arma::conv_to<arma::Row<size_t>>::from(loanData.row(loanData.n_rows - 1));

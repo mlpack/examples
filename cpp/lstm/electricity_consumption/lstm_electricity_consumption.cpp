@@ -82,7 +82,7 @@ void CreateTimeSeriesData(InputDataType dataset,
  */
 void SaveResults(const string& filename,
                  const arma::cube& predictions,
-                 data::MinMaxScaler& scale,
+                 data::MinMaxScaler<arma::mat>& scale,
                  const arma::cube& testX)
 {
   arma::mat flatDataAndPreds = testX.slice(testX.n_slices - 1);
@@ -116,14 +116,8 @@ void SaveResults(const string& filename,
 
 int main()
 {
-  // Change the names of these files as necessary. They should be correct
-  // already, if your program's working directory contains the data and/or
-  // model.
-  const string dataFile = "../../../data/electricity-usage.csv";
-  // example: const string dataFile =
-  //                  "C:/mlpack-model-app/electricity-usage.csv";
-  // example: const string dataFile =
-  //                  "/home/user/mlpack-model-app/electricity-usage.csv";
+  // Change the name of this file as necessary. It should be correct already,
+  // if your program's working directory contains the model.
 
   const string modelFile = "lstm_univar.bin";
   // example: const string modelFile =
@@ -171,7 +165,8 @@ int main()
 
   // In Armadillo rows represent features, columns represent data points.
   cout << "Reading data ..." << endl;
-  data::Load(dataFile, dataset, true);
+  data::Load("http://datasets.mlpack.org/examples/electricity-usage.csv",
+      dataset, data::Fatal);
 
   // The CSV file has a header, so it is necessary to remove it. In Armadillo's
   // representation it is the first column.
@@ -188,7 +183,7 @@ int main()
   const int EPOCHS = 150;
 
   // Scale all data into the range (0, 1) for increased numerical stability.
-  data::MinMaxScaler scale;
+  data::MinMaxScaler<arma::mat> scale;
   // Fit scaler only on training data.
   scale.Fit(trainData);
   scale.Transform(trainData, trainData);
@@ -218,7 +213,7 @@ int main()
     {
       // The model will be trained further.
       cout << "Loading and further training model..." << endl;
-      data::Load(modelFile, "LSTMUnivar", model);
+      data::Load(modelFile, model, data::BIN);
     }
     else
     {
@@ -264,7 +259,7 @@ int main()
 
     cout << "Finished training." << endl;
     cout << "Saving Model" << endl;
-    data::Save(modelFile, "LSTMUnivar", model);
+    data::Save(modelFile, model, data::BIN);
     cout << "Model saved in " << modelFile << endl;
   }
 
@@ -277,7 +272,7 @@ int main()
   // Load RNN model and use it for prediction.
   RNN<MeanSquaredError, HeInitialization> modelP(rho);
   cout << "Loading model ..." << endl;
-  data::Load(modelFile, "LSTMUnivar", modelP);
+  data::Load(modelFile, modelP, data::BIN);
   arma::cube predOutP;
 
   // Get predictions on the test data points.

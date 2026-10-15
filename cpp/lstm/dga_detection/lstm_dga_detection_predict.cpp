@@ -118,8 +118,8 @@ int main(int argc, char** argv)
   // First load the model.
   RNN<NegativeLogLikelihoodType<arma::fmat>, RandomInitialization, arma::fmat>
       benignModel, maliciousModel;
-  data::Load(argv[1], "lstm_model", benignModel, true /* fatal on failure */);
-  data::Load(argv[2], "lstm_model", maliciousModel, true);
+  data::Load(argv[1], benignModel, data::BIN + data::Fatal);
+  data::Load(argv[2], maliciousModel, data::BIN + data::Fatal);
 
   // Now enter a loop where we read domains from stdin and then make
   // predictions.
