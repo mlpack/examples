@@ -36,6 +36,11 @@ coot::Row<size_t> getLabels(const coot::mat& predOut)
   }
   return predLabels;
 }
+double accuracy(const coot::Row<size_t>& predLabels, const coot::mat& labels)
+{
+  const coot::Row<size_t> trueLabels = coot::conv_to<coot::Row<size_t>>::from(labels);
+  return coot::accu(predLabels == trueLabels) / (double) labels.n_elem * 100;
+}
 
 int main()
 {
