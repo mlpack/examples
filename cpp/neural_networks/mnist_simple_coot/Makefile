@@ -10,7 +10,11 @@ SRC := mnist_simple_coot.cpp
 LIBS_NAME := bandicoot openblas armadillo
 
 CXX := g++
-CXXFLAGS += -std=c++17 -Wall -Wextra -O3 -g -DNDEBUG -fopenmp
+CXXFLAGS += -std=c++17 -Wall -Wextra -O3 -DNDEBUG -fopenmp
+# Select the bandicoot backend to run the example on.
+CXXFLAGS += -DCOOT_DEFAULT_BACKEND=CUDA_BACKEND
+# CXXFLAGS += -DCOOT_DEFAULT_BACKEND=CL_BACKEND
+# CXXFLAGS += -DCOOT_DEFAULT_BACKEND=VULKAN_BACKEND
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and
 # without optimizations.
 # CXXFLAGS += -std=c++14 -Wall -Wextra -g -O0
