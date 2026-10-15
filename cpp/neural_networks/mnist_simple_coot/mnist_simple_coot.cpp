@@ -159,29 +159,20 @@ int main()
   cout << "Accuracy: train = " << trainAccuracy << "%,"
        << "\t valid = " << validAccuracy << "%" << endl;
 
-  //data::Save("model.bin", "model", model, false);
-
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  //data::Load("../data/mnist_test.csv", dataset, true);
-  //coot::mat testY = dataset.row(0);
-  //dataset.shed_row(0); // Strip labels before predicting.
-  //dataset /= 255.0; // Apply the same normalization as to the training data.
+  data::Load("../../../data/mnist_test.csv", dataset, true);
+  const coot::mat testY = coot::conv_to<coot::mat>::from(dataset.row(0));
+  dataset.shed_row(0); // Strip labels before predicting.
+  dataset /= 255.0; // Apply the same normalization as to the training data.
+  const coot::mat testX = coot::conv_to<coot::mat>::from(dataset);
 
-  //cout << "Predicting on test set..." << endl;
-  //coot::mat testPredOut;
-  //// Getting predictions on test data points.
-  //model.Predict(dataset, testPredOut);
-  //// Generating labels for the test dataset.
-  //coot::Row<size_t> testPred = getLabels(testPredOut);
+  cout << "Predicting on test set..." << endl;
+  coot::mat testPredOut;
+  // Getting predictions on test data points.
+  model.Predict(testX, testPredOut);
 
-  //double testAccuracy = coot::accu(testPred == testY) /
-      //(double) testY.n_elem * 100;
-  //cout << "Accuracy: test = " << testAccuracy << "%" << endl;
-
-  //cout << "Saving predicted labels to \"results.csv\" ..." << endl;
-  //testPred.save("results.csv", coot::csv_ascii);
-
-  //cout << "Neural network model is saved to \"model.bin\"" << endl;
+  double testAccuracy = accuracy(getLabels(testPredOut), testY);
+  cout << "Accuracy: test = " << testAccuracy << "%" << endl;
   cout << "Finished" << endl;
 }
