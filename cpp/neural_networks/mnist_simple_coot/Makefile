@@ -24,12 +24,15 @@ LDFLAGS  += -fopenmp
 # default compiler search path.
 
 INCLFLAGS := -I .
-INCLFLAGS := -I/meta/ensmallen/include
-# If you have mlpack or ensmallen installed somewhere nonstandard, uncomment and
-# update the lines below.
-INCLFLAGS += -I/opt/cuda/targets/x86_64-linux/include
-INCLFLAGS += -I/meta/mlpack/src
-#INCLFLAGS += -I/meta/m
+# If you have mlpack, ensmallen or bandicoot installed somewhere nonstandard,
+# uncomment and update the lines below.
+# INCLFLAGS += -I/path/to/mlpack/include/
+# INCLFLAGS += -I/path/to/ensmallen/include/
+# INCLFLAGS += -I/path/to/bandicoot/include/
+# The CUDA backend of bandicoot needs the CUDA headers; comment this out if
+# bandicoot was built without CUDA support.
+INCLFLAGS += -I/usr/local/cuda/include
+CXXFLAGS += $(INCLFLAGS)
 CXXFLAGS += $(INCLFLAGS)
 
 OBJS := $(SRC:.cpp=.o)
