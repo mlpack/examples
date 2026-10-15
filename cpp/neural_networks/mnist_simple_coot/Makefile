@@ -1,7 +1,7 @@
 # This is a simple Makefile used to build the example source code.
 # This example might requires some modifications in order to work correctly on
 # your system.
-# This example trains mlpack neural network on GPU via OpenCL or CUDA, and it uses
+# This example trains mlpack neural network on GPU via OpenCL, CUDA or Vulkan, and it uses
 # the bandicoot library.
 
 TARGET := mnist_simple_coot
