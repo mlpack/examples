@@ -17,7 +17,7 @@ CXXFLAGS += -DCOOT_DEFAULT_BACKEND=CUDA_BACKEND
 # CXXFLAGS += -DCOOT_DEFAULT_BACKEND=VULKAN_BACKEND
 # Use these CXXFLAGS instead if you want to compile with debugging symbols and
 # without optimizations.
-# CXXFLAGS += -std=c++14 -Wall -Wextra -g -O0
+# CXXFLAGS += -std=c++17 -Wall -Wextra -g -O0
 
 LDFLAGS  += -fopenmp
 # Add header directories for any includes that aren't on the
