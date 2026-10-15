@@ -27,12 +27,12 @@
 using namespace mlpack;
 using namespace std;
 
-coot::Row<size_t> getLabels(coot::mat predOut)
+coot::Row<size_t> getLabels(const coot::mat& predOut)
 {
   coot::Row<size_t> predLabels(predOut.n_cols);
   for (coot::uword i = 0; i < predOut.n_cols; ++i)
   {
-    // predLabels(i) = predOut.col(i).index_max();
+    predLabels(i) = predOut.col(i).index_max();
   }
   return predLabels;
 }
