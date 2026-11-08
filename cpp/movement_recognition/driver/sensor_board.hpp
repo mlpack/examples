@@ -32,8 +32,8 @@
 #include "imu.hpp"
 #include "imu_sample.hpp"
 
-//! Which sensors to record.  accel/gyro/mag come from the IMU; baro is the
-//! BMP180.
+// Which sensors to record.  accel/gyro/mag come from the IMU; baro is the
+// BMP180.
 struct Sensors
 {
   bool accel = false, gyro = false, mag = false, baro = false;
