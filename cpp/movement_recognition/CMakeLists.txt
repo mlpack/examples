@@ -39,8 +39,6 @@ fetch_mlpack(ON)
 
 if(CMAKE_CROSSCOMPILING)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
-  file(GLOB OPENBLAS_LIB "${CMAKE_BINARY_DIR}/deps/OpenBLAS-*/libopenblas.a")
-  set(MLPACK_EXTRA_LIBS ${OPENBLAS_LIB} gfortran m)
 endif()
 
 # The GY-89 driver is self-contained: the I2C wrapper and the three chip drivers.
@@ -65,7 +63,6 @@ add_executable(train train/train.cpp)
 target_include_directories(train SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
 target_link_libraries(train PRIVATE
   ${MLPACK_LIBRARIES}
-  ${MLPACK_EXTRA_LIBS}
   pthread
 )
 
@@ -73,6 +70,5 @@ add_executable(infer infer/infer.cpp ${DRIVER_SOURCES})
 target_include_directories(infer SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
 target_link_libraries(infer PRIVATE
   ${MLPACK_LIBRARIES}
-  ${MLPACK_EXTRA_LIBS}
   pthread
 )
