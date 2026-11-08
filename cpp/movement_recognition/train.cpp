@@ -1,5 +1,5 @@
 /**
- * @file train/train.cpp
+ * @file train.cpp
  * @author Omar Shrit
  *
  * Train a movement-recognition neural network, on the device, from the CSV
@@ -29,7 +29,7 @@
 
 #include <mlpack.hpp>
 
-#include "../model.hpp"
+#include "model.hpp"
 
 using namespace mlpack;
 

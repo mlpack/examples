@@ -1,5 +1,5 @@
 /**
- * @file infer/infer.cpp
+ * @file infer.cpp
  * @author Omar Shrit
  *
  * Live movement-recognition inference on the device.  It reads the GY-89 IMU
@@ -13,7 +13,7 @@
  *   infer accel /dev/i2c-0 model                   # prints predictions to stdout
  *
  * Everything runs in f32 to stay light on the 64 MB device.  The feature
- * extraction here is deliberately identical to train/train.cpp -- keep the two
+ * extraction here is deliberately identical to train.cpp -- keep the two
  * in sync if you change one.  The window size and step are hardcoded constants
  * (see main()) and MUST match the ones in train.cpp.
  *
@@ -40,8 +40,8 @@
 #define MLPACK_ENABLE_ANN_SERIALIZATION_FMAT
 #include <mlpack.hpp>
 
-#include "../model.hpp"
-#include "../driver/sensor_board.hpp"
+#include "model.hpp"
+#include "driver/sensor_board.hpp"
 
 using namespace mlpack;
 

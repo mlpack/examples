@@ -55,14 +55,14 @@ add_executable(imu_test driver/imu_test.cpp ${DRIVER_SOURCES})
 target_compile_options(imu_test PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
 target_link_libraries(imu_test PRIVATE -Wl,--gc-sections pthread)
 
-add_executable(collect collect/collect.cpp ${DRIVER_SOURCES})
+add_executable(collect collect.cpp ${DRIVER_SOURCES})
 target_compile_options(collect PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
 target_link_libraries(collect PRIVATE -Wl,--gc-sections pthread)
 
-add_executable(train train/train.cpp)
+add_executable(train train.cpp)
 target_include_directories(train SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
 target_link_libraries(train PRIVATE ${MLPACK_LIBRARIES})
 
-add_executable(infer infer/infer.cpp ${DRIVER_SOURCES})
+add_executable(infer infer.cpp ${DRIVER_SOURCES})
 target_include_directories(infer SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
 target_link_libraries(infer PRIVATE ${MLPACK_LIBRARIES})

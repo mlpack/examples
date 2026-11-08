@@ -3,7 +3,7 @@
  * @author Omar Shrit
  *
  * Small data-collection app that records GY-89 sensor data to a CSV file.  It
- * depends only on the drivers in ../driver and argument parsing is hand-rolled,
+ * depends only on the drivers in driver/ and argument parsing is hand-rolled,
  * so the binary stays tiny.
  *
  * - choose which sensors to record with the positional `[sensors]` argument (a
@@ -36,7 +36,7 @@
 #include <string>
 #include <thread>
 
-#include "../driver/sensor_board.hpp"
+#include "driver/sensor_board.hpp"
 
 namespace {
 
