@@ -1,5 +1,6 @@
 # Build for the movement-recognition example relevant to the movement
-# recognition tutorial,
+# recognition tutorial:
+#   https://www.mlpack.org/doc/tutorials/movement_recognition.html
 #
 #   imu_test  -- sensor check + magnetometer calibration
 #   collect   -- record sensor data to CSV
