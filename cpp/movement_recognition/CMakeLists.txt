@@ -61,14 +61,8 @@ target_link_libraries(collect PRIVATE -Wl,--gc-sections pthread)
 
 add_executable(train train/train.cpp)
 target_include_directories(train SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
-target_link_libraries(train PRIVATE
-  ${MLPACK_LIBRARIES}
-  pthread
-)
+target_link_libraries(train PRIVATE ${MLPACK_LIBRARIES})
 
 add_executable(infer infer/infer.cpp ${DRIVER_SOURCES})
 target_include_directories(infer SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
-target_link_libraries(infer PRIVATE
-  ${MLPACK_LIBRARIES}
-  pthread
-)
+target_link_libraries(infer PRIVATE ${MLPACK_LIBRARIES})
