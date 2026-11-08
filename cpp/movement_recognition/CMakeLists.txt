@@ -52,12 +52,12 @@ set(DRIVER_SOURCES
 )
 
 add_executable(imu_test driver/imu_test.cpp ${DRIVER_SOURCES})
-add_executable(collect  collect/collect.cpp ${DRIVER_SOURCES})
+target_compile_options(imu_test PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
+target_link_libraries(imu_test PRIVATE -Wl,--gc-sections pthread)
 
-foreach(tool imu_test collect)
-  target_compile_options(${tool} PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
-  target_link_libraries(${tool} PRIVATE -Wl,--gc-sections pthread)
-endforeach()
+add_executable(collect collect/collect.cpp ${DRIVER_SOURCES})
+target_compile_options(collect PRIVATE -Os -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections)
+target_link_libraries(collect PRIVATE -Wl,--gc-sections pthread)
 
 add_executable(train train/train.cpp)
 target_include_directories(train SYSTEM PRIVATE ${MLPACK_INCLUDE_DIRS})
