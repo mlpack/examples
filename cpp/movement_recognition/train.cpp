@@ -17,13 +17,6 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <algorithm>
-#include <filesystem>
-#include <limits>
-#include <map>
-#include <string>
-#include <vector>
-
 #define MLPACK_ENABLE_ANN_SERIALIZATION
 #define MLPACK_ENABLE_ANN_SERIALIZATION_FMAT
 
@@ -328,7 +321,6 @@ int main(int argc, char** argv)
     if (entry.path().extension() == ".csv")
       files.push_back(entry.path());
   }
-  std::sort(files.begin(), files.end());
 
   std::cerr << "data dir '" << dataDir << "': " << files.size()
             << " .csv file(s), window=" << window << ", step=" << step << "\n";
