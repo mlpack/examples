@@ -31,8 +31,6 @@ namespace fs = std::filesystem;
 
 constexpr size_t kHidden = 64;
 
-namespace {
-
 // The label is the file name without the trailing "_<date>".
 std::string LabelOf(const fs::path& p)
 {
@@ -270,8 +268,6 @@ void TrainNN(const arma::fmat& trainData, const arma::Row<size_t>& trainLabels,
   std::cout << "neural net test accuracy: " << Accuracy(pred, testLabels)
             << "\n";
 }
-
-}  // namespace
 
 int main(int argc, char** argv)
 {

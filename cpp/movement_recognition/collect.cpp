@@ -38,8 +38,6 @@
 
 #include "driver/sensor_board.hpp"
 
-namespace {
-
 uint64_t UnixMicros()
 {
   struct timespec ts;
@@ -147,8 +145,6 @@ int Record(const SensorBoard& board, std::ostream& csv,
             << std::setprecision(1) << effHz << " Hz).\n";
   return 0;
 }
-
-}  // namespace
 
 int main(int argc, char** argv)
 {

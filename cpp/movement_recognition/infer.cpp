@@ -46,8 +46,6 @@
 using namespace mlpack;
 
 
-namespace {
-
 std::atomic<bool> g_stop{false};
 void HandleSigint(int) { g_stop = true; }
 
@@ -213,8 +211,6 @@ int RunInference(const SensorBoard& board, Network& nn,
   }
   return 0;
 }
-
-}  // namespace
 
 int main(int argc, char** argv)
 {
