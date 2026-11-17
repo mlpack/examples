@@ -25,48 +25,50 @@
 #include "model.hpp"
 
 using namespace mlpack;
+using namespace std;
+using namespace arma;
 
 
-namespace fs = std::filesystem;
+namespace fs = filesystem;
 
 constexpr size_t kHidden = 64;
 
 // The label is the file name without the trailing "_<date>".
-std::string LabelOf(const fs::path& p)
+string LabelOf(const fs::path& p)
 {
-  const std::string stem = p.stem().string();
+  const string stem = p.stem().string();
   const size_t u = stem.rfind('_');
 
-  if (u == std::string::npos)
+  if (u == string::npos)
     return stem;
 
   return stem.substr(0, u);
 }
 
-bool LoadRecording(const fs::path& path, size_t window, arma::fmat& raw)
+bool LoadRecording(const fs::path& path, size_t window, fmat& raw)
 {
   // mlpack loads text column-major, so each CSV column becomes a row.
   data::TextOptions opts;
   opts.HasHeaders() = true;
   opts.Fatal() = true;
 
-  std::cerr << "  load " << path.filename().string() << " ... ";
+  cerr << "  load " << path.filename().string() << " ... ";
 
   data::Load(path.string(), raw, opts);
 
-  std::cerr << "loaded " << raw.n_rows << " channels(+ts) x " << raw.n_cols
-            << " samples";
+  cerr << "loaded " << raw.n_rows << " channels(+ts) x " << raw.n_cols
+       << " samples";
 
   if (raw.n_rows < 2)
   {
-    std::cerr << " -- < 2 rows, skipped\n";
+    cerr << " -- < 2 rows, skipped\n";
     return false;
   }
 
   if (raw.n_cols < window)
   {
-    std::cerr << " -- fewer than the window size (" << window
-              << ") samples, skipped\n";
+    cerr << " -- fewer than the window size (" << window
+         << ") samples, skipped\n";
     return false;
   }
 
@@ -163,17 +165,17 @@ bool LoadRecording(const fs::path& path, size_t window, arma::fmat& raw)
 // capture the periodicity. In addition to this we are adding time domain
 // information using statistical methods (mean, stddev, median) to capture the
 // intensity of the movements.
-arma::fvec WindowToFeatures(const arma::fmat& win)
+fvec WindowToFeatures(const fmat& win)
 {
   const size_t numBins = win.n_cols / 2 + 1;
 
-  const arma::cx_fmat spectrum = arma::fft(win.t());
-  const arma::fmat power = arma::square(arma::abs(spectrum.rows(0, numBins - 1)));
+  const cx_fmat spectrum = fft(win.t());
+  const fmat power = square(abs(spectrum.rows(0, numBins - 1)));
 
-  return arma::join_cols(arma::vectorise(power),
-                         arma::mean(win, 1),
-                         arma::stddev(win, 0, 1),
-                         arma::median(win, 1));
+  return join_cols(vectorise(power),
+                   mean(win, 1),
+                   stddev(win, 0, 1),
+                   median(win, 1));
 }
 
 // Cut `raw` (channels x samples) into overlapping windows and turn each into one
@@ -184,9 +186,9 @@ arma::fvec WindowToFeatures(const arma::fmat& win)
 // accuracy; it also matches how `infer` slides its window at run time.  No
 // window taper is applied -- for these short, low-frequency movement windows a
 // rectangular window classifies better than a Hamming-tapered one.
-void ExtractWindows(const arma::fmat& raw, size_t window, size_t step,
-                    size_t classIdx, std::vector<arma::fvec>& cols,
-                    std::vector<size_t>& labels)
+void ExtractWindows(const fmat& raw, size_t window, size_t step,
+                    size_t classIdx, vector<fvec>& cols,
+                    vector<size_t>& labels)
 {
   size_t numWindows = 0;
 
@@ -198,31 +200,23 @@ void ExtractWindows(const arma::fmat& raw, size_t window, size_t step,
   }
 
   const size_t numFeatures = cols.empty() ? 0 : cols.back().n_elem;
-  std::cerr << " -> " << numWindows << " windows of " << numFeatures
-            << " features\n";
-}
-
-double Accuracy(const arma::Row<size_t>& pred, const arma::Row<size_t>& truth)
-{
-  if (truth.n_elem == 0)
-    return 0.0;
-
-  return (double) arma::accu(pred == truth) / truth.n_elem;
+  cerr << " -> " << numWindows << " windows of " << numFeatures
+       << " features\n";
 }
 
 // Train the network on the training split, report accuracy on the held-out test
 // split, and fill `net`.  `patience` is the early-stopping patience.
-void TrainNN(const arma::fmat& trainData, const arma::Row<size_t>& trainLabels,
-             const arma::fmat& testData, const arma::Row<size_t>& testLabels,
+void TrainNN(const fmat& trainData, const Row<size_t>& trainLabels,
+             const fmat& testData, const Row<size_t>& testLabels,
              size_t numClasses, size_t patience, Network& net)
 {
-  net.Add<Linear<arma::fmat>>(kHidden);
-  net.Add<ReLU<arma::fmat>>();
-  net.Add<Linear<arma::fmat>>(numClasses);
-  net.Add<LogSoftMax<arma::fmat>>();
+  net.Add<Linear<fmat>>(kHidden);
+  net.Add<ReLU<fmat>>();
+  net.Add<Linear<fmat>>(numClasses);
+  net.Add<LogSoftMax<fmat>>();
 
-  const arma::fmat responses = arma::conv_to<arma::fmat>::from(trainLabels);
-  const arma::fmat testResponses = arma::conv_to<arma::fmat>::from(testLabels);
+  const fmat responses = conv_to<fmat>::from(trainLabels);
+  const fmat testResponses = conv_to<fmat>::from(testLabels);
 
   ens::Adam optimizer(
       1e-2,    // step size (learning rate)
@@ -234,10 +228,10 @@ void TrainNN(const arma::fmat& trainData, const arma::Row<size_t>& trainLabels,
       1e-8,    // tolerance
       true);   // shuffle between epochs
 
-  double bestValLoss = std::numeric_limits<double>::infinity();
-  arma::fmat bestParams;
-  ens::EarlyStopAtMinLossType<arma::fmat> earlyStop(
-      [&](const arma::fmat& /* param */)
+  double bestValLoss = numeric_limits<double>::infinity();
+  fmat bestParams;
+  ens::EarlyStopAtMinLossType<fmat> earlyStop(
+      [&](const fmat& /* param */)
       {
         const double valLoss = net.Evaluate(testData, testResponses);
         if (valLoss < bestValLoss)
@@ -257,16 +251,17 @@ void TrainNN(const arma::fmat& trainData, const arma::Row<size_t>& trainLabels,
   if (!bestParams.is_empty())
     net.Parameters() = bestParams;
 
-  arma::fmat scores;
+  fmat scores;
   net.Predict(testData, scores);
 
-  arma::Row<size_t> pred(scores.n_cols);
+  Row<size_t> pred(scores.n_cols);
   for (size_t i = 0; i < scores.n_cols; ++i)
   {
     pred[i] = scores.col(i).index_max();
   }
-  std::cout << "neural net test accuracy: " << Accuracy(pred, testLabels)
-            << "\n";
+  cout << "neural net test accuracy: "
+       << (double) accu(pred == testLabels) / testLabels.n_elem
+       << "\n";
 }
 
 int main(int argc, char** argv)
@@ -280,62 +275,62 @@ int main(int argc, char** argv)
 
   if (argc < 2)
   {
-    std::cerr << "Usage: " << argv[0]
-              << " <data-dir> [out-dir] [patience] [test-split]\n"
+    cerr << "Usage: " << argv[0]
+         << " <data-dir> [out-dir] [patience] [test-split]\n"
                  "  out-dir holds the model file model.bin (default: model)\n";
     return 1;
   }
 
-  const std::string dataDir = argv[1];
+  const string dataDir = argv[1];
   // Output directory for the model; the network, scaler, and class names are
   // all serialized together into model.bin.
-  const std::string outDir  = argc > 2 ? argv[2] : "model";
-  const size_t patience     = argc > 3 ? std::stoul(argv[3]) : 10;
-  const double testSplit    = argc > 4 ? std::stod(argv[4]) : 0.2;
+  const string outDir  = argc > 2 ? argv[2] : "model";
+  const size_t patience     = argc > 3 ? stoul(argv[3]) : 10;
+  const double testSplit    = argc > 4 ? stod(argv[4]) : 0.2;
 
   if (!fs::is_directory(dataDir))
   {
-    std::cerr << "error: '" << dataDir << "' is not a directory\n";
+    cerr << "error: '" << dataDir << "' is not a directory\n";
     return 1;
   }
 
   // Create the output directory, then build the three fixed file paths in it.
-  std::error_code ec;
+  error_code ec;
   fs::create_directories(outDir, ec);
   if (ec)
   {
-    std::cerr << "error: cannot create output directory '" << outDir
-              << "': " << ec.message() << "\n";
+    cerr << "error: cannot create output directory '" << outDir
+         << "': " << ec.message() << "\n";
     return 1;
   }
-  const std::string modelFile = (fs::path(outDir) / "model.bin").string();
+  const string modelFile = (fs::path(outDir) / "model.bin").string();
 
   // Collect the CSV files in the data directory.
-  std::vector<fs::path> files;
+  vector<fs::path> files;
   for (const fs::directory_entry& entry : fs::directory_iterator(dataDir))
   {
     if (entry.path().extension() == ".csv")
       files.push_back(entry.path());
   }
 
-  std::cerr << "data dir '" << dataDir << "': " << files.size()
-            << " .csv file(s), window=" << window << ", step=" << step << "\n";
+  cerr << "data dir '" << dataDir << "': " << files.size()
+       << " .csv file(s), window=" << window << ", step=" << step << "\n";
   if (files.empty())
   {
-    std::cerr << "error: no .csv files in '" << dataDir << "'\n";
+    cerr << "error: no .csv files in '" << dataDir << "'\n";
     return 1;
   }
 
   // Map each label to a class index, then turn every file into feature columns.
-  std::map<std::string, size_t> classOf;
-  std::vector<std::string> classNames;
-  std::vector<arma::fvec> cols;
-  std::vector<size_t> labels;
+  map<string, size_t> classOf;
+  vector<string> classNames;
+  vector<fvec> cols;
+  vector<size_t> labels;
 
   for (size_t f = 0; f < files.size(); ++f)
   {
     const fs::path& path = files[f];
-    const std::string label = LabelOf(path);
+    const string label = LabelOf(path);
 
     if (classOf.count(label) == 0)
     {
@@ -344,9 +339,9 @@ int main(int argc, char** argv)
     }
     const size_t classIdx = classOf[label];
 
-    std::cerr << "[" << label << "]\n";
+    cerr << "[" << label << "]\n";
 
-    arma::fmat raw;
+    fmat raw;
     if (LoadRecording(path, window, raw))
       ExtractWindows(raw, window, step, classIdx, cols, labels);
   }
@@ -357,45 +352,45 @@ int main(int argc, char** argv)
   {
     if (cols[i].n_elem != feat)
     {
-      std::cerr << "error: window " << i << " has " << cols[i].n_elem
-                << " features but the first has " << feat
-                << " -- were the files recorded with different --sensors?\n";
+      cerr << "error: window " << i << " has " << cols[i].n_elem
+           << " features but the first has " << feat
+           << " -- were the files recorded with different --sensors?\n";
       return 1;
     }
   }
 
-  std::cerr << "totals: " << cols.size() << " windows, " << feat
-            << " features, " << classNames.size() << " classes (";
+  cerr << "totals: " << cols.size() << " windows, " << feat
+       << " features, " << classNames.size() << " classes (";
   for (size_t i = 0; i < classNames.size(); ++i)
   {
-    std::cerr << (i ? ", " : "") << classNames[i];
+    cerr << (i ? ", " : "") << classNames[i];
   }
-  std::cerr << ")\n";
+  cerr << ")\n";
 
   if (cols.size() < 2 || classNames.size() < 2)
   {
-    std::cerr << "error: need >=2 windows and >=2 labels. Collect more data, "
+    cerr << "error: need >=2 windows and >=2 labels. Collect more data, "
                  "or lower the window size (currently " << window
-              << ") in the source so short recordings have more windows.\n";
+         << ") in the source so short recordings have more windows.\n";
     return 1;
   }
 
   // Assemble the feature matrix X (one column per window) and the label row y.
-  arma::fmat X(feat, cols.size());
-  arma::Row<size_t> y(cols.size());
+  fmat X(feat, cols.size());
+  Row<size_t> y(cols.size());
   for (size_t i = 0; i < cols.size(); ++i)
   {
     X.col(i) = cols[i];
     y[i] = labels[i];
   }
-  std::cout << X.n_cols << " windows, " << X.n_rows << " features, "
-            << classNames.size() << " classes.\n";
+  cout << X.n_cols << " windows, " << X.n_rows << " features, "
+       << classNames.size() << " classes.\n";
 
-  arma::fmat trainData, testData;
-  arma::Row<size_t> trainLabels, testLabels;
+  fmat trainData, testData;
+  Row<size_t> trainLabels, testLabels;
   data::Split(X, y, trainData, testData, trainLabels, testLabels, testSplit);
-  std::cerr << "split: " << trainData.n_cols << " train, " << testData.n_cols
-            << " test\n";
+  cerr << "split: " << trainData.n_cols << " train, " << testData.n_cols
+       << " test\n";
 
   // Since we have features from time domain and frequency domain, it is
   // better to standardize all of features to have similar scale.  The scaler
@@ -412,6 +407,6 @@ int main(int argc, char** argv)
   // Serialize the network, scaler, and class names together into model.bin.
   data::Save(modelFile, model, data::BIN);
 
-  std::cout << "saved model to '" << modelFile << "'\n";
+  cout << "saved model to '" << modelFile << "'\n";
   return 0;
 }
