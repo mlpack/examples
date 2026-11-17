@@ -48,14 +48,17 @@ bool LoadRecording(const fs::path& path, size_t window, fmat& raw)
   // mlpack loads text column-major, so each CSV column becomes a row.
   data::TextOptions opts;
   opts.HasHeaders() = true;
-  opts.Fatal() = true;
 
   cerr << "  load " << path.filename().string() << " ... ";
 
-  data::Load(path.string(), raw, opts);
+  if (!data::Load(path.string(), raw, opts))
+  {
+    cerr << "cannot load, skipped\n";
+    return false;
+  }
 
-  cerr << "loaded " << raw.n_rows << " channels(+ts) x " << raw.n_cols
-       << " samples";
+  cerr << "loaded " << raw.n_rows << " rows (timestamp + channels) x "
+       << raw.n_cols << " samples";
 
   if (raw.n_rows < 2)
   {
