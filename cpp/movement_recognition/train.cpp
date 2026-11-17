@@ -31,8 +31,6 @@ using namespace arma;
 
 namespace fs = filesystem;
 
-constexpr size_t kHidden = 64;
-
 // The label is the file name without the trailing "_<date>".
 string LabelOf(const fs::path& p)
 {
@@ -210,7 +208,7 @@ void TrainNN(const fmat& trainData, const Row<size_t>& trainLabels,
              const fmat& testData, const Row<size_t>& testLabels,
              size_t numClasses, size_t patience, Network& net)
 {
-  net.Add<Linear<fmat>>(kHidden);
+  net.Add<Linear<fmat>>(64);
   net.Add<ReLU<fmat>>();
   net.Add<Linear<fmat>>(numClasses);
   net.Add<LogSoftMax<fmat>>();
