@@ -17,12 +17,12 @@
 
 #include "i2c_bus.hpp"
 
-//! Configuration + read driver for the LSM303D (accel in g, mag in gauss).
+// Configuration + read driver for the LSM303D (accel in g, mag in gauss).
 class LSM303D
 {
  public:
-  static constexpr uint8_t defaultAddress = 0x1D;    //!< SDO/SA0 high
-  static constexpr uint8_t alternateAddress = 0x1E;  //!< SDO/SA0 low
+  static constexpr uint8_t defaultAddress = 0x1D;    // SDO/SA0 high
+  static constexpr uint8_t alternateAddress = 0x1E;  // SDO/SA0 low
   static constexpr uint8_t whoAmIValue = 0x49;
 
   enum class AccelScale { G_2, G_4, G_6, G_8, G_16 };
@@ -39,10 +39,10 @@ class LSM303D
    */
   bool Begin(bool& identityMatched, uint8_t& whoAmI) const;
 
-  //! Read acceleration of all three axes (g).  False on I2C error.
+  // Read acceleration of all three axes (g).  False on I2C error.
   bool ReadAccel(float& ax, float& ay, float& az) const;
 
-  //! Read magnetic field of all three axes (gauss).  False on I2C error.
+  // Read magnetic field of all three axes (gauss).  False on I2C error.
   bool ReadMag(float& mx, float& my, float& mz) const;
 
  private:
@@ -50,8 +50,8 @@ class LSM303D
   uint8_t address;
   AccelScale accelScale;
   MagScale magScale;
-  float accelSensitivity;  //!< g per LSB.
-  float magSensitivity;    //!< gauss per LSB.
+  float accelSensitivity;  // g per LSB.
+  float magSensitivity;    // gauss per LSB.
 };
 
 #endif

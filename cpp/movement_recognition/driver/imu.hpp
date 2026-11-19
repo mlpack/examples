@@ -43,7 +43,7 @@ class IMU
    */
   bool Begin();
 
-  //! Read one synchronized, timestamped 9-DOF sample.  False on I2C error.
+  // Read one synchronized, timestamped 9-DOF sample.  False on I2C error.
   bool Sample(ImuSample& out) const;
 
  private:

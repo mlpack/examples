@@ -43,17 +43,17 @@ struct Sensors
     return accel || gyro || mag;
   }
 
-  //! Number of scalar channels the selection produces, in the canonical order
-  //! accel(3), gyro(3), mag(3), baro(2) -- the order used for CSV columns and
-  //! feature vectors alike.
+  // Number of scalar channels the selection produces, in the canonical order
+  // accel(3), gyro(3), mag(3), baro(2) -- the order used for CSV columns and
+  // feature vectors alike.
   size_t Channels() const
   {
     return 3 * accel + 3 * gyro + 3 * mag + 2 * baro;
   }
 };
 
-//! Parse "all" or a comma list like "accel,gyro,mag,baro" into a Sensors.
-//! Returns false if the spec is empty or contains an unknown name.
+// Parse "all" or a comma list like "accel,gyro,mag,baro" into a Sensors.
+// Returns false if the spec is empty or contains an unknown name.
 inline bool ParseSensors(const std::string& spec, Sensors& out)
 {
   if (spec == "all")
@@ -82,11 +82,11 @@ inline bool ParseSensors(const std::string& spec, Sensors& out)
   return out.accel || out.gyro || out.mag || out.baro;
 }
 
-//! One reading of the whole board: the 9-DOF motion sample plus the barometer.
-//! Only the fields for the selected sensors are meaningful.
+// One reading of the whole board: the 9-DOF motion sample plus the barometer.
+// Only the fields for the selected sensors are meaningful.
 struct Reading
 {
-  ImuSample motion;         //!< accelerometer / gyroscope / magnetometer
+  ImuSample motion;         // accelerometer / gyroscope / magnetometer
   float pressurePa = 0.f;
   float tempC = 0.f;
 };
@@ -107,7 +107,7 @@ class SensorBoard
   {
   }
 
-  //! Which sensors this board was told to record (for the CSV columns).
+  // Which sensors this board was told to record (for the CSV columns).
   const Sensors& Selected() const { return sensors; }
 
   /**
@@ -119,7 +119,7 @@ class SensorBoard
    */
   bool Begin();
 
-  //! Read one sample of all selected sensors.  False on an I2C error.
+  // Read one sample of all selected sensors.  False on an I2C error.
   bool Read(Reading& out) const;
 
  private:

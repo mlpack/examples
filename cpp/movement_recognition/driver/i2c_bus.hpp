@@ -27,10 +27,10 @@
 class I2CBus
 {
  public:
-  //! Construct without opening; call Open() afterwards.
+  // Construct without opening; call Open() afterwards.
   I2CBus();
 
-  //! Construct and open `device` (e.g. "/dev/i2c-0"); check IsOpen().
+  // Construct and open `device` (e.g. "/dev/i2c-0"); check IsOpen().
   explicit I2CBus(const char* device);
 
   ~I2CBus();
@@ -41,13 +41,13 @@ class I2CBus
   I2CBus(I2CBus&& other) noexcept;
   I2CBus& operator=(I2CBus&& other) noexcept;
 
-  //! Open the bus device.  Returns false (and sets errno) on failure.
+  // Open the bus device.  Returns false (and sets errno) on failure.
   bool Open(const char* device);
 
-  //! Whether a bus is currently open.
+  // Whether a bus is currently open.
   bool IsOpen() const { return fd >= 0; }
 
-  //! Read a single 8-bit register into `value`.  Returns false on error.
+  // Read a single 8-bit register into `value`.  Returns false on error.
   bool ReadRegister(uint8_t address, uint8_t reg, uint8_t& value) const;
 
   /**
@@ -61,11 +61,11 @@ class I2CBus
                      uint8_t* buffer,
                      std::size_t count) const;
 
-  //! Write `value` to register `reg`.  Returns false on error.
+  // Write `value` to register `reg`.  Returns false on error.
   bool WriteRegister(uint8_t address, uint8_t reg, uint8_t value) const;
 
  private:
-  //! Point the bus at `address` via ioctl(I2C_SLAVE); cached.  False on error.
+  // Point the bus at `address` via ioctl(I2C_SLAVE); cached.  False on error.
   bool SelectDevice(uint8_t address) const;
 
   int fd;

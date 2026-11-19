@@ -20,15 +20,15 @@
 
 #include "i2c_bus.hpp"
 
-//! Configuration + read driver for the BMP180 (temperature in degC, pressure
-//! in Pa).
+// Configuration + read driver for the BMP180 (temperature in degC, pressure
+// in Pa).
 class BMP180
 {
  public:
-  static constexpr uint8_t address = 0x77;         //!< fixed I2C address
-  static constexpr uint8_t expectedChipId = 0x55;  //!< value of ID register
+  static constexpr uint8_t address = 0x77;         // fixed I2C address
+  static constexpr uint8_t expectedChipId = 0x55;  // value of ID register
 
-  //! Pressure oversampling setting (more samples = less noise, more time).
+  // Pressure oversampling setting (more samples = less noise, more time).
   enum class Oversampling { ULTRA_LOW = 0, STANDARD = 1, HIGH = 2,
                             ULTRA_HIGH = 3 };
 
@@ -59,7 +59,7 @@ class BMP180
   bool ReadRawPressure(int32_t& up) const;
 
   const I2CBus* bus;
-  int oss;  //!< oversampling value 0..3
+  int oss;  // oversampling value 0..3
 
   // Factory calibration coefficients (datasheet section 3.4).
   int16_t ac1, ac2, ac3;

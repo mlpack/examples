@@ -18,15 +18,15 @@
 
 #include "i2c_bus.hpp"
 
-//! Configuration + read driver for the L3GD20H gyroscope (output in dps).
+// Configuration + read driver for the L3GD20H gyroscope (output in dps).
 class L3GD20H
 {
  public:
-  static constexpr uint8_t defaultAddress = 0x6B;    //!< SDO/SA0 high
-  static constexpr uint8_t alternateAddress = 0x6A;  //!< SDO/SA0 low
+  static constexpr uint8_t defaultAddress = 0x6B;    // SDO/SA0 high
+  static constexpr uint8_t alternateAddress = 0x6A;  // SDO/SA0 low
   static constexpr uint8_t whoAmIValue = 0xD7;
-  //! Some clone GY-89 boards carry the older L3GD20 (non-H), which is
-  //! register-compatible but reports this WHO_AM_I instead.
+  // Some clone GY-89 boards carry the older L3GD20 (non-H), which is
+  // register-compatible but reports this WHO_AM_I instead.
   static constexpr uint8_t whoAmIValueL3GD20 = 0xD4;
 
   enum class Scale { DPS_245, DPS_500, DPS_2000 };
@@ -45,14 +45,14 @@ class L3GD20H
    */
   bool Begin(bool& identityMatched, uint8_t& whoAmI) const;
 
-  //! Read angular rate of all three axes (dps).  False on I2C error.
+  // Read angular rate of all three axes (dps).  False on I2C error.
   bool Read(float& gx, float& gy, float& gz) const;
 
  private:
   const I2CBus* bus;
   uint8_t address;
   Scale scale;
-  float sensitivity;  //!< dps per LSB for the configured full scale.
+  float sensitivity;  // dps per LSB for the configured full scale.
 };
 
 #endif
