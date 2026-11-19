@@ -38,65 +38,13 @@
 
 #include "driver/sensor_board.hpp"
 
-uint64_t UnixMicros()
-{
-  struct timespec ts;
-  clock_gettime(CLOCK_REALTIME, &ts);
-  return static_cast<uint64_t>(ts.tv_sec) * 1000000ull + ts.tv_nsec / 1000;
-}
-
-/*
- * Save collected data set in the following format:
- * "<dir>/<label>_<YYYYmmdd-HHMMSS>.csv".
- */ 
-std::string MakeFilename(const std::string& dir, const std::string& label)
-{
-  const time_t now = std::time(nullptr);
-  struct tm tmv;
-  localtime_r(&now, &tmv);
-  char stamp[32];
-  std::strftime(stamp, sizeof(stamp), "%Y%m%d-%H%M%S", &tmv);
-  return dir + "/" + label + "_" + stamp + ".csv";
-}
-
-void WriteHeader(std::ostream& f, const Sensors& s)
-{
-  f << "timestamp_unix_us";
-
-  if (s.accel)
-    f << ",ax,ay,az";
-  if (s.gyro)
-    f << ",gx,gy,gz";
-  if (s.mag)
-    f << ",mx,my,mz";
-  if (s.baro)
-    f << ",pressure_pa,temp_c";
-
-  f << "\n";
-}
-
-void WriteRow(std::ostream& f, const Sensors& s, uint64_t ts, const Reading& r)
-{
-  const ImuSample& m = r.motion;
-  f << ts;
-  if (s.accel)
-    f << "," << m.ax << "," << m.ay << "," << m.az;
-  if (s.gyro)
-    f << "," << m.gx << "," << m.gy << "," << m.gz;
-  if (s.mag)
-    f << "," << m.mx << "," << m.my << "," << m.mz;
-  if (s.baro)
-    f << "," << r.pressurePa << "," << r.tempC;
-
-  f << "\n";
-}
-
 // Sample the board at `rateHz`, writing one CSV row per sample until the
 // duration elapses.
 int Record(const SensorBoard& board, std::ostream& csv,
            double rateHz, double durationSec)
 {
   using namespace std::chrono;
+  const Sensors& s = board.Selected();
   const steady_clock::duration period =
       duration_cast<steady_clock::duration>(duration<double>(1.0 / rateHz));
   const uint64_t durationMicros =
@@ -110,7 +58,11 @@ int Record(const SensorBoard& board, std::ostream& csv,
 
   while (true)
   {
-    const uint64_t ts = UnixMicros();
+    // Unix time in microseconds.
+    struct timespec now;
+    clock_gettime(CLOCK_REALTIME, &now);
+    const uint64_t ts =
+        static_cast<uint64_t>(now.tv_sec) * 1000000ull + now.tv_nsec / 1000;
 
     Reading reading;
 
@@ -121,7 +73,19 @@ int Record(const SensorBoard& board, std::ostream& csv,
       return 1;
     }
 
-    WriteRow(csv, board.Selected(), ts, reading);
+    // Write one CSV row.
+    const ImuSample& m = reading.motion;
+    csv << ts;
+    if (s.accel)
+      csv << "," << m.ax << "," << m.ay << "," << m.az;
+    if (s.gyro)
+      csv << "," << m.gx << "," << m.gy << "," << m.gz;
+    if (s.mag)
+      csv << "," << m.mx << "," << m.my << "," << m.mz;
+    if (s.baro)
+      csv << "," << reading.pressurePa << "," << reading.tempC;
+
+    csv << "\n";
 
     if (count == 0)
       firstTs = ts;
@@ -191,8 +155,14 @@ int main(int argc, char** argv)
   if (!board.Begin())
     return 1;
 
-  // Open one dated file named after the label.
-  const std::string path = MakeFilename(outDir, label);
+  // Open one dated file named after the label, in the following format:
+  // "<dir>/<label>_<YYYYmmdd-HHMMSS>.csv".
+  const time_t now = std::time(nullptr);
+  struct tm tmv;
+  localtime_r(&now, &tmv);
+  char stamp[32];
+  std::strftime(stamp, sizeof(stamp), "%Y%m%d-%H%M%S", &tmv);
+  const std::string path = outDir + "/" + label + "_" + stamp + ".csv";
 
   std::ofstream csv(path);
 
@@ -203,10 +173,20 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  // Six significant digits per value (see WriteRow); set once for the file.
+  // Six significant digits per value; set once for the file.
   csv << std::setprecision(6);
 
-  WriteHeader(csv, sensors);
+  csv << "timestamp_unix_us";
+  if (sensors.accel)
+    csv << ",ax,ay,az";
+  if (sensors.gyro)
+    csv << ",gx,gy,gz";
+  if (sensors.mag)
+    csv << ",mx,my,mz";
+  if (sensors.baro)
+    csv << ",pressure_pa,temp_c";
+  csv << "\n";
+
   std::cout << "Recording '" << label << "' (" << sensorSpec << ") at "
             << std::fixed << std::setprecision(0) << rateHz << " Hz to " << path
             << " for " << durationSec << " s.\n";
