@@ -22,16 +22,6 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <chrono>
-#include <deque>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <thread>
-#include <vector>
-
 // Enable mlpack's neural-network serialization so we can load the trained
 // network with data::Load (see the mnist_simple_f32 example).
 #define MLPACK_ENABLE_ANN_SERIALIZATION
@@ -135,7 +125,9 @@ int RunInference(const SensorBoard& board, MovementModel& model,
   const Sensors& sensors = board.Selected();
   const steady_clock::duration period =
       duration_cast<steady_clock::duration>(duration<double>(1.0 / rateHz));
-  std::deque<arma::fvec> buf;
+  // The (channels x window) window, filled one sample column at a time.
+  arma::fmat buf(sensors.Channels(), window);
+  size_t filled = 0;
 
   while (true)
   {
@@ -145,22 +137,17 @@ int RunInference(const SensorBoard& board, MovementModel& model,
       std::cerr << "error: I2C read failed during sampling\n";
       return 1;
     }
-    buf.push_back(SampleToColumn(sensors, reading));
+    buf.col(filled++) = SampleToColumn(sensors, reading);
 
-    if (buf.size() >= window)
+    if (filled == window)
     {
-      // Pack the last `window` samples into a (channels x window) matrix.
-      arma::fmat win(sensors.Channels(), window);
-      for (size_t j = 0; j < window; ++j)
-        win.col(j) = buf[j];
-
-      const std::string pred = model.Classify(WindowToFeatures(win));
+      const std::string pred = model.Classify(WindowToFeatures(buf));
       // std::endl flushes, so each prediction appears live.
       std::cout << "predict: " << pred << std::endl;
 
       // Slide the window forward by `step` samples.
-      for (size_t j = 0; j < step && !buf.empty(); ++j)
-        buf.pop_front();
+      buf.cols(0, window - step - 1) = buf.cols(step, window - 1);
+      filled = window - step;
     }
 
     std::this_thread::sleep_for(period);
