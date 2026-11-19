@@ -46,8 +46,6 @@ class IMU
   //! Read one synchronized, timestamped 9-DOF sample.  False on I2C error.
   bool Sample(ImuSample& out) const;
 
-  const LSM303D& AccelMag() const { return accelMag; }
-
  private:
   L3GD20H gyro;
   LSM303D accelMag;

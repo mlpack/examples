@@ -2,7 +2,7 @@
 # recognition tutorial:
 #   https://www.mlpack.org/doc/tutorials/movement_recognition.html
 #
-#   imu_test  -- sensor check + magnetometer calibration
+#   imu_test  -- sensor check
 #   collect   -- record sensor data to CSV
 #   train     -- train a neural network from the CSVs
 #   infer     -- live inference from the IMU
