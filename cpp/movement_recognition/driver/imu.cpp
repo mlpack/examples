@@ -12,7 +12,6 @@
 #include "imu.hpp"
 
 #include <cstdio>
-#include <thread>
 
 IMU::IMU(const I2CBus& bus, uint8_t gyroAddress, uint8_t accelMagAddress) :
     gyro(bus, gyroAddress),
@@ -60,28 +59,5 @@ bool IMU::Sample(ImuSample& out) const
   if (!accelMag.ReadMag(out.mx, out.my, out.mz))
     return false;
 
-  return true;
-}
-
-bool IMU::RunSamplingLoop(
-    double rateHz,
-    const std::function<bool(const ImuSample&)>& onSample) const
-{
-  using namespace std::chrono;
-  const double safeRate = (rateHz > 0.0) ? rateHz : 1.0;
-  const auto period =
-      duration_cast<steady_clock::duration>(duration<double>(1.0 / safeRate));
-
-  auto nextTick = steady_clock::now();
-  ImuSample sample;
-  while (true)
-  {
-    if (!Sample(sample))
-      return false;  // I2C read error
-    if (!onSample(sample))
-      break;
-    nextTick += period;
-    std::this_thread::sleep_until(nextTick);
-  }
   return true;
 }

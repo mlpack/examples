@@ -16,9 +16,7 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <atomic>
 #include <chrono>
-#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -30,10 +28,6 @@
 #include "mag_calibration.hpp"
 
 namespace {
-
-std::atomic<bool> g_stop{false};
-
-void HandleSigint(int) { g_stop = true; }
 
 // Sleep helper that keeps an absolute schedule (no rate drift).
 template<typename TimePoint>
@@ -59,8 +53,8 @@ int RunCalibration(const char* outFile, const char* device, double seconds)
   imu.Begin();  // configure the chips; raw mag is read via AccelMag() below
 
   std::printf("Magnetometer calibration: slowly rotate the board through ALL\n"
-              "orientations (figure-eights, turning it over) for %.0f s. "
-              "Ctrl-C to stop early.\n\n", seconds);
+              "orientations (figure-eights, turning it over) for %.0f s.\n\n",
+              seconds);
 
   float minVals[3] = { std::numeric_limits<float>::max(),
                        std::numeric_limits<float>::max(),
@@ -77,7 +71,7 @@ int RunCalibration(const char* outFile, const char* device, double seconds)
 
   auto next = start;
   unsigned long count = 0;
-  while (!g_stop.load() && steady_clock::now() < deadline)
+  while (steady_clock::now() < deadline)
   {
     float mx, my, mz;
     if (!imu.AccelMag().ReadMag(mx, my, mz))
@@ -164,7 +158,17 @@ int RunStream(const char* device, double rateHz)
   std::printf("%10s | %-23s | %-23s | %-23s\n", "t[s]",
               "accel[g] x y z", "gyro[dps] x y z", "mag[gauss] x y z");
 
-  const bool ok = imu.RunSamplingLoop(rateHz, [](const ImuSample& s) {
+  using namespace std::chrono;
+  const auto period =
+      duration_cast<steady_clock::duration>(duration<double>(1.0 / rateHz));
+  ImuSample s;
+  while (true)
+  {
+    if (!imu.Sample(s))
+    {
+      std::fprintf(stderr, "\nError: I2C read failed during sampling.\n");
+      return 1;
+    }
     std::printf("\r%10.3f | %7.3f %7.3f %7.3f | %7.1f %7.1f %7.1f | "
                 "%7.3f %7.3f %7.3f",
                 s.timestampMicros / 1e6,
@@ -172,24 +176,14 @@ int RunStream(const char* device, double rateHz)
                 s.gx, s.gy, s.gz,
                 s.mx, s.my, s.mz);
     std::fflush(stdout);
-    return !g_stop.load();
-  });
-
-  if (!ok)
-  {
-    std::fprintf(stderr, "\nError: I2C read failed during sampling.\n");
-    return 1;
+    std::this_thread::sleep_for(period);
   }
-  std::printf("\nStopped.\n");
-  return 0;
 }
 
 }  // namespace
 
 int main(int argc, char** argv)
 {
-  std::signal(SIGINT, HandleSigint);
-
   if (argc > 1 && !std::strcmp(argv[1], "--calibrate"))
   {
     if (argc < 3)

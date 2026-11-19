@@ -18,7 +18,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <functional>
 
 #include "i2c_bus.hpp"
 #include "imu_sample.hpp"
@@ -26,8 +25,7 @@
 #include "lsm303d.hpp"
 
 /**
- * Composite 9-DOF IMU.  Construct it, call Begin(), then Sample() or
- * RunSamplingLoop().
+ * Composite 9-DOF IMU.  Construct it, call Begin(), then Sample().
  */
 class IMU
 {
@@ -48,18 +46,6 @@ class IMU
   //! Read one synchronized, timestamped 9-DOF sample.  False on I2C error.
   bool Sample(ImuSample& out) const;
 
-  /**
-   * Fixed-rate sampling loop.  Calls `onSample` for each reading; stops when it
-   * returns false.  Uses an absolute (sleep_until) schedule so callback jitter
-   * does not drift the average rate.
-   *
-   * @return true if stopped by the callback; false if a sensor read failed.
-   */
-  bool RunSamplingLoop(double rateHz,
-                       const std::function<bool(const ImuSample&)>& onSample)
-      const;
-
-  const L3GD20H& Gyro() const { return gyro; }
   const LSM303D& AccelMag() const { return accelMag; }
 
  private:
