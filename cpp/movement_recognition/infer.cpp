@@ -206,7 +206,7 @@ int main(int argc, char** argv)
               << " -- they must match training.\n";
     return 1;
   }
-  std::cerr << "loaded model from '" << modelDir << "' (window " << window
+  std::cout << "loaded model from '" << modelDir << "' (window " << window
             << ", " << model.classes.size() << " classes)\n";
 
   // The whole GY-89 board behind one object: open the bus and bring up only the
