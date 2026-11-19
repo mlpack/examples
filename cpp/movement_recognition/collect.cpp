@@ -38,12 +38,14 @@
 
 #include "driver/sensor_board.hpp"
 
+using namespace std;
+
 // Sample the board at `rateHz`, writing one CSV row per sample until the
 // duration elapses.
-int Record(const SensorBoard& board, std::ostream& csv,
+int Record(const SensorBoard& board, ostream& csv,
            double rateHz, double durationSec)
 {
-  using namespace std::chrono;
+  using namespace chrono;
   const Sensors& s = board.Selected();
   const steady_clock::duration period =
       duration_cast<steady_clock::duration>(duration<double>(1.0 / rateHz));
@@ -68,8 +70,8 @@ int Record(const SensorBoard& board, std::ostream& csv,
 
     if (!board.Read(reading))
     {
-      std::cerr << "\nerror: I2C read failed during sampling: "
-                << std::strerror(errno) << "\n";
+      cerr << "\nerror: I2C read failed during sampling: "
+                << strerror(errno) << "\n";
       return 1;
     }
 
@@ -93,20 +95,20 @@ int Record(const SensorBoard& board, std::ostream& csv,
     lastTs = ts;
 
     if (++count % kProgressEvery == 0)
-      std::cout << "\r  " << count << " samples..." << std::flush;
+      cout << "\r  " << count << " samples..." << flush;
 
     if (ts - firstTs >= durationMicros)
       break;
 
     nextTick += period;
-    std::this_thread::sleep_until(nextTick);
+    this_thread::sleep_until(nextTick);
   }
 
   const double elapsed = (count > 1) ? (lastTs - firstTs) / 1e6 : 0.0;
   const double effHz = (elapsed > 0.0) ? (count - 1) / elapsed : 0.0;
-  std::cout << "\rWrote " << count << " samples in "
-            << std::fixed << std::setprecision(2) << elapsed << " s (effective "
-            << std::setprecision(1) << effHz << " Hz).\n";
+  cout << "\rWrote " << count << " samples in "
+            << fixed << setprecision(2) << elapsed << " s (effective "
+            << setprecision(1) << effHz << " Hz).\n";
   return 0;
 }
 
@@ -114,28 +116,28 @@ int main(int argc, char** argv)
 {
   if (argc < 2)
   {
-    std::cerr << "Usage: " << argv[0] << " <label> [sensors] [out-dir] [device]"
+    cerr << "Usage: " << argv[0] << " <label> [sensors] [out-dir] [device]"
                  " [rate-hz] <duration-sec>\n"
                  "  duration-sec is required and must be > 0\n";
     return 1;
   }
 
-  const std::string label      = argv[1];
-  const std::string sensorSpec = argc > 2 ? argv[2] : "all";
-  const std::string outDir     = argc > 3 ? argv[3] : ".";
-  const std::string device     = argc > 4 ? argv[4] : "/dev/i2c-0";
-  const double rateHz          = argc > 5 ? std::stod(argv[5]) : 100.0;
-  const double durationSec     = argc > 6 ? std::stod(argv[6]) : 0.0;
+  const string label      = argv[1];
+  const string sensorSpec = argc > 2 ? argv[2] : "all";
+  const string outDir     = argc > 3 ? argv[3] : ".";
+  const string device     = argc > 4 ? argv[4] : "/dev/i2c-0";
+  const double rateHz          = argc > 5 ? stod(argv[5]) : 100.0;
+  const double durationSec     = argc > 6 ? stod(argv[6]) : 0.0;
 
   if (rateHz <= 0.0)
   {
-    std::cerr << "error: rate-hz must be > 0\n";
+    cerr << "error: rate-hz must be > 0\n";
     return 2;
   }
 
   if (durationSec <= 0.0)
   {
-    std::cerr << "error: duration-sec is required and must be > 0\n";
+    cerr << "error: duration-sec is required and must be > 0\n";
     return 2;
   }
 
@@ -143,7 +145,7 @@ int main(int argc, char** argv)
 
   if (!ParseSensors(sensorSpec, sensors))
   {
-    std::cerr << "error: sensors must be 'all' or a comma list of "
+    cerr << "error: sensors must be 'all' or a comma list of "
                  "accel,gyro,mag,baro\n";
     return 2;
   }
@@ -157,24 +159,24 @@ int main(int argc, char** argv)
 
   // Open one dated file named after the label, in the following format:
   // "<dir>/<label>_<YYYYmmdd-HHMMSS>.csv".
-  const time_t now = std::time(nullptr);
+  const time_t now = time(nullptr);
   struct tm tmv;
   localtime_r(&now, &tmv);
   char stamp[32];
-  std::strftime(stamp, sizeof(stamp), "%Y%m%d-%H%M%S", &tmv);
-  const std::string path = outDir + "/" + label + "_" + stamp + ".csv";
+  strftime(stamp, sizeof(stamp), "%Y%m%d-%H%M%S", &tmv);
+  const string path = outDir + "/" + label + "_" + stamp + ".csv";
 
-  std::ofstream csv(path);
+  ofstream csv(path);
 
   if (!csv)
   {
-    std::cerr << "error: cannot open '" << path << "' for writing: "
-              << std::strerror(errno) << "\n";
+    cerr << "error: cannot open '" << path << "' for writing: "
+              << strerror(errno) << "\n";
     return 1;
   }
 
   // Six significant digits per value; set once for the file.
-  csv << std::setprecision(6);
+  csv << setprecision(6);
 
   csv << "timestamp_unix_us";
   if (sensors.accel)
@@ -187,13 +189,9 @@ int main(int argc, char** argv)
     csv << ",pressure_pa,temp_c";
   csv << "\n";
 
-  std::cout << "Recording '" << label << "' (" << sensorSpec << ") at "
-            << std::fixed << std::setprecision(0) << rateHz << " Hz to " << path
+  cout << "Recording '" << label << "' (" << sensorSpec << ") at "
+            << fixed << setprecision(0) << rateHz << " Hz to " << path
             << " for " << durationSec << " s.\n";
 
-  const int rc = Record(board, csv, rateHz, durationSec);
-
-  csv.close();
-
-  return rc;
+  return Record(board, csv, rateHz, durationSec);
 }
