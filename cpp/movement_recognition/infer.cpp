@@ -129,32 +129,12 @@ arma::fvec SampleToColumn(const Sensors& s, const Reading& r)
 // See train.cpp for the full pipeline (recording -> sliding windows -> here).
 // ===========================================================================
 
-// Classify one feature column -> class name (arg-max of the network output).
-// Apply the SAME standardization train fitted (the scaler works in f32)
-// before predicting.
-std::string Classify(Network& nn, data::StandardScaler<arma::fmat>& scaler,
-                     const std::vector<std::string>& classes,
-                     const arma::fmat& feat)
-{
-  // The scaler works directly on f32 matrices, so no double conversion is
-  // needed.
-  arma::fmat scaled;
-  scaler.Transform(feat, scaled);
-
-  arma::fmat scores;
-  nn.Predict(scaled, scores);
-  const size_t idx = scores.col(0).index_max();
-  return idx < classes.size() ? classes[idx] : "?";
-}
-
 // --- the live classification loop -------------------------------------------
 
 // Sample the board at `rateHz`, and every time `window` samples have been
 // buffered, turn them into features, classify, print the prediction, and slide
 // the window forward by `step`.  Runs until Ctrl-C.
-int RunInference(const SensorBoard& board, Network& nn,
-                 data::StandardScaler<arma::fmat>& scaler,
-                 const std::vector<std::string>& classes,
+int RunInference(const SensorBoard& board, MovementModel& model,
                  size_t window, size_t step, double rateHz)
 {
   using namespace std::chrono;
@@ -181,8 +161,7 @@ int RunInference(const SensorBoard& board, Network& nn,
       for (size_t j = 0; j < window; ++j)
         win.col(j) = buf[j];
 
-      const std::string pred =
-          Classify(nn, scaler, classes, WindowToFeatures(win));
+      const std::string pred = model.Classify(WindowToFeatures(win));
       // std::endl flushes, so each prediction appears live.
       std::cout << "predict: " << pred << std::endl;
 
@@ -259,6 +238,5 @@ int main(int argc, char** argv)
 
   std::signal(SIGINT, HandleSigint);
 
-  return RunInference(board, model.net, model.scaler, model.classes,
-                      window, step, rateHz);
+  return RunInference(board, model, window, step, rateHz);
 }

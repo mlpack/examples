@@ -18,6 +18,19 @@ struct MovementModel
   mlpack::data::StandardScaler<arma::fmat> scaler;
   std::vector<std::string> classes;
 
+  // Classify one feature column and return the class name.  The features are
+  // standardized with the scaler fitted in train before predicting.
+  std::string Classify(const arma::fmat& feat)
+  {
+    arma::fmat scaled;
+    scaler.Transform(feat, scaled);
+
+    arma::fmat scores;
+    net.Predict(scaled, scores);
+    const size_t idx = scores.col(0).index_max();
+    return idx < classes.size() ? classes[idx] : "?";
+  }
+
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int /* version */)
   {
