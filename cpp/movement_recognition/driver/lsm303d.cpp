@@ -108,7 +108,7 @@ bool LSM303D::Begin(bool& identityMatched, uint8_t& whoAmI) const
   whoAmI = 0;
   if (!bus->ReadRegister(address, REG_WHO_AM_I, whoAmI))
     return false;
-  identityMatched = (whoAmI == kWhoAmIValue);
+  identityMatched = (whoAmI == whoAmIValue);
 
   // CTRL1: AODR=0110 (100 Hz), Z/Y/X enabled (low three bits) -> 0x67.
   if (!bus->WriteRegister(address, REG_CTRL1, 0x67))

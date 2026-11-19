@@ -65,7 +65,7 @@ bool L3GD20H::Begin(bool& identityMatched, uint8_t& whoAmI) const
   whoAmI = 0;
   if (!bus->ReadRegister(address, REG_WHO_AM_I, whoAmI))
     return false;
-  identityMatched = (whoAmI == kWhoAmIValue || whoAmI == kWhoAmIValueL3GD20);
+  identityMatched = (whoAmI == whoAmIValue || whoAmI == whoAmIValueL3GD20);
 
   // CTRL1: ODR ~100 Hz, normal mode (PD=1), Z/Y/X enabled (low nibble 0xF).
   if (!bus->WriteRegister(address, REG_CTRL1, 0x0F))

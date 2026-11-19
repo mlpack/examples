@@ -53,7 +53,7 @@ int Record(const SensorBoard& board, ostream& csv,
       static_cast<uint64_t>(durationSec * 1e6);
 
   // Report progress to the terminal every this many samples.
-  constexpr uint64_t kProgressEvery = 50;
+  constexpr uint64_t progressEvery = 50;
 
   uint64_t count = 0, firstTs = 0, lastTs = 0;
   steady_clock::time_point nextTick = steady_clock::now();
@@ -94,7 +94,7 @@ int Record(const SensorBoard& board, ostream& csv,
 
     lastTs = ts;
 
-    if (++count % kProgressEvery == 0)
+    if (++count % progressEvery == 0)
       cout << "\r  " << count << " samples..." << flush;
 
     if (ts - firstTs >= durationMicros)

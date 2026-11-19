@@ -56,7 +56,7 @@ int RunStream(const char* device, double rateHz)
   else
   {
     std::printf("BMP180 not detected (chip id 0x%02X, expected 0x%02X).\n",
-                baroChip, BMP180::kChipId);
+                baroChip, BMP180::expectedChipId);
   }
 
   std::printf("\nSampling IMU at %.0f Hz on %s. Press Ctrl-C to stop.\n",

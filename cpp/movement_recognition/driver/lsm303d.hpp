@@ -21,15 +21,15 @@
 class LSM303D
 {
  public:
-  static constexpr uint8_t kDefaultAddress = 0x1D;    //!< SDO/SA0 high
-  static constexpr uint8_t kAlternateAddress = 0x1E;  //!< SDO/SA0 low
-  static constexpr uint8_t kWhoAmIValue = 0x49;
+  static constexpr uint8_t defaultAddress = 0x1D;    //!< SDO/SA0 high
+  static constexpr uint8_t alternateAddress = 0x1E;  //!< SDO/SA0 low
+  static constexpr uint8_t whoAmIValue = 0x49;
 
   enum class AccelScale { G_2, G_4, G_6, G_8, G_16 };
   enum class MagScale { GAUSS_2, GAUSS_4, GAUSS_8, GAUSS_12 };
 
   LSM303D(const I2CBus& bus,
-          uint8_t address = kDefaultAddress,
+          uint8_t address = defaultAddress,
           AccelScale accelScale = AccelScale::G_2,
           MagScale magScale = MagScale::GAUSS_4);
 

@@ -7,7 +7,7 @@
  * into fixed-length windows, turned into FFT power-spectrum features, and used
  * to train a small f32 feed-forward network.
  *
- * The window size and step are hardcoded constants (kWindow / kStep) at the top
+ * The window size and step are hardcoded constants (window / step) at the top
  * of main(); edit them in the source if your movements are slower or faster.
  *
  *   train DIR model            # data dir, output directory "model"

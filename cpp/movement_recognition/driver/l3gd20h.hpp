@@ -22,17 +22,17 @@
 class L3GD20H
 {
  public:
-  static constexpr uint8_t kDefaultAddress = 0x6B;    //!< SDO/SA0 high
-  static constexpr uint8_t kAlternateAddress = 0x6A;  //!< SDO/SA0 low
-  static constexpr uint8_t kWhoAmIValue = 0xD7;
+  static constexpr uint8_t defaultAddress = 0x6B;    //!< SDO/SA0 high
+  static constexpr uint8_t alternateAddress = 0x6A;  //!< SDO/SA0 low
+  static constexpr uint8_t whoAmIValue = 0xD7;
   //! Some clone GY-89 boards carry the older L3GD20 (non-H), which is
   //! register-compatible but reports this WHO_AM_I instead.
-  static constexpr uint8_t kWhoAmIValueL3GD20 = 0xD4;
+  static constexpr uint8_t whoAmIValueL3GD20 = 0xD4;
 
   enum class Scale { DPS_245, DPS_500, DPS_2000 };
 
   L3GD20H(const I2CBus& bus,
-          uint8_t address = kDefaultAddress,
+          uint8_t address = defaultAddress,
           Scale scale = Scale::DPS_245);
 
   /**

@@ -31,8 +31,8 @@ class IMU
 {
  public:
   IMU(const I2CBus& bus,
-      uint8_t gyroAddress = L3GD20H::kDefaultAddress,
-      uint8_t accelMagAddress = LSM303D::kDefaultAddress);
+      uint8_t gyroAddress = L3GD20H::defaultAddress,
+      uint8_t accelMagAddress = LSM303D::defaultAddress);
 
   /**
    * Configure both chips and start the timestamp clock.  Prints a warning to

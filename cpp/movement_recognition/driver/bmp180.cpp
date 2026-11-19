@@ -48,9 +48,9 @@ bool BMP180::Read16(uint8_t reg, uint16_t& out) const
   // The BMP180 does not use the auto-increment convention of the other GY-89
   // chips, so read the two bytes as separate register accesses.
   uint8_t msb, lsb;
-  if (!bus->ReadRegister(kAddress, reg, msb))
+  if (!bus->ReadRegister(address, reg, msb))
     return false;
-  if (!bus->ReadRegister(kAddress, static_cast<uint8_t>(reg + 1), lsb))
+  if (!bus->ReadRegister(address, static_cast<uint8_t>(reg + 1), lsb))
     return false;
   out = static_cast<uint16_t>((static_cast<uint16_t>(msb) << 8) | lsb);
   return true;
@@ -60,9 +60,9 @@ bool BMP180::Begin(bool& identityMatched, uint8_t& chipId)
 {
   identityMatched = false;
   chipId = 0;
-  if (!bus->ReadRegister(kAddress, REG_CHIP_ID, chipId))
+  if (!bus->ReadRegister(address, REG_CHIP_ID, chipId))
     return false;
-  identityMatched = (chipId == kChipId);
+  identityMatched = (chipId == expectedChipId);
 
   // Read the 11 calibration coefficients (0xAA..0xBF, big-endian 16-bit).
   uint16_t raw[11];
@@ -87,7 +87,7 @@ bool BMP180::Begin(bool& identityMatched, uint8_t& chipId)
 
 bool BMP180::ReadRawTemperature(int32_t& ut) const
 {
-  if (!bus->WriteRegister(kAddress, REG_CONTROL, CMD_READ_TEMP))
+  if (!bus->WriteRegister(address, REG_CONTROL, CMD_READ_TEMP))
     return false;
   SleepMs(5);
   uint16_t value;
@@ -99,17 +99,17 @@ bool BMP180::ReadRawTemperature(int32_t& ut) const
 
 bool BMP180::ReadRawPressure(int32_t& up) const
 {
-  if (!bus->WriteRegister(kAddress, REG_CONTROL,
+  if (!bus->WriteRegister(address, REG_CONTROL,
                           static_cast<uint8_t>(CMD_READ_PRES | (oss << 6))))
     return false;
   SleepMs(CONVERSION_MS[oss]);
 
   uint8_t msb, lsb, xlsb;
-  if (!bus->ReadRegister(kAddress, REG_OUT_MSB, msb))
+  if (!bus->ReadRegister(address, REG_OUT_MSB, msb))
     return false;
-  if (!bus->ReadRegister(kAddress, REG_OUT_MSB + 1, lsb))
+  if (!bus->ReadRegister(address, REG_OUT_MSB + 1, lsb))
     return false;
-  if (!bus->ReadRegister(kAddress, REG_OUT_MSB + 2, xlsb))
+  if (!bus->ReadRegister(address, REG_OUT_MSB + 2, xlsb))
     return false;
 
   up = ((static_cast<int32_t>(msb) << 16) |

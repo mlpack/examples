@@ -31,7 +31,7 @@ bool IMU::Begin()
                  "wiring, the bus/pinmux, and the gyro address.\n");
   else if (!gyroId)
     std::fprintf(stderr, "IMU: L3GD20H WHO_AM_I mismatch (got 0x%02X, expected "
-                 "0x%02X).\n", gyroWho, L3GD20H::kWhoAmIValue);
+                 "0x%02X).\n", gyroWho, L3GD20H::whoAmIValue);
 
   const bool amIo = accelMag.Begin(amId, amWho);
   if (!amIo)
@@ -39,7 +39,7 @@ bool IMU::Begin()
                  "wiring, the bus/pinmux, and the accel/mag address.\n");
   else if (!amId)
     std::fprintf(stderr, "IMU: LSM303D WHO_AM_I mismatch (got 0x%02X, expected "
-                 "0x%02X).\n", amWho, LSM303D::kWhoAmIValue);
+                 "0x%02X).\n", amWho, LSM303D::whoAmIValue);
 
   epoch = std::chrono::steady_clock::now();
   return gyroIo && amIo && gyroId && amId;

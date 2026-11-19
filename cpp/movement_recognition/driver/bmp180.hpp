@@ -25,8 +25,8 @@
 class BMP180
 {
  public:
-  static constexpr uint8_t kAddress = 0x77;   //!< fixed I2C address
-  static constexpr uint8_t kChipId = 0x55;    //!< value of the ID register
+  static constexpr uint8_t address = 0x77;         //!< fixed I2C address
+  static constexpr uint8_t expectedChipId = 0x55;  //!< value of ID register
 
   //! Pressure oversampling setting (more samples = less noise, more time).
   enum class Oversampling { ULTRA_LOW = 0, STANDARD = 1, HIGH = 2,
@@ -37,7 +37,8 @@ class BMP180
   /**
    * Verify the chip ID and read the factory calibration coefficients.
    *
-   * @param identityMatched set to whether the ID register matched kChipId.
+   * @param identityMatched set to whether the ID register matched
+   *     expectedChipId.
    * @param chipId set to the raw ID byte that was read.
    * @return true if all I2C transactions succeeded; false on an I2C error.
    */
