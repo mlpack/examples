@@ -22,9 +22,7 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  */
-#include <atomic>
 #include <chrono>
-#include <csignal>
 #include <deque>
 #include <filesystem>
 #include <fstream>
@@ -45,10 +43,6 @@
 #include "driver/sensor_board.hpp"
 
 using namespace mlpack;
-
-
-std::atomic<bool> g_stop{false};
-void HandleSigint(int) { g_stop = true; }
 
 // Read the data from the sensors in the same order that has been used in
 // collect.cpp, if the order changes there, then this one needs to be adapted.
@@ -142,9 +136,8 @@ int RunInference(const SensorBoard& board, MovementModel& model,
   const steady_clock::duration period =
       duration_cast<steady_clock::duration>(duration<double>(1.0 / rateHz));
   std::deque<arma::fvec> buf;
-  steady_clock::time_point nextTick = steady_clock::now();
 
-  while (!g_stop.load())
+  while (true)
   {
     Reading reading;
     if (!board.Read(reading))
@@ -170,8 +163,7 @@ int RunInference(const SensorBoard& board, MovementModel& model,
         buf.pop_front();
     }
 
-    nextTick += period;
-    std::this_thread::sleep_until(nextTick);
+    std::this_thread::sleep_for(period);
   }
   return 0;
 }
@@ -235,8 +227,6 @@ int main(int argc, char** argv)
   SensorBoard board(device, sensors);
   if (!board.Begin())
     return 1;
-
-  std::signal(SIGINT, HandleSigint);
 
   return RunInference(board, model, window, step, rateHz);
 }
