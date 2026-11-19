@@ -23,6 +23,7 @@
 #include <mlpack.hpp>
 
 #include "model.hpp"
+#include "utils.hpp"
 
 using namespace mlpack;
 using namespace std;
@@ -161,23 +162,6 @@ bool LoadRecording(const fs::path& path, size_t window, fmat& raw)
 //              y  (  c0    c1    c2   ...  cM-1 )   class index per window
 //
 // ===========================================================================
-
-// Applying Fast Fourier Transform to extract frequency domain, to allow to
-// capture the periodicity. In addition to this we are adding time domain
-// information using statistical methods (mean, stddev, median) to capture the
-// intensity of the movements.
-fvec WindowToFeatures(const fmat& win)
-{
-  const size_t numBins = win.n_cols / 2 + 1;
-
-  const cx_fmat spectrum = fft(win.t());
-  const fmat power = square(abs(spectrum.rows(0, numBins - 1)));
-
-  return join_cols(vectorise(power),
-                   mean(win, 1),
-                   stddev(win, 0, 1),
-                   median(win, 1));
-}
 
 // Cut `raw` (channels x samples) into overlapping windows and turn each into one
 // feature column, appending the columns and their class to `cols`/`labels`.
@@ -384,11 +368,7 @@ int main(int argc, char** argv)
   fmat scores;
   model.net.Predict(testData, scores);
 
-  Row<size_t> pred(scores.n_cols);
-  for (size_t i = 0; i < scores.n_cols; ++i)
-  {
-    pred[i] = scores.col(i).index_max();
-  }
+  Row<size_t> pred = conv_to<Row<size_t>>::from(index_max(scores, 0));
   cout << "neural net test accuracy: "
        << (double) accu(pred == testLabels) / testLabels.n_elem
        << "\n";

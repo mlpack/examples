@@ -41,6 +41,7 @@
 #include <mlpack.hpp>
 
 #include "model.hpp"
+#include "utils.hpp"
 #include "driver/sensor_board.hpp"
 
 using namespace mlpack;
@@ -127,22 +128,6 @@ arma::fvec SampleToColumn(const Sensors& s, const Reading& r)
 //
 // See train.cpp for the full pipeline (recording -> sliding windows -> here).
 // ===========================================================================
-
-// A (channels x window) window -> one feature vector: the one-sided FFT power
-// spectrum of each channel, followed by per-channel mean, stddev, and median.
-// MUST match train's WindowToFeatures.
-arma::fvec WindowToFeatures(const arma::fmat& win)
-{
-  const size_t numBins = win.n_cols / 2 + 1;
-
-  const arma::cx_fmat spectrum = arma::fft(win.t());
-  const arma::fmat power = arma::square(arma::abs(spectrum.rows(0, numBins - 1)));
-
-  return arma::join_cols(arma::vectorise(power),
-                         arma::mean(win, 1),
-                         arma::stddev(win, 0, 1),
-                         arma::median(win, 1));
-}
 
 // Classify one feature column -> class name (arg-max of the network output).
 // Apply the SAME standardization train fitted (the scaler works in f32)
