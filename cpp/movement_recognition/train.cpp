@@ -49,26 +49,26 @@ bool LoadRecording(const fs::path& path, size_t window, fmat& raw)
   data::TextOptions opts;
   opts.HasHeaders() = true;
 
-  cerr << "  load " << path.filename().string() << " ... ";
+  cout << "  load " << path.filename().string() << " ... ";
 
   if (!data::Load(path.string(), raw, opts))
   {
-    cerr << "cannot load, skipped\n";
+    cout << "cannot load, skipped\n";
     return false;
   }
 
-  cerr << "loaded " << raw.n_rows << " rows (timestamp + channels) x "
+  cout << "loaded " << raw.n_rows << " rows (timestamp + channels) x "
        << raw.n_cols << " samples";
 
   if (raw.n_rows < 2)
   {
-    cerr << " -- < 2 rows, skipped\n";
+    cout << " -- < 2 rows, skipped\n";
     return false;
   }
 
   if (raw.n_cols < window)
   {
-    cerr << " -- fewer than the window size (" << window
+    cout << " -- fewer than the window size (" << window
          << ") samples, skipped\n";
     return false;
   }
@@ -182,11 +182,9 @@ fvec WindowToFeatures(const fmat& win)
 // Cut `raw` (channels x samples) into overlapping windows and turn each into one
 // feature column, appending the columns and their class to `cols`/`labels`.
 // Consecutive windows start `step` samples apart, so with step < window they
-// overlap.  Overlap is a cheap way to get more training windows out of the same
-// recording (a 50% overlap roughly doubles them), which measurably improves
-// accuracy; it also matches how `infer` slides its window at run time.  No
-// window taper is applied -- for these short, low-frequency movement windows a
-// rectangular window classifies better than a Hamming-tapered one.
+// overlap.  Overlap is allows us to get more training windows out of the same
+// recording (a 50% overlap roughly doubles them), which usually improves
+// accuracy; it also matches how `infer` slides its window at run time.
 void ExtractWindows(const fmat& raw, size_t window, size_t step,
                     size_t classIdx, vector<fvec>& cols,
                     vector<size_t>& labels)
@@ -201,68 +199,8 @@ void ExtractWindows(const fmat& raw, size_t window, size_t step,
   }
 
   const size_t numFeatures = cols.empty() ? 0 : cols.back().n_elem;
-  cerr << " -> " << numWindows << " windows of " << numFeatures
+  cout << " -> " << numWindows << " windows of " << numFeatures
        << " features\n";
-}
-
-// Train the network on the training split, report accuracy on the held-out test
-// split, and fill `net`.  `patience` is the early-stopping patience.
-void TrainNN(const fmat& trainData, const Row<size_t>& trainLabels,
-             const fmat& testData, const Row<size_t>& testLabels,
-             size_t numClasses, size_t patience, Network& net)
-{
-  net.Add<Linear<fmat>>(64);
-  net.Add<ReLU<fmat>>();
-  net.Add<Linear<fmat>>(numClasses);
-  net.Add<LogSoftMax<fmat>>();
-
-  const fmat responses = conv_to<fmat>::from(trainLabels);
-  const fmat testResponses = conv_to<fmat>::from(testLabels);
-
-  ens::Adam optimizer(
-      1e-2,    // step size (learning rate)
-      32,      // batch size
-      0.9,     // exp. decay for the 1st moment estimate
-      0.999,   // exp. decay for the 2nd moment estimate
-      1e-8,    // epsilon for numerical stability
-      0,       // max iterations: 0 = no limit
-      1e-8,    // tolerance
-      true);   // shuffle between epochs
-
-  double bestValLoss = numeric_limits<double>::infinity();
-  fmat bestParams;
-  ens::EarlyStopAtMinLossType<fmat> earlyStop(
-      [&](const fmat& /* param */)
-      {
-        const double valLoss = net.Evaluate(testData, testResponses);
-        if (valLoss < bestValLoss)
-        {
-          bestValLoss = valLoss;
-          bestParams = net.Parameters();
-        }
-        return valLoss;
-      },
-      patience);
-
-  net.Train(trainData, responses, optimizer,
-            ens::PrintLoss(),
-            ens::ProgressBar(),
-            earlyStop);
-
-  if (!bestParams.is_empty())
-    net.Parameters() = bestParams;
-
-  fmat scores;
-  net.Predict(testData, scores);
-
-  Row<size_t> pred(scores.n_cols);
-  for (size_t i = 0; i < scores.n_cols; ++i)
-  {
-    pred[i] = scores.col(i).index_max();
-  }
-  cout << "neural net test accuracy: "
-       << (double) accu(pred == testLabels) / testLabels.n_elem
-       << "\n";
 }
 
 int main(int argc, char** argv)
@@ -314,7 +252,7 @@ int main(int argc, char** argv)
       files.push_back(entry.path());
   }
 
-  cerr << "data dir '" << dataDir << "': " << files.size()
+  cout << "data dir '" << dataDir << "': " << files.size()
        << " .csv file(s), window=" << window << ", step=" << step << "\n";
   if (files.empty())
   {
@@ -340,7 +278,7 @@ int main(int argc, char** argv)
     }
     const size_t classIdx = classOf[label];
 
-    cerr << "[" << label << "]\n";
+    cout << "[" << label << "]\n";
 
     fmat raw;
     if (LoadRecording(path, window, raw))
@@ -360,13 +298,13 @@ int main(int argc, char** argv)
     }
   }
 
-  cerr << "totals: " << cols.size() << " windows, " << feat
+  cout << "totals: " << cols.size() << " windows, " << feat
        << " features, " << classNames.size() << " classes (";
   for (size_t i = 0; i < classNames.size(); ++i)
   {
-    cerr << (i ? ", " : "") << classNames[i];
+    cout << (i ? ", " : "") << classNames[i];
   }
-  cerr << ")\n";
+  cout << ")\n";
 
   if (cols.size() < 2 || classNames.size() < 2)
   {
@@ -390,7 +328,7 @@ int main(int argc, char** argv)
   fmat trainData, testData;
   Row<size_t> trainLabels, testLabels;
   data::Split(X, y, trainData, testData, trainLabels, testLabels, testSplit);
-  cerr << "split: " << trainData.n_cols << " train, " << testData.n_cols
+  cout << "split: " << trainData.n_cols << " train, " << testData.n_cols
        << " test\n";
 
   // Since we have features from time domain and frequency domain, it is
@@ -402,8 +340,58 @@ int main(int argc, char** argv)
   model.scaler.Transform(trainData, trainData);
   model.scaler.Transform(testData, testData);
 
-  TrainNN(trainData, trainLabels, testData, testLabels, classNames.size(),
-            patience, model.net);
+  model.net.Add<Linear<fmat>>(64);
+  model.net.Add<ReLU<fmat>>();
+  model.net.Add<Linear<fmat>>(classNames.size());
+  model.net.Add<LogSoftMax<fmat>>();
+
+  const fmat responses = conv_to<fmat>::from(trainLabels);
+  const fmat testResponses = conv_to<fmat>::from(testLabels);
+
+  ens::Adam optimizer(
+      1e-2,    // step size (learning rate)
+      32,      // batch size
+      0.9,     // exp. decay for the 1st moment estimate
+      0.999,   // exp. decay for the 2nd moment estimate
+      1e-8,    // epsilon for numerical stability
+      0,       // max iterations: 0 = no limit
+      1e-8,    // tolerance
+      true);   // shuffle between epochs
+
+  double bestValLoss = numeric_limits<double>::infinity();
+  fmat bestParams;
+  ens::EarlyStopAtMinLossType<fmat> earlyStop(
+      [&](const fmat& /* param */)
+      {
+        const double valLoss = model.net.Evaluate(testData, testResponses);
+        if (valLoss < bestValLoss)
+        {
+          bestValLoss = valLoss;
+          bestParams = model.net.Parameters();
+        }
+        return valLoss;
+      },
+      patience);
+
+  model.net.Train(trainData, responses, optimizer,
+                  ens::PrintLoss(),
+                  ens::ProgressBar(),
+                  earlyStop);
+
+  if (!bestParams.is_empty())
+    model.net.Parameters() = bestParams;
+
+  fmat scores;
+  model.net.Predict(testData, scores);
+
+  Row<size_t> pred(scores.n_cols);
+  for (size_t i = 0; i < scores.n_cols; ++i)
+  {
+    pred[i] = scores.col(i).index_max();
+  }
+  cout << "neural net test accuracy: "
+       << (double) accu(pred == testLabels) / testLabels.n_elem
+       << "\n";
 
   // Serialize the network, scaler, and class names together into model.bin.
   data::Save(modelFile, model, data::BIN);
