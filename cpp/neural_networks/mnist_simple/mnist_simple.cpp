@@ -53,7 +53,7 @@ int main()
   // Labeled dataset that contains data for training is loaded from CSV file,
   // rows represent features, columns represent data points.
   arma::mat dataset;
-  data::Load("../../../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, data::Fatal);
 
   // Originally on Kaggle dataset CSV file has header, so it's necessary to
   // get rid of the this row, in Armadillo representation it's the first column.
@@ -157,11 +157,11 @@ int main()
   cout << "Accuracy: train = " << trainAccuracy << "%,"
        << "\t valid = " << validAccuracy << "%" << endl;
 
-  data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", model, data::BIN);
 
   // Loading test dataset (the one whose predicted labels
   // should be sent to kaggle website).
-  data::Load("../../../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, data::Fatal);
   arma::mat testY = dataset.row(0);
   dataset.shed_row(0); // Strip labels before predicting.
   dataset /= 255.0; // Apply the same normalization as to the training data.

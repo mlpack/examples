@@ -59,8 +59,6 @@ double ComputeMSE(mat& pred, mat& Y)
 
 int main()
 {
-  //! Path to the dataset used for training and testing.
-  const string datasetPath = "../../../data/BodyFat.tsv";
   // File for saving the model.
   const string modelFile = "nn_regressor.bin";
 
@@ -98,10 +96,8 @@ int main()
 
   // In Armadillo rows represent features, columns represent data points.
   cout << "Reading data." << endl;
-  bool loadedDataset = data::Load(datasetPath, dataset, true);
-  // If dataset is not loaded correctly, exit.
-  if (!loadedDataset)
-    return -1;
+  data::Load("http://datasets.mlpack.org/examples/bodyfat.tsv", dataset,
+      data::Fatal);
 
   // Split the dataset into training and validation sets.
   arma::mat trainData, validData;
@@ -141,7 +137,7 @@ int main()
     {
       // The model will be trained further.
       cout << "Loading and further training the model." << endl;
-      data::Load(modelFile, "NNRegressor", model);
+      data::Load(modelFile, model, data::BIN);
     }
     else
     {
@@ -190,7 +186,7 @@ int main()
                 ens::EarlyStopAtMinLoss(20));
 
     cout << "Finished training. \nSaving Model" << endl;
-    data::Save(modelFile, "NNRegressor", model);
+    data::Save(modelFile, model, data::BIN);
     cout << "Model saved in " << modelFile << endl;
   }
 
@@ -199,7 +195,7 @@ int main()
   // The following steps will be performed after normalizing the dataset.
   FFN<MeanSquaredError, HeInitialization> modelP;
   // Load weights into the model.
-  data::Load(modelFile, "NNRegressor", modelP);
+  data::Load(modelFile, modelP, data::BIN);
 
   // Create predictions on the dataset.
   arma::mat predOut;
@@ -214,8 +210,5 @@ int main()
   // predictions.
   scaleY.InverseTransform(predOut, predOut);
   // Save the prediction results.
-  bool saved = data::Save("results.csv", predOut, true);
-
-  if (!saved)
-    cout << "Results have not been saved." << endl;
+  data::Save("results.csv", predOut, data::Fatal);
 }

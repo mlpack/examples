@@ -332,12 +332,8 @@ int main(int argc, char** argv)
       << " correct (" << testAccuracy << "%)." << endl;
 
   // Save the trained model.
-  data::Save("lstm_dga_detector_benign.bin",
-             "lstm_model",
-             benignModel,
-             true /* fatal on failure */);
-  data::Save("lstm_dga_detector_malicious.bin",
-             "lstm_model",
-             maliciousModel,
-             true /* fatal on failure */);
+  data::Save("lstm_dga_detector_benign.bin", benignModel,
+      data::BIN + data::Fatal);
+  data::Save("lstm_dga_detector_malicious.bin", maliciousModel,
+      data::BIN + data::Fatal);
 }

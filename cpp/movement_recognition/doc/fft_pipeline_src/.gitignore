@@ -1,0 +1,4 @@
+# Local build tooling / artefacts -- not part of the example.
+.venv/
+__pycache__/
+figures/.stamp

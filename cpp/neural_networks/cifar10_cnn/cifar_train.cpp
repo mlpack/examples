@@ -45,7 +45,7 @@ int main()
   // Cifar 10 Dataset containing 3072 features (32 * 32) + labels is loaded from
   // CSV file.
   mat dataset;
-  data::Load("../../../data/cifar-10_train.csv", dataset, true);
+  data::Load("../../../data/cifar-10_train.csv", dataset, data::Fatal);
 
   // Header column is dropped.
   dataset.shed_col(0);
@@ -143,5 +143,5 @@ int main()
        << "\t valid = " << validAccuracy <<"%" << endl;
 
   // Save trained model.
-  data::Save("cifarNet.xml", "model", model, false);
+  data::Save("cifarNet.xml", model, data::XML);
 }

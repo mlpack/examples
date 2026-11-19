@@ -13,7 +13,8 @@
  * 3-clause BSD license along with mlpack.  If not, see
  * http://www.opensource.org/licenses/BSD-3-Clause for more information.
  *
- * @author Daivik Nema
+ * @author Omar Shrit
+ * @author Ryan Curtin
  */
 #define MLPACK_ENABLE_ANN_SERIALIZATION
 #include <mlpack.hpp>
@@ -62,7 +63,7 @@ int main()
 
   // The original file can be downloaded from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../../../data/mnist_train.csv", dataset, true);
+  data::Load("../../../data/mnist_train.csv", dataset, data::Fatal);
 
   // Split the dataset into training and validation sets.
   arma::fmat train, valid;
@@ -206,14 +207,14 @@ int main()
   cout << "Accuracy: train = " << trainAccuracy << "%,"
             << "\t valid = " << validAccuracy << "%" << endl;
 
-  data::Save("model.bin", "model", model, false);
+  data::Save("model.bin", model, data::BIN);
 
   cout << "Predicting on test set..." << endl;
 
   // Get predictions on test data points.
   // The original file could be download from
   // https://www.kaggle.com/c/digit-recognizer/data
-  data::Load("../../../data/mnist_test.csv", dataset, true);
+  data::Load("../../../data/mnist_test.csv", dataset, data::Fatal);
   const arma::fmat testX = dataset.submat(1, 0, dataset.n_rows - 1, dataset.n_cols - 1)
       / 256.0;
   const arma::fmat testY = dataset.row(0);

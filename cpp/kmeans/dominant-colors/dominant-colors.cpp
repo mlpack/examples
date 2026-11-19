@@ -199,8 +199,8 @@ void dominantColors(std::string PathToImage, std::string PathToColorBars)
 {
   // Load the example image.
   arma::Mat<unsigned char> imageMatrix;
-  data::ImageInfo info;
-  data::Load(PathToImage, imageMatrix, info, false);
+  data::ImageOptions info;
+  data::Load(PathToImage, imageMatrix, info);
   // Print the image shape.
   std::cout << "Image info -"
             << " Width:" << info.Width()
