@@ -1,3 +1,4 @@
+#include <iostream>
 #include <mlpack.hpp>
 
 using namespace mlpack;
