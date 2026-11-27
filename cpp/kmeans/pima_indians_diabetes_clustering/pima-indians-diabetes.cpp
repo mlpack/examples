@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
   // Digestive and Kidney Diseases and can be used to predict whether a,
   // patient has diabetes based on certain diagnostic factors.,
   arma::mat input;
-  Load("../../../data/pima-indians-diabetes.csv", input, mlpack::Fatal);
+  Load("../../../data/pima-indians-diabetes.csv", input, Fatal);
   // Print the first 10 rows of the input data.,
   std::cout << std::setw(18) << "Pregnancies "
             << std::setw(10) << "Glucose "
