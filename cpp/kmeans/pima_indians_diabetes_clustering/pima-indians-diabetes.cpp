@@ -1,3 +1,4 @@
+
 /**,
  * @file pima-indians-diabetes.cpp,
  *,
@@ -8,6 +9,7 @@
  */
 #include <mlpack.hpp>
 #include <sstream>
+#include <iostream>
 
 // Header files to create and produce the plot using Python
 // You can use this header safely and uncomment the Scatter function 
@@ -22,7 +24,12 @@ int main(int argc, char* argv[])
   // Digestive and Kidney Diseases and can be used to predict whether a,
   // patient has diabetes based on certain diagnostic factors.,
   arma::mat input;
-  data::Load("../../../data/pima-indians-diabetes.csv", input);
+  if (!data::Load("../../../data/pima-indians-diabetes.csv", input))
+  {
+    std::cerr << "Failed to load the dataset." << std::endl;
+    return 1;
+  }
+
   // Print the first 10 rows of the input data.,
   std::cout << std::setw(18) << "Pregnancies "
             << std::setw(10) << "Glucose "
@@ -34,7 +41,7 @@ int main(int argc, char* argv[])
             << "Age "
             << "Outcome " << std::endl;
   
-  std::cout << input.submat(0, 0, input.n_rows - 1 , 10).t() << std::endl;
+  std::cout << input.submat(0, 0, input.n_rows - 1 , 9).t() << std::endl;
   // Split the labels last column.
   arma::rowvec labels = input.row(input.n_rows - 1);
   arma::mat dataset = input.rows(0, input.n_rows - 2);
@@ -45,7 +52,7 @@ int main(int argc, char* argv[])
   pca.Apply(dataset, 2);
   
   // Print the first ten columns of the transformed input.
-  std::cout << dataset.cols(0, 10).t() << std::endl;
+  std::cout << dataset.cols(0, 9).t() << std::endl;
 
   // Plot the transformed input. 
   // Get the data to for the indices.
@@ -124,3 +131,4 @@ int main(int argc, char* argv[])
           //iterations,  [> Number of optimization steps. <]
           //"output.gif" [> Output file. <]);
 }
+
